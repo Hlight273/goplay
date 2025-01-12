@@ -1,4 +1,6 @@
-# jwtlogin
+# GoPlay多房间音乐播放页面
+
+vue3 + typescript
 
 ## Project setup
 ```
