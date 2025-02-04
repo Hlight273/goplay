@@ -10,6 +10,7 @@ const RUrl:string = "192.168.3.55";
 
 const FinalIp = isLocalTest?"localhost":RUrl
 
-//export const websocketRoot = "http://localhost:8085/ws";192.168.3.55
 export const websocketRoot = `http://${FinalIp}:8081/ws`;
 export const webRoot = `http://${FinalIp}:8081`;
+
+export const needDebugOutpot = true;

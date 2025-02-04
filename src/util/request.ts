@@ -34,7 +34,9 @@ service.interceptors.response.use(
         let res = response.data;
         
         if (response.config.responseType === 'blob') {// 如果是返回的文件
-            return res
+            console.log(res);
+            
+            return response
         }
         if (typeof res === 'string') { // 兼容服务端返回的字符串数据
             res = res ? JSON.parse(res) : res
@@ -86,4 +88,51 @@ const msgErr = (msg:string) => {
         type: 'error'
     });
 }
+
+export const downloadWithAxios = (url: string, filename: string) => {
+    service({
+      url,
+      method: "GET",
+      responseType: "blob", // 关键
+    })
+      .then((response) => {
+        const blob = new Blob([response.data]);
+        const a = document.createElement("a");
+        const objectUrl = URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+        document.body.removeChild(a);
+      })
+      .catch((error) => {
+        console.error("下载失败:", error);
+      });
+  };
+
+export const downloadLargeFile = async (url: string, filename: string) => {
+    const response = await fetch(url);
+    const reader = response.body?.getReader();
+    const stream = new ReadableStream({
+      async start(controller) {
+        while (true) {
+          const { done, value } = await reader!.read();
+          if (done) break;
+          controller.enqueue(value);
+        }
+        controller.close();
+      },
+    });
+  
+    const blob = await new Response(stream).blob();
+    const a = document.createElement("a");
+    const objectUrl = URL.createObjectURL(blob);
+    a.href = objectUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(objectUrl);
+    document.body.removeChild(a);
+  };
  

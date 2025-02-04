@@ -80,6 +80,9 @@
         <el-tab-pane label="音乐" :name="RoomStatus.MUSIC" add-icon>
           <template #label><span class="custom-tabs-label"><el-icon><Headset/></el-icon></span></template>
         </el-tab-pane>
+        <el-tab-pane label="歌单" :name="RoomStatus.LIST" add-icon>
+          <template #label><span class="custom-tabs-label"><el-icon><List /></el-icon></span></template>
+        </el-tab-pane>
         <el-tab-pane label="聊天" :name="RoomStatus.CHAT" add-icon>
           <template #label><span class="custom-tabs-label"><el-icon><ChatLineRound/></el-icon></span></template>
         </el-tab-pane>
@@ -89,7 +92,26 @@
     <!-- 播放器面板 -->
     <div class="line musicPanel" v-show="currentRoomState==RoomStatus.MUSIC">
       <div class="musicZone">
-      
+        <img src="" alt="" class="cd">
+      </div>
+    </div>
+
+    <!-- 音乐列表面板 -->
+    <div class="line listPanel" v-show="currentRoomState==RoomStatus.LIST">
+      <div class="listZone">
+        <ul class="songUl">
+          <li class="songLi" v-for="songContent in songContentList">
+            <img :src='"data:image/png;base64," + songContent.coverBase64' alt="">
+            <span>{{ songContent.songInfo.songName }}</span>
+            <span>{{ songContent.songInfo.songArtist }}</span>
+            <span>{{ songContent.songInfo.songAlbum }}</span>
+            <span>{{ formatDuration(songContent.songInfo.songDuration) }}</span>
+            <span>
+              <el-icon @click="downloadSong(songContent.songUrl)"><Download/></el-icon>
+              {{ formatBytes(songContent.songInfo.songSize) }}
+            </span>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -106,8 +128,11 @@
       </div>
     </div>
 
-    
-
+    <!--底部通用 播放器-->
+    <div class="musicPlayer">
+      
+    </div>
+    <!--底部通用 聊天输入框-->
     <div class="line send">
       <el-input v-model="textToSend" placeholder="聊天对话..." @keyup.enter="sayInRoom()"/>
       <el-button class="btn_join" type="primary" @click="sayInRoom()" 
@@ -121,8 +146,10 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted} from 'vue'
 import { ArrowLeft, Promotion} from '@element-plus/icons-vue'
-import {roomCreate,isUserInRoom,roomJoin,roomExit,roomMember,roomOwnerTransPrivilege,roomMemberPrivilege} from '@/api/room'
-import {userRoomInfo, getPrivilegeName, HasOwnerPower, HasRoomAdminPower} from '@/api/user'
+import { roomCreate,isUserInRoom,roomJoin,roomExit,roomMember,roomOwnerTransPrivilege,roomMemberPrivilege,roomSongContentList} from '@/api/room'
+import { userRoomInfo, getPrivilegeName, HasOwnerPower, HasRoomAdminPower} from '@/api/user'
+import { getSong } from '@/api/song'
+import { formatDuration, formatBytes } from '@/util/commonUtil'
 
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { Room } from '@/interface/room'
@@ -131,6 +158,8 @@ import { WebSocketService } from '@/util/webSocketService';
 import { websocketRoot } from '@/util/webConst';
 import { Client, IMessage } from '@stomp/stompjs';
 import { TabsPaneContext } from 'element-plus';
+import { Song } from '@/interface/song';
+import {downloadWithAxios} from '@/util/request'
 const { globalProperties } = useCurrentInstance();
 
 //room、user's data
@@ -152,7 +181,7 @@ const roomData = ref<Room.Room>({
   isActive: 0
 })
 const userInfoList = ref<User.UserInfo[]>()
-const roomUserList = ref<User.UserInfo[]>()
+const songContentList = reactive<Song.SongContent[]>([])
 const textToSend = ref<string>()
 const msgList = ref<Room.RoomMsg[]>([])
 
@@ -164,6 +193,7 @@ enum PageStatus {
 enum RoomStatus {
   CHAT = 0,
   MUSIC = 1,
+  LIST = 2,
 }
 const currentPageState = ref(PageStatus.WAIT_FOR_ROOM)
 const currentRoomState = ref(RoomStatus.MUSIC)
@@ -175,6 +205,7 @@ const setPageState = (pageState:PageStatus, _roomData?:Room.Room)=>{
         roomData.value = _roomData;
         roomCode_join.value = _roomData.roomCode;
         updateRoomUserInfo();//进入房间 刷新用户信息  
+        updateSongContentInfo();//进入房间 刷新歌单信息  
         subscribeWebsocket()//开启WebSocket
       }
       break;
@@ -316,6 +347,29 @@ const updateRoomUserInfo = () => {
     });
 }
 
+const updateSongContentInfo = () => {
+  if(roomCode_join.value==undefined) return
+  roomSongContentList(roomCode_join.value).then(
+      (res)=>{   
+      switch (res.code) {
+        case 20000:
+          for (const key in res.oData) {
+            songContentList[key] = res.oData[key];
+          }
+          break;
+        default:
+          break;
+      }
+    },(err)=>{
+
+    });
+}
+
+const downloadSong = (songUrl:string) => {
+  if(songUrl==undefined || songUrl=="" || songUrl == null) return
+  getSong(songUrl)
+}
+
 //本地页面
 const copyRoomCode = async () => {
   if(roomData.value==undefined) return
@@ -327,8 +381,6 @@ const copyRoomCode = async () => {
 const updateUserInfoList = (_userInfoList:User.UserInfo[]) => {
   userInfoList.value = _userInfoList
   let myinfo = getMyUserInfoInList(userInfoList.value)
-  
-  
   if(myinfo!=undefined||myinfo!=null) 
     myUserInfo.value = myinfo
 }
@@ -395,8 +447,8 @@ const getMyUserInfoInList = (userInfoList:User.UserInfo[]):User.UserInfo|undefin
   display: flex;
   justify-content: space-around;
   font-size: 1.4vh;
-  /* width: 20vw !important; */
-  width: 180px !important;
+  width: 20vw !important;
+  /* width: 180px !important; */
   height: 3vh;
   padding: 0 !important;
   align-items: center;
@@ -427,6 +479,11 @@ const getMyUserInfoInList = (userInfoList:User.UserInfo[]):User.UserInfo|undefin
   padding: 0;
 }
 .content .line.musicPanel {
+  /* flex: 1; */
+  height: 60vh;
+  padding: 0;
+}
+.content .line.listPanel {
   /* flex: 1; */
   height: 60vh;
   padding: 0;
@@ -583,6 +640,67 @@ const getMyUserInfoInList = (userInfoList:User.UserInfo[]):User.UserInfo|undefin
   border: .1vh solid #e7e7e7;
   box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
 }
+
+/* 歌单面板 */
+.listZone {
+  width: 100%;
+  max-height: 64vh;
+  overflow-y: auto;
+  background-color: #f5f5f6;
+  border-radius: 1vh;
+  border: .1vh solid #e7e7e7;
+  box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
+}
+.songUl {
+  margin: .9vh .4vh
+}
+.songLi {
+  margin: .6vh .6vh;
+  padding: 0.3vh 0;
+  display: flex;
+  align-items: center;
+  background-color: #ededf1;
+  border-radius: .6vh;
+  box-shadow: 0px 0px 0.2vh .1vh rgb(91 98 116 / 20%);
+}
+.songLi span {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.28vh;
+  color: #474747;
+}
+.songLi img:nth-child(1) {
+  margin: 0px 1.2vh 0 1vh;
+  width: 3.5vh;
+  height: 3.5vh;
+  border-radius: .4vh;
+}
+.songLi span:nth-child(2) {
+  flex: 8 1 0%;
+}
+.songLi span:nth-child(3) {
+  flex: 3 1 0%;
+}
+.songLi span:nth-child(4) {
+  flex: 3 1 0%;
+}
+.songLi span:nth-child(5) {
+  flex: 1.5 1 0%;
+}
+.songLi span:nth-child(6) {
+  /* margin-left: -3vh; */
+  padding-right: 2vh;
+}
+.songLi span:nth-child(6)>i {
+  cursor: pointer;
+  padding: .3vh;
+  font-size: 2vh;
+  color: #ab9bbb;
+}
+
 
 /* 点头像的 用户弹出框 */
 .playerInfoPanel {

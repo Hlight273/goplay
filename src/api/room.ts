@@ -1,5 +1,6 @@
 import { Result } from "@/interface/result";
 import { Room } from "@/interface/room";
+import { Song } from "@/interface/song";
 import { User } from "@/interface/user";
 import {http} from '@/util/request'
 
@@ -29,4 +30,8 @@ export const roomMemberPrivilege = (roomCode:string, userId:number,privilegeCode
 
 export const roomOwnerTransPrivilege = (roomCode:string, userId:number, targetUserId:number) => {
     return http.post<Result<User.UserInfo[]>>(`room/${roomCode}/user/${userId}/owner/to/user/${targetUserId}`);
+}
+
+export const roomSongContentList = (roomCode:string) => {
+    return http.get<Result<Song.SongContent[]>>(`room/${roomCode}/songList`);
 }

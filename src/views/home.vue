@@ -28,7 +28,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted} from 'vue'
 import { logout } from '@/api/user'
-import { ResultCode } from '@/util/webConst'
+import { ResultCode, needDebugOutpot } from '@/util/webConst'
 
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 const { globalProperties } = useCurrentInstance();
@@ -55,6 +55,11 @@ const userLogout = ()=>{
 
     });
 }
+
+onMounted(()=>{
+  if(needDebugOutpot)
+    console.log(localStorage.getItem("token"));
+})  
 </script>
 
 <style scoped>
