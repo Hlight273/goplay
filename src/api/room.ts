@@ -35,3 +35,7 @@ export const roomOwnerTransPrivilege = (roomCode:string, userId:number, targetUs
 export const roomSongContentList = (roomCode:string) => {
     return http.get<Result<Song.SongContent[]>>(`room/${roomCode}/songList`);
 }
+
+export const roomSongRemove = (roomCode:string, songId:Number, data:User.UserId) => {
+    return http.post<Result<string>>(`room/${roomCode}/song/${songId}/remove`, data);
+}

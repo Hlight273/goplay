@@ -1,138 +1,49 @@
 <template>
-  <header>
-    <el-button class="logout_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
+    <div class="mse_outline">
+        <div class="gradient-border">
+            <div id="mse"></div>
+        </div>
+    </div>
 
-  </header>
-  <main>
-    <el-tabs :tab-position="tabPosition" type="border-card" class="demo-tabs">
-      <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><UserFilled/></el-icon></span></template>
-        <TabMyInfo></TabMyInfo>
-      </el-tab-pane>
-      <el-tab-pane>
-        <template #label> <span class="custom-tabs-label"> <el-icon><HomeFilled/></el-icon></span></template>
-        <TabRoom></TabRoom>
-      </el-tab-pane>
-      <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><Setting/></el-icon></span></template>
-        设置
-      </el-tab-pane>
-    </el-tabs>
-    <AudioConsole></AudioConsole>
-    <!-- <div class="mse_outline">
-      <div class="gradient-border">
-        <div id="mse"></div>
-      </div>
-    </div> -->
-    
-    
-  </main>
-  
-  <!-- <div class="out">
-    
-    
-  </div> -->
+    <div v-show="locked" style="position: fixed; top: 44%; left: 47%;">
+      <img :src="require('@/assets/icons/lock.png')" alt="">
+    </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount } from 'vue'
-import { useRoute } from 'vue-router';
-import { logout } from '@/api/user'
-import { ResultCode, needDebugOutpot } from '@/util/webConst'
-
+import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount, Ref } from 'vue'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
+import { GoPlayer } from '@/util/XgPlayer';
 const { globalProperties } = useCurrentInstance();
 
-import type { TabsInstance } from 'element-plus'
-const tabPosition = ref<TabsInstance['tabPosition']>('left') //tab栏暂时设在左边
 
-import TabMyInfo from './tabMyInfo.vue';
-import TabRoom from './tabRoom.vue';
-import AudioConsole from '@/components/audioConsole.vue';
+const currentTime = ref(new Date().toLocaleTimeString());
 
-const is_lock = ref(false);
-
-const userLogout = ()=>{
-  logout().then(
-    (res)=>{   
-      switch (res.code) {
-        case ResultCode.SUCCESS:          
-          localStorage.removeItem("token")
-          globalProperties?.$router.replace("/login")
-          globalProperties?.$message.success(res.message)
-          break;
-        default:
-          break;
-      }
-    },(err)=>{
-
-    });
-}
-
+let locked:Ref<any> = ref();
 onMounted(()=>{
-  if(needDebugOutpot)
-    console.log(localStorage.getItem("token"));
+  //初始化播放器 绑定到home页面的mse上
+  console.log("\n");
+  console.log("🎵播放器已挂载🎵");
+  globalProperties?.$GoPlayer.registerPlayer("mse")
+
+
+
+
+  locked = ref(GoPlayer.broadcast_lock)
+  let timer = setInterval(() => {
+    currentTime.value = new Date().toLocaleTimeString();
+    console.log(GoPlayer.broadcast_lock);
+    
+  }, 1);
+})  
+
+  
+onBeforeMount(()=>{
+  globalProperties?.$GoPlayer.destroy()
 })
-
-
 </script>
 
 <style scoped>
-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 100%;
-  height: 5vh;
-  box-sizing: border-box;
-  padding: .5vh;
-  box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
-}
-
-main {
-  box-sizing: border-box;
-  height: calc(calc(var(--i-window-height) - 6vh) - 1px);
-  width: 100vw;
-}
-
-.out {
-  display: flex;
-  position: absolute;
-  top: calc(100px + 35%);
-  left: 50%;
-  margin-left: -250px;
-  margin-top: -200px;
-}
-
-.demo-tabs {
-  height: 88vh;
-}
-.demo-tabs > .el-tabs__content {
-  padding: 3vh;
-  color: #6b778c;
-  font-size: 3vw;
-  font-weight: 600;
-  text-align: center;
-}
-.demo-tabs .custom-tabs-label .el-icon {
-  display: flex;
-  height: 20px;
-  font-size: 20px;
-}
-.el-tabs {
-  height: calc(calc(var(--i-window-height) - 6vh) - 1px);
-  --el-tabs-header-height: 60px;
-  box-sizing: border-box;
-}
-
-:deep(.el-tabs--border-card>.el-tabs__content) {
-    padding: 1vh;
-}
-:deep(.el-tabs--border-card>.el-tabs__header .el-tabs__item){
-  padding: 0px 20px;
-}
-
-
 #mse {
   width: calc(100% - 0px) !important;
   position: fixed;
@@ -141,8 +52,8 @@ main {
   height: 50px;
   border-top-left-radius: 30px;
   border-top-right-radius: 30px;
-  background: #363636;
-  box-shadow: 0px -1.3vh .2vh 0px rgb(35 21 31 / 42%) inset;
+  background: #302f36;
+  box-shadow: 0px -1.3vh .2vh 0px rgb(0 0 0 / 42%) inset;
   position: relative; /* 相对定位，确保文字在前面 */
   z-index: 1; /* 确保文本在渐变边框上方 */
   text-align: center;
@@ -176,7 +87,7 @@ main {
 :deep(#mse .xgplayer-progress-played){
   background: none;
   /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
-  animation: backgroundAnimation 10s linear infinite; /* 动画效果 */
+  animation: backgroundDarkAnimation 3s linear infinite; /* 动画效果 */
 }
 :deep(#mse .xgplayer-slider){
   background: #5e5e5e;
@@ -238,7 +149,7 @@ main {
     /* background-image: linear-gradient(white, white), linear-gradient(45deg, red, yellow, green, cyan, blue, magenta, red); */
     background-origin: border-box; /* 确保背景从边框开始 */
     /*background-clip: content-box, border-box; *//* 确保背景只展示在内容框和边框上 */
-    animation: backgroundAnimation 10s linear infinite; /* 动画效果 */
+    animation: backgroundDarkAnimation 3s linear infinite; /* 动画效果 */
 
     width: calc(100% - 10px) !important;
     position: fixed;
@@ -259,6 +170,34 @@ main {
         background-position: 100% 0%;
     }
   }
+
+  @keyframes backgroundDarkAnimation {
+    0% {
+      background-color: #5900ff;
+    }
+    14% {
+      background-color: #bf00ff;
+    }
+    28% {
+      background-color: #ff2ba0;
+    }
+    42% {
+      background-color: #bf00ff;
+    }
+    57% {
+      background-color: #5900ff;
+    }
+    71% {
+      background-color: #355aff;
+    }
+    85% {
+      background-color: #309bff;
+    }
+    100% {
+      background-color: #5900ff;
+    }
+  }
+
   @keyframes backgroundAnimation {
     0% {
       background-color: #ce9292;

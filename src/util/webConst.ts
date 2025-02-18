@@ -14,3 +14,13 @@ export const websocketRoot = `http://${FinalIp}:8081/ws`;
 export const webRoot = `http://${FinalIp}:8081`;
 
 export const needDebugOutpot = true;
+
+export const allowedMimeTypes:Array<string> = [
+        "audio/mpeg",  // MP3
+        "audio/wav",   // WAV
+        "audio/flac",  // FLAC
+        "audio/x-flac",  // FLAC
+        "audio/ogg"  // OGG
+    ]
+
+export const maxFileSize = 100 * 1024 * 1024; // 允许上传最大100MB的音频文件

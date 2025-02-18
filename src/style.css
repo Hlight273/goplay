@@ -11,3 +11,35 @@
 body, html {
     height: var(--i-window-height);
 }
+
+:deep(.el-message-box button){
+    color: var(--el-color-primary);
+}
+:deep(.el-message-box button.el-button--primary){
+    color: #fff;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+
+body::-webkit-scrollbar {
+
+
+    display: none;
+
+
+}
+
+
+/* Hide scrollbar for IE, Edge and Firefox */
+
+
+body {
+
+
+    -ms-overflow-style: none;  /* IE and Edge */
+
+
+    scrollbar-width: none;  /* Firefox */
+
+
+}

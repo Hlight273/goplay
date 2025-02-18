@@ -13,7 +13,10 @@ const service = axios.create({
 // 可以自请求发送前对请求做一些处理
 // 比如统一加token，对请求参数统一加密
 service.interceptors.request.use(config => {
-    config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    // 避免覆盖 multipart/form-data
+    if (!(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    }
     let token = localStorage.getItem("token") ? localStorage.getItem("token") : null
     if (token) {
         config.headers['token'] = token;  // 设置请求头
@@ -34,9 +37,7 @@ service.interceptors.response.use(
         let res = response.data;
         
         if (response.config.responseType === 'blob') {// 如果是返回的文件
-            console.log(res);
-            
-            return response
+            return response;
         }
         if (typeof res === 'string') { // 兼容服务端返回的字符串数据
             res = res ? JSON.parse(res) : res
@@ -66,7 +67,7 @@ export const http = {
       return service.get(url, config)
     },
   
-    post<T=any>(url: string, data?: object, config?: AxiosRequestConfig) :Promise<T> {
+    post<T=any>(url: string, data?: object, config?: AxiosRequestConfig) :Promise<T> {      
       return service.post(url, data, config)
     },
   
@@ -89,8 +90,8 @@ const msgErr = (msg:string) => {
     });
 }
 
-export const downloadWithAxios = (url: string, filename: string) => {
-    service({
+export const downloadWithAxios = (url: string, filename: string):Promise<string|void>  => {
+    return service({
       url,
       method: "GET",
       responseType: "blob", // 关键
@@ -103,8 +104,9 @@ export const downloadWithAxios = (url: string, filename: string) => {
         a.download = filename;
         document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(objectUrl);
+        //URL.revokeObjectURL(objectUrl);
         document.body.removeChild(a);
+        return objectUrl
       })
       .catch((error) => {
         console.error("下载失败:", error);
@@ -132,7 +134,24 @@ export const downloadLargeFile = async (url: string, filename: string) => {
     a.download = filename;
     document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(objectUrl);
+    //URL.revokeObjectURL(objectUrl);
     document.body.removeChild(a);
+    return objectUrl
   };
+
+export const getFileBlobFromServer = (url: string, filename: string):Promise<string|void> => {
+    return service({
+        url,
+        method: "GET",
+        responseType: "blob",
+    }).then((response) => {
+        const blob = new Blob([response.data]);
+        const objectUrl:string = URL.createObjectURL(blob);
+        return objectUrl
+    }) .catch((error) => {
+        console.error("创建Blob失败:", error);
+
+    });
+    
+};
  

@@ -2,6 +2,13 @@ import { getCurrentInstance } from "vue";
 import type { ComponentInternalInstance } from "vue";
  
 export default function useCurrentInstance() {
+  const instance = getCurrentInstance();
+  //console.log(instance);
+  
+  if (!instance) {
+    console.warn("useCurrentInstance() called outside of setup or from a component instance");
+    return { globalProperties: null }; 
+  }
   const { appContext } = getCurrentInstance() as ComponentInternalInstance;
   const globalProperties = appContext.config.globalProperties;
   return {

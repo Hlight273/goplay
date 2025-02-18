@@ -33,3 +33,35 @@ export function formatBytes(bytes: number, decimals = 2): string {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+// 原文链接：https://blog.csdn.net/XH_jing/article/details/135824934
+export function copyToClipboard(textToCopy:string) {
+    // navigator clipboard 需要https等安全上下文
+  if (navigator.clipboard && window.isSecureContext) {
+      // navigator clipboard 向剪贴板写文本
+      return navigator.clipboard.writeText(textToCopy);
+  } else {
+       // document.execCommand('copy') 向剪贴板写文本
+      let input = document.createElement('input')
+      input.style.position = 'fixed'
+      input.style.top = '-10000px'
+      input.style.zIndex = '-999'
+      document.body.appendChild(input)
+      input.value = textToCopy
+      input.focus()
+      input.select()
+      try {
+        let result:boolean = document.execCommand('copy')
+        document.body.removeChild(input)
+        if (!result) {
+          console.log('复制失败')
+        } else {
+          console.log('复制成功')
+        }
+      } catch (e) {
+        document.body.removeChild(input)
+        alert('当前浏览器不支持复制功能，请检查更新或更换其他浏览器操作')
+      }
+  }
+}
+
+

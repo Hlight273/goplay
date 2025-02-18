@@ -15,12 +15,18 @@
     "core-js": "^3.8.3",
     "crypto-js": "^4.2.0",
     "element-plus": "^2.7.3",
+    "filepond": "^4.32.7",
+    "filepond-plugin-file-validate-type": "^1.2.9",
+    "filepond-plugin-image-preview": "^4.6.12",
+    "mitt": "^3.0.1",
     "sockjs-client": "^1.6.1",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
+    "vue-filepond": "^7.0.4",
     "vue-router": "^4.0.3",
     "ws": "^8.18.0",
-    "xgplayer": "^3.0.0-alpha.146"
+    "xgplayer": "^3.0.0-alpha.146",
+    "xgplayer-music": "^3.0.20"
   },
   "devDependencies": {
     "@types/sockjs-client": "^1.5.4",

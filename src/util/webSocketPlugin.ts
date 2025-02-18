@@ -2,9 +2,9 @@ import { App } from 'vue';
 import {WebSocketService} from '@/util/webSocketService';
 
 const websocketPlugin = {
-    install(app: App, options: { url: string }) {
+    install(app: App, options: { url: string, userId:number, roomId:number }) {
     // 使用传入的 URL 创建 WebSocketService 实例
-    const webSocketService = new WebSocketService(options.url);
+    const webSocketService = new WebSocketService(options.url, options.userId, options.roomId);
     
     // 挂载到全局属性上
     app.config.globalProperties.$ws = webSocketService;
