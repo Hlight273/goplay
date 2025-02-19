@@ -147,15 +147,15 @@ export class GoPlayer {
         if (!this.player || this.player.plugins.music.list==null) 
             return
 
-        let dataIsSetIndex = _data.curTime==0 || _data.index!=this.player.plugins.music.index;
+        let dataIsSetIndex = _data.curTime==0 && _data.index!=this.player.plugins.music.index;
 
         //状态为播放 才允许调时间(time为0走setindex而不是调时间)
-        if(!_data.paused && !dataIsSetIndex){
+        if(!_data.paused){
             this.player.seek(_data.curTime);
         }
 
-        //来的数据时间为0，index和上一首不同才视为调index
-        if(dataIsSetIndex){
+        //来的数据时间为0，index和上一首不同才视为调index (有一种特殊情况那就是尚未初始化过)
+        if(dataIsSetIndex || !this.hasSynced){
             this.player.plugins.music.setIndex(_data.index);
         }
 
