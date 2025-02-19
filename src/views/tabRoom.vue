@@ -511,6 +511,7 @@ const roomPlayerEventReg = () => {
   //播放
   globalProperties?.$GoPlayer.player?.on(Events.PLAY, () => {
     if(globalProperties?.$GoPlayer.is_b_locked()){
+      console.log("播放被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
       return
     }
@@ -529,6 +530,7 @@ const roomPlayerEventReg = () => {
   //暂停
   globalProperties?.$GoPlayer.player?.on(Events.PAUSE, () => {
     if(globalProperties?.$GoPlayer.is_b_locked()){
+      console.log("暂停被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
       return
     }
@@ -560,6 +562,7 @@ const roomPlayerEventReg = () => {
   //时间调整
   globalProperties?.$GoPlayer.player?.on(Events.SEEKED, () => {
     if(globalProperties?.$GoPlayer.is_b_locked()){
+      console.log("调时间被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
       return
     }

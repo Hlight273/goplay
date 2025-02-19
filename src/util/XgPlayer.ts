@@ -17,6 +17,7 @@ export class GoPlayer {
     private curIndex: number = 0;
     player:Player | null = null;
     public static broadcast_lock:boolean = false;
+    private hasSynced = false;
 
     constructor() { 
         GoPlayer.broadcast_lock=false;
@@ -140,22 +141,25 @@ export class GoPlayer {
     }
 
     syncPlayerData(_data:PlayerData):void{
+
         console.log("sync_pdata:",_data);
         
         if (!this.player || this.player.plugins.music.list==null) 
             return
 
-        if(!_data.paused)
-            this.player.seek(_data.curTime)
+        let dataIsSetIndex = _data.curTime==0 || _data.index!=this.player.plugins.music.index;
 
-
-        if(_data.curTime==0 || _data.index!=this.player.plugins.music.index){
-            this.player.plugins.music.setIndex(_data.index);
-            this.player.autoplay = true;
-            this.player.play()
+        //状态为播放 才允许调时间(time为0走setindex而不是调时间)
+        if(!_data.paused && !dataIsSetIndex){
+            this.player.seek(_data.curTime);
         }
-            
 
+        //来的数据时间为0，index和上一首不同才视为调index
+        if(dataIsSetIndex){
+            this.player.plugins.music.setIndex(_data.index);
+        }
+
+        //仅仅切换暂停播放
         if (_data.paused === this.player.paused) return;
         
         if(_data.paused){      
@@ -169,6 +173,8 @@ export class GoPlayer {
                //console.log("catch"); //未经用户交互时的自动播放
            });
         }  
+
+        this.hasSynced = true;
     }
 
     checkCache():Promise<any>{
