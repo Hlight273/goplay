@@ -13,7 +13,7 @@ import { fa } from 'element-plus/es/locale';
 
 export class GoPlayer {
     private static instance: GoPlayer;
-    //private playerList: Array<Song.SongContent>|null = null;
+    private playerList: Array<Song.SongContent>|null = null;
     private curIndex: number = 0;
     player:Player | null = null;
     public static broadcast_lock:boolean = false;
@@ -72,32 +72,11 @@ export class GoPlayer {
                     const dom = Util.createDom('div', `<img src="${imgSrc}"/>`, {}, 'mse_btn');
                     return dom;
                 },
-                playnext: ()=>{
-                    const imgSrc = require('@/assets/icons/next2.png');
-                    const dom = Util.createDom('div', `<img src="${imgSrc}"/>`, {}, 'mse_btn');
-                    return dom;
-                },
-                prev: ()=>{
-                    const imgSrc = require('@/assets/icons/step2.png');
-                    const dom = Util.createDom('div', `<img src="${imgSrc}"/>`, {}, 'mse_btn');
-                    return dom;
-                },
-                x: ()=>{
-                    const imgSrc = require('@/assets/icons/pause1.png');
-                    const dom = Util.createDom('div', `<img src="${imgSrc}"/>`, {}, 'mse_btn');
-                    return dom;
-                },
-                d: ()=>{
-                    const imgSrc = require('@/assets/icons/pause1.png');
-                    const dom = Util.createDom('div', `<img src="${imgSrc}"/>`, {}, 'mse_btn');
-                    return dom;
-                },
               },
         })
-
-        // this.player.on(Events.PLAYNEXT, () => {
-        //     this.player?.play()
-        //   })
+        
+        
+        this.player.on(Events.PLAY, this.sendNewSongEv)
         console.log("🎵Goplayer初始化完成🎵...");
         console.log("\n");
         
@@ -128,11 +107,21 @@ export class GoPlayer {
                 console.log(`>>>> 歌曲 ${index} 已同步: ${song.songInfo.songName} >>>>`);
             }
         }
+        this.playerList = _playerList;
         // console.log(results);
         // console.log(this.list());
         
     }
 
+    getCurSongContent():Song.SongContent|null{
+        if(!this.playerList)
+            return null;
+        let index = this.player?.plugins.music.index;
+        let target = this.playerList[index];
+        if(target==null||target==undefined)
+            return null;
+        return target;
+    }
 
     forceReset():void{
         if(this.player)
@@ -142,7 +131,7 @@ export class GoPlayer {
 
     syncPlayerData(_data:PlayerData):void{
 
-        console.log("sync_pdata:",_data);
+        //console.log("sync_pdata:",_data);
         
         if (!this.player || this.player.plugins.music.list==null) 
             return
@@ -181,6 +170,8 @@ export class GoPlayer {
         return this.player?.plugins.music.checkOffline()
     }
 
+
+
     isPaused():boolean{
         if (!this.player) 
             return true
@@ -189,6 +180,7 @@ export class GoPlayer {
 
     destroy() {
         if (this.player) {
+            this.player.off(Events.PLAY, this.sendNewSongEv)
             this.player.destroy();
             this.player = null;
         }
@@ -202,6 +194,11 @@ export class GoPlayer {
     }
     is_b_locked():boolean{
         return GoPlayer.broadcast_lock;
+    }
+
+    sendNewSongEv = () =>  {
+        let songContent = this.getCurSongContent();
+        eventBus.emit(MEventTypes.PLAY_NEW_SONG, songContent)
     }
     
 }

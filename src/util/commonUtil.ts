@@ -64,4 +64,8 @@ export function copyToClipboard(textToCopy:string) {
   }
 }
 
+export function isNullorEmpty(text:string):boolean {
+  return text == null || text=='';
+}
+
 

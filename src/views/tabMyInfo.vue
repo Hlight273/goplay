@@ -1,7 +1,7 @@
 <template>
     <div class="box">
       <img :src="userinfo?.avatarUrl" alt="avator" class="avatar">
-      <div class="usertitle">欢迎回来，<span>{{ userinfo?.username }}</span>！</div>
+      <div class="usertitle">欢迎回来，{{ User.descForUser(userinfo) }}<span>{{ userinfo?.username }}</span>！</div>
     </div>
 </template>
 
@@ -12,16 +12,22 @@ import service from '@/util/request'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { userInfo } from '@/api/user';
 import { User } from '@/interface/user';
+import { ResultCode } from '@/util/webConst';
 const { globalProperties } = useCurrentInstance();
 
-const userinfo = ref<User.UserInfo>();
-const userId = Number(localStorage.getItem("userid"))
+const userinfo = ref<User.UserInfo>({
+  id: 0,
+  username: '',
+  avatarUrl: '',
+  level:0
+});
+const userId = Number(localStorage.getItem("userid"));
 
 onMounted(() => {
   userInfo(userId).then(
     (res)=>{   
       switch (res.code) {
-        case 20000:          
+        case ResultCode.SUCCESS:          
           userinfo.value = res.oData
           break;
         default:

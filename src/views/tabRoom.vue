@@ -92,7 +92,7 @@
     <!-- 播放器面板 -->
     <div class="line musicPanel" v-show="currentRoomState==RoomStatus.MUSIC">
       <div class="musicZone">
-        <img src="" alt="" class="cd">
+        <audioCdPlayer></audioCdPlayer>
       </div>
     </div>
 
@@ -172,13 +172,14 @@ import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { Room } from '@/interface/room'
 import { Privilege, User } from '@/interface/user'
 import { WebSocketService } from '@/util/webSocketService';
-import { websocketRoot } from '@/util/webConst';
+import { ResultCode, websocketRoot } from '@/util/webConst';
 import { Client, IMessage } from '@stomp/stompjs';
 import { TabsPaneContext } from 'element-plus';
 import { Song } from '@/interface/song';
 import {downloadWithAxios} from '@/util/request'
 import { PlayerData } from '@/interface/playerData'
 import AudioUploader from '@/components/audioUploader.vue'
+import AudioCdPlayer from '@/components/audioCdPlayer.vue'
 import { Events } from 'xgplayer'
 import { eventBus,MEventTypes } from '@/util/eventBus'
 
@@ -190,7 +191,8 @@ const userId = Number(localStorage.getItem("userid"))
 const myUserInfo = ref<User.UserInfo>({
   id: 0,
   username: '',
-  avatarUrl: ''
+  avatarUrl: '',
+  level:0
 })
 const roomCode_join = ref('');
 const roomData = ref<Room.Room>({
@@ -251,7 +253,7 @@ onMounted(() => {
   userRoomInfo(userId).then(
     (res)=>{   
       switch (res.code) {
-        case 20000://加入房间 用户信息、歌单信息、开启ws连接、注册播放器监听
+        case ResultCode.SUCCESS://加入房间 用户信息、歌单信息、开启ws连接、注册播放器监听
           globalProperties?.$message.success(res.message)
           setPageState(PageStatus.IN_ROOM, res.oData)
           break;
@@ -281,7 +283,6 @@ const subscribeWebsocket = () => {
   wsService.subscribe(`/topic/${roomData.value?.id}/userInfoList`,receive_UserInfoList_InRoom)
   wsService.subscribe(`/topic/${roomData.value?.id}/songContentList`,receive_SongContentList_InRoom)
   wsService.subscribe(`/topic/${roomData.value?.id}/playerData`,receive_PlayerData_InRoom)
-  //wsService.subscribe(`/user/${userId}/queue/${roomData.value?.id}/playerData`,receive_PlayerData_InRoom)
   wsService.connect();
 }
 
@@ -303,7 +304,7 @@ const broadcast_playerStatusChangeInRoom = (playerData:PlayerData) => {
     return
   if(!HasRoomAdminPower(myUserInfo.value))
     return
-  console.log("send_pdata:",playerData);
+  //console.log("send_pdata:",playerData);
   wsService?.sendMessage(`/app/${roomData.value?.id}/${userId}/change/playerStatus`, JSON.stringify(playerData));
 }
 //订阅
@@ -324,11 +325,7 @@ const receive_SongContentList_InRoom = (msg:IMessage)=>{
 }
 //订阅 播放器状态更新 /topic/房间id/playerData  (需要排除广播到自己)
 const receive_PlayerData_InRoom = (msg:IMessage)=>{
-  
-  console.log("上锁上锁上锁上锁上锁上锁上锁");
-  
-  //console.log(msg);
-  
+  //console.log("上锁上锁上锁上锁上锁上锁上锁");
   let _playerData = JSON.parse(msg.body) as PlayerData
   
   //排除自己发的
@@ -345,7 +342,7 @@ const createNewRoom = ()=>{
   roomCreate({userId: userId}).then(
     (res)=>{   
       switch (res.code) {
-        case 20000:
+        case ResultCode.SUCCESS:
           globalProperties?.$message.success(res.message)
           setPageState(PageStatus.IN_ROOM, res.oData)
           break;
@@ -362,7 +359,7 @@ const joinNewRoom = ()=>{
     return
   roomJoin(roomCode_join.value, {userId: userId}).then((res)=>{   
       switch (res.code) {
-        case 20000:
+        case ResultCode.SUCCESS:
           globalProperties?.$message.success(res.message)
           setPageState(PageStatus.IN_ROOM, res.oData)
           break;
@@ -379,7 +376,7 @@ const exitRoom = ()=>{
   roomExit(roomCode_join.value, userId).then(
     (res)=>{   
       switch (res.code) {
-        case 20000:
+        case ResultCode.SUCCESS:
           globalProperties?.$message.success(res.message)
           setPageState(PageStatus.WAIT_FOR_ROOM)
           break;
@@ -396,7 +393,7 @@ const updateRoomUserInfo = () => {
   roomMember(roomCode_join.value).then(
       (res)=>{   
       switch (res.code) {
-        case 20000:
+        case ResultCode.SUCCESS:
           updateUserInfoList(res.oData)
           break;
         default:
@@ -412,7 +409,7 @@ const updateSongContentInfo = () => {
   roomSongContentList(roomCode_join.value).then(
       (res)=>{   
       switch (res.code) {
-        case 20000:
+        case ResultCode.SUCCESS:
           updateSongContentList(res.oData)
           break;
         default:
@@ -428,7 +425,7 @@ const removeSong = (songId:number) => {
   roomSongRemove(roomCode_join.value, songId, {userId: userId}).then(
       (res)=>{   
       switch (res.code) {
-        case 20000:
+        case ResultCode.SUCCESS:
           globalProperties?.$message.success(res.message)
           break;
         default:
@@ -506,12 +503,12 @@ const selectSong = (event: MouseEvent, songContent:Song.SongContent, i:number):v
 }
 //其他播放器回调事件统一注册、卸载
 const roomPlayerEventReg = () => {
-  console.log(globalProperties?.$GoPlayer.player);
+  //console.log(globalProperties?.$GoPlayer.player);
   
   //播放
   globalProperties?.$GoPlayer.player?.on(Events.PLAY, () => {
     if(globalProperties?.$GoPlayer.is_b_locked()){
-      console.log("播放被拦截，锁已解开");
+      //console.log("播放被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
       return
     }
@@ -524,13 +521,13 @@ const roomPlayerEventReg = () => {
       srcUserId : userId,
       isExternal:true,
     };
-    console.log("-<<<(((房间内广播_播放)))>>>---");
+    //console.log("-<<<(((房间内广播_播放)))>>>---");
     broadcast_playerStatusChangeInRoom(_playerData);
   });
   //暂停
   globalProperties?.$GoPlayer.player?.on(Events.PAUSE, () => {
     if(globalProperties?.$GoPlayer.is_b_locked()){
-      console.log("暂停被拦截，锁已解开");
+      //console.log("暂停被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
       return
     }
@@ -542,27 +539,13 @@ const roomPlayerEventReg = () => {
       srcUserId : userId,
       isExternal:true,
     };
-    console.log("-<<<(((房间内广播_暂停)))>>>---");
+    //console.log("-<<<(((房间内广播_暂停)))>>>---");
     broadcast_playerStatusChangeInRoom(_playerData);
   });
-  //开始播放
-  // globalProperties?.$GoPlayer.player?.on(Events.LOAD_START, () => {
-    // if(globalProperties?.$GoPlayer.is_b_locked()){
-    //   globalProperties?.$GoPlayer.b_unlock()
-    //   return
-    // }
-  //   let _playerData:PlayerData = {
-  //     index: selectedIndex.value,
-  //     url: "",
-  //     curTime: globalProperties?.$GoPlayer.player?.currentTime,
-  //     paused: globalProperties?.$GoPlayer.isPaused()? false:true
-  //   };
-  //   broadcast_playerStatusChangeInRoom(_playerData);
-  // });
   //时间调整
   globalProperties?.$GoPlayer.player?.on(Events.SEEKED, () => {
     if(globalProperties?.$GoPlayer.is_b_locked()){
-      console.log("调时间被拦截，锁已解开");
+      //console.log("调时间被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
       return
     }
@@ -574,7 +557,7 @@ const roomPlayerEventReg = () => {
       srcUserId : userId,
       isExternal:true,
     };
-    console.log("-<<<(((房间内广播_调时间)))>>>---");
+    //console.log("-<<<(((房间内广播_调时间)))>>>---");
     broadcast_playerStatusChangeInRoom(_playerData);
   });
 
@@ -850,6 +833,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   border: .1vh solid #e7e7e7;
   box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
 }
+
 
 /* 歌单面板 */
 .listZone {

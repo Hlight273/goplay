@@ -6,12 +6,15 @@ export enum ResultCode {
 }
 
 const isLocalTest:boolean = false;
-const RUrl:string = "192.168.3.55";
+const isServerRelease:boolean = false;
+
+const RUrl:string = isServerRelease?"117.72.10.111":"192.168.3.55";
+//const RUrl:string = "117.72.10.111";
 
 const FinalIp = isLocalTest?"localhost":RUrl
 
-export const websocketRoot = `http://${FinalIp}:8081/ws`;
-export const webRoot = `http://${FinalIp}:8081`;
+export const websocketRoot = isServerRelease?`http://${FinalIp}/api/ws`:`http://${FinalIp}:8081/ws`;
+export const webRoot = isServerRelease?`http://${FinalIp}/api`:`http://${FinalIp}:8081`;
 
 export const needDebugOutpot = true;
 

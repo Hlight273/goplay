@@ -19,13 +19,12 @@
 </template>
   
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref,defineProps } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { UploadFilled, Upload, Refrigerator } from '@element-plus/icons-vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { uploadAudio } from "@/api/upload";
-import { defineProps } from 'vue';
 import { allowedMimeTypes, maxFileSize } from '@/util/webConst';
 const { globalProperties } = useCurrentInstance();
 

@@ -14,24 +14,13 @@
         <TabRoom></TabRoom>
       </el-tab-pane>
       <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><Setting/></el-icon></span></template>
-        设置
+        <template #label><span class="custom-tabs-label"><el-icon><Tools/></el-icon></span></template>
+        <TabSetting></TabSetting>
       </el-tab-pane>
     </el-tabs>
     <AudioConsole></AudioConsole>
-    <!-- <div class="mse_outline">
-      <div class="gradient-border">
-        <div id="mse"></div>
-      </div>
-    </div> -->
-    
     
   </main>
-  
-  <!-- <div class="out">
-    
-    
-  </div> -->
 </template>
 
 <script lang="ts" setup>
@@ -49,8 +38,7 @@ const tabPosition = ref<TabsInstance['tabPosition']>('left') //tab栏暂时设�
 import TabMyInfo from './tabMyInfo.vue';
 import TabRoom from './tabRoom.vue';
 import AudioConsole from '@/components/audioConsole.vue';
-
-const is_lock = ref(false);
+import TabSetting from './tabSetting.vue';
 
 const userLogout = ()=>{
   logout().then(

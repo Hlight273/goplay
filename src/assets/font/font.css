@@ -1,0 +1,12 @@
+@font-face {
+    font-family: "LibreBaskerville-Bold";
+    src: url('./LibreBaskerville-Bold.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "LibreBaskerville-Regular";
+    src: url('./LibreBaskerville-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
