@@ -99,39 +99,9 @@
     <!-- 音乐列表面板 -->
     <div class="line listPanel" v-show="currentRoomState==RoomStatus.LIST">
       <div class="listZone">
-
-          <!-- <ul class="songUl">
-            <li :class="[
-                  'songLi', 
-                  selectedIndex == i ? 'select' : '', 
-                  HasRoomAdminPower(myUserInfo) ? 'admin' : ''
-              ]"
-              v-for="(songContent, i) in songContentList" @click="(event) => selectSong(event,songContent,i)">
-              <img :src='(songContent.coverBase64!=null)?
-              ("data:image/png;base64," + songContent.coverBase64):
-              require("@/assets/icons/default_album.png")' alt="">
-              <span>{{ songContent.songInfo.songName }}</span>
-              <span>{{ songContent.songInfo.songArtist }}</span>
-              <span>{{ songContent.songInfo.songAlbum }}</span>
-              <span>{{ formatDuration(songContent.songInfo.songDuration) }}</span>
-              <span>
-                <el-icon @click="downloadSong(songContent.songUrl)"><Download/></el-icon>
-                {{ formatBytes(songContent.songInfo.songSize) }}
-              </span>
-              <span class="delete" @click="removeSong(songContent.songInfo.id)">
-                <el-icon><DeleteFilled /></el-icon>
-              </span>
-            </li>
-          </ul>
-          <li class="songLi uploadSong">
-              <AudioUploader :user-id="userId" :room-code="roomData.roomCode"/>
-          </li> -->
-
           <GoSongList 
           :my-user-info="myUserInfo" 
-          :song-content-list="songContentList"
-          :room-code="roomData.roomCode"/>
-
+          :song-content-list="songContentList"/>
       </div>
       
     </div>
@@ -235,19 +205,20 @@ const setPageState = (pageState:PageStatus, _roomData?:Room.Room)=>{
         updateRoomUserInfo();//进入房间 刷新用户信息  
         updateSongContentInfo();//进入房间 刷新歌单信息  
         subscribeWebsocket();//开启WebSocket
-        roomPlayerEventReg();  //监听播放器就绪事件
+        
         GoPlayer.enterRoomMode();
       }
       break;
     case PageStatus.WAIT_FOR_ROOM:
       roomStore.leaveRoom();
-      roomPlayerEventUnreg();  //清除播放器事件监听
+      
       GoPlayer.quitRoomMode();
       break;
     default:
       break;
   }
 }
+
 
 //生命周期
 onMounted(() => {
@@ -274,17 +245,15 @@ onUnmounted(()=>{
     wsService.disconnect();
     wsService = null;
   }
-  roomPlayerEventUnreg(); //清除播放器事件监听
+  // roomPlayerEventUnreg(); //清除播放器事件监听
 })
 
-//开启ws，订阅端点
 let wsService:WebSocketService| null = null;
 const subscribeWebsocket = () => {
   wsService = new WebSocketService(websocketRoot, userId, roomData.value.id);
   wsService.subscribe(`/topic/${roomData.value?.id}/receive`,receive_Msg_InRoom)
   wsService.subscribe(`/topic/${roomData.value?.id}/userInfoList`,receive_UserInfoList_InRoom)
   wsService.subscribe(`/topic/${roomData.value?.id}/songContentList`,receive_SongContentList_InRoom)
-  wsService.subscribe(`/topic/${roomData.value?.id}/playerData`,receive_PlayerData_InRoom)
   wsService.connect();
 }
 
@@ -300,15 +269,7 @@ const broadcast_sayInRoom = () => {
   wsService?.sendMessage(`/app/${roomData.value?.id}/${userId}/say`, textToSend.value);
   textToSend.value = "";
 }
-//播放器状态更改(需要管理员权限)
-const broadcast_playerStatusChangeInRoom = (playerData:PlayerData) => {
-  if(playerData == null||playerData==undefined) 
-    return
-  if(!HasRoomAdminPower(myUserInfo.value))
-    return
-  //console.log("send_pdata:",playerData);
-  wsService?.sendMessage(`/app/${roomData.value?.id}/${userId}/change/playerStatus`, JSON.stringify(playerData));
-}
+
 //订阅
 //订阅 房间内消息更新 /topic/房间id/receive
 const receive_Msg_InRoom = (msg:IMessage)=>{
@@ -325,18 +286,7 @@ const receive_SongContentList_InRoom = (msg:IMessage)=>{
   let _songContentList = JSON.parse(msg.body) as Song.SongContent[]
   updateSongContentList(_songContentList)
 }
-//订阅 播放器状态更新 /topic/房间id/playerData  (需要排除广播到自己)
-const receive_PlayerData_InRoom = (msg:IMessage)=>{
-  //console.log("上锁上锁上锁上锁上锁上锁上锁");
-  let _playerData = JSON.parse(msg.body) as PlayerData
-  
-  //排除自己发的
-  if(_playerData.srcUserId == userId)
-    return
-  globalProperties?.$GoPlayer.b_lock();//上锁。
-  console.log("🎵播放器状态更新👉");
-  updateMyPlayerData(_playerData);
-}
+
 
 
 //http方法
@@ -461,73 +411,7 @@ const getMyUserInfoInList = (userInfoList:User.UserInfo[]):User.UserInfo|undefin
 
 //播放器相关 
 //播放列表点击事件
-//其他播放器回调事件统一注册、卸载
-const roomPlayerEventReg = () => {
-  //console.log(globalProperties?.$GoPlayer.player);
-  
-  //播放
-  globalProperties?.$GoPlayer.player?.on(Events.PLAY, () => {
-    if(globalProperties?.$GoPlayer.is_b_locked()){
-      //console.log("播放被拦截，锁已解开");
-      globalProperties?.$GoPlayer.b_unlock()
-      return
-    }
-    selectedIndex.value = globalProperties?.$GoPlayer.player?.plugins.music.index;
-    let _playerData:PlayerData = {
-      index: globalProperties?.$GoPlayer.player?.plugins.music.index,
-      url: "",
-      curTime: globalProperties?.$GoPlayer.player?.currentTime,
-      paused: false,
-      srcUserId : userId,
-      isExternal:true,
-    };
-    //console.log("-<<<(((房间内广播_播放)))>>>---");
-    broadcast_playerStatusChangeInRoom(_playerData);
-  });
-  //暂停
-  globalProperties?.$GoPlayer.player?.on(Events.PAUSE, () => {
-    if(globalProperties?.$GoPlayer.is_b_locked()){
-      //console.log("暂停被拦截，锁已解开");
-      globalProperties?.$GoPlayer.b_unlock()
-      return
-    }
-    let _playerData:PlayerData = {
-      index: globalProperties?.$GoPlayer.player?.plugins.music.index,
-      url: "",
-      curTime: globalProperties?.$GoPlayer.player?.currentTime,
-      paused: true,
-      srcUserId : userId,
-      isExternal:true,
-    };
-    //console.log("-<<<(((房间内广播_暂停)))>>>---");
-    broadcast_playerStatusChangeInRoom(_playerData);
-  });
-  //时间调整
-  globalProperties?.$GoPlayer.player?.on(Events.SEEKED, () => {
-    if(globalProperties?.$GoPlayer.is_b_locked()){
-      //console.log("调时间被拦截，锁已解开");
-      globalProperties?.$GoPlayer.b_unlock()
-      return
-    }
-    let _playerData:PlayerData = {
-      index: globalProperties?.$GoPlayer.player?.plugins.music.index,
-      url: "",
-      curTime: globalProperties?.$GoPlayer.player?.currentTime,
-      paused: false,
-      srcUserId : userId,
-      isExternal:true,
-    };
-    //console.log("-<<<(((房间内广播_调时间)))>>>---");
-    broadcast_playerStatusChangeInRoom(_playerData);
-  });
 
-}
-const roomPlayerEventUnreg = () => {
-  globalProperties?.$GoPlayer.player?.off(Events.PLAY, broadcast_playerStatusChangeInRoom)
-  globalProperties?.$GoPlayer.player?.off(Events.PAUSE, broadcast_playerStatusChangeInRoom)
-  globalProperties?.$GoPlayer.player?.off(Events.LOAD_START, broadcast_playerStatusChangeInRoom)
-  globalProperties?.$GoPlayer.player?.off(Events.SEEKED, broadcast_playerStatusChangeInRoom)
-}
 //浏览器更新播放器状态
 const updateMyPlayerData = (playerData:PlayerData):void=>{
   console.log(`浏览器加载第${playerData.index}首歌曲`);

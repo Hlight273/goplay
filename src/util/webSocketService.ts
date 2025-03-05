@@ -11,9 +11,11 @@ export class WebSocketService {
   private activeSubscriptions: StompSubscription[] = [];
   private retryCount:number = 0;
   public MAX_RETRY_COUNT =20;
+
+  private activeDisconnect = false;
   
   constructor(brokerURL: string, userId:number, roomId:number) {
-    console.log("👷‍♂<<构造WsService对象>>"+brokerURL);
+    console.log("<<new WsService>>"+brokerURL);
     this.url = brokerURL;
     this.userId = userId;
     this.roomId = roomId;
@@ -44,18 +46,23 @@ export class WebSocketService {
   }
 
   connect(): void {
+    this.activeDisconnect = false;
     this.client.activate();
   }
 
   disconnect(): void {
+    this.activeDisconnect = true;
     this.client.deactivate();
+    this.cleanupSubscriptions();
+  
   }
 
   public onConnect(frame: any): void {
-    console.log('📞📞连接成功📞📞:', frame);
+    console.log('📞📞连接成功📞📞:'/*, frame*/);
+    this.retryCount = 0
     // **自动恢复所有已备份的订阅**
     if (this.subscriptionQueue.length == 0 && this.backupSubscriptions.length > 0) {
-      console.log("♻️📌 恢复之前的订阅");
+      //console.log("♻️📌 恢复之前的订阅");
       this.backupSubscriptions.forEach(({ destination, callback }) => {
         this.subscribe(destination, callback);
       });
@@ -63,7 +70,7 @@ export class WebSocketService {
 
     // 处理等待中的订阅队列
     if (this.subscriptionQueue.length > 0) {
-      console.log("♻️📌 处理等待队列中的订阅");
+      //console.log("♻️📌 处理等待队列中的订阅");
       this.subscriptionQueue.forEach(({ destination, callback }) => {
         this.subscribe(destination, callback);
       });
@@ -78,7 +85,7 @@ export class WebSocketService {
       const subscription = this.client.subscribe(destination, callback);
       this.activeSubscriptions.push(subscription); // 保存订阅对象，方便取消订阅
     } else {
-      console.log(`☑ 存储端点 ${destination}`);
+      //console.log(`☑ 存储端点 ${destination}`);
       this.subscriptionQueue.push({ destination, callback }); // 将订阅请求加入队列，未处于活跃状态直接用原生的订阅会失败
     }
     // **确保所有订阅都存入备份**
@@ -91,9 +98,14 @@ export class WebSocketService {
     console.error('⚠STOMP错误⚠:', error);
   }
 
-  private  onDisconnect(): void {
+  private onDisconnect(): void {
     console.log('⚠WebSocket已断开连接⚠');
-    this.disconnect();
+
+
+    if (this.activeDisconnect) {
+      console.log("🔌 主动断开，不重连");
+      return; // ✅ 如果是主动断开，则不进行重连
+    }
 
     if(this.retryCount>=this.MAX_RETRY_COUNT){
       console.log(`重连次数已达上限！！终止重连${this.retryCount}`);
@@ -104,6 +116,12 @@ export class WebSocketService {
     console.log(`WebSocket重置中♻️...${this.retryCount}/${this.MAX_RETRY_COUNT}次...`);
     this.client = this.createClient(this.url, this.userId, this.roomId)
     this.connect();
+  }
+
+  private cleanupSubscriptions(): void {
+    console.log("🧹 清理所有订阅");
+    this.activeSubscriptions.forEach(sub => sub.unsubscribe());
+    this.activeSubscriptions = []; // 清空活动订阅
   }
 
   sendMessage(destination: string, body: string): void {

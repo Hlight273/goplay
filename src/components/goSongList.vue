@@ -32,11 +32,14 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { Song } from '@/interface/song';
 import { formatDuration, formatBytes, isNothing } from '@/util/commonUtil'
 
+import { eventBus, MEventTypes } from '@/util/eventBus';
+import { Events } from 'xgplayer';
+
 import { User } from '@/interface/user';
 import { HasRoomAdminPower} from '@/api/user'
 import { getSongFile } from '@/api/song';
 import { roomSongRemove } from '@/api/room';
-import { ResultCode } from '@/util/webConst';
+import { ResultCode, websocketRoot } from '@/util/webConst';
 import { PlayerData } from '@/interface/playerData';
 
 import useCurrentInstance from "@/hooks/useCurrentInstance";
@@ -46,9 +49,12 @@ import AudioUploader from '@/components/audioUploader.vue'
 
 import { useRoomStore } from "@/store/roomStore";
 import { storeToRefs } from "pinia";
-import { eventBus, MEventTypes } from '@/util/eventBus';
+import { WebSocketService } from '@/util/webSocketService';
+import { IMessage } from '@stomp/stompjs';
 const roomStore = useRoomStore();
-const { roomCode } = storeToRefs(roomStore);
+const { roomCode,roomData } = storeToRefs(roomStore);
+
+const userId = Number(localStorage.getItem("userid"))
 
 interface Props {
   songContentList: Song.SongContent[];
@@ -124,13 +130,124 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
 
 onMounted(() => {
     eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, (val:boolean) => { 
+      if(val==true){ //房间模式
+        console.log("<<<<<<<<<<<<<<<<<<<<<<<进入房间模式");
+        subscribeWebsocket();//开启WebSocket
+        roomPlayerEventReg();  //监听播放器就绪事件
+      }
+      else {//单人模式
+        console.log("<<<<<<<<<<<<<<<<<<<<<<<进入单人模式");
         
+        if(wsService!==null){ //卸载WebSocket
+          wsService.disconnect();
+          wsService = null;
+        }
+        roomPlayerEventUnreg();  //清除播放器事件监听
+      }
     });
 });
 
 onUnmounted(() => {
     eventBus.off(MEventTypes.GOPLAYER_MODE_CHANGED);
 });
+
+//其他播放器回调事件统一注册、卸载
+const roomPlayerEventReg = () => {
+  //console.log(globalProperties?.$GoPlayer.player);
+  
+  //播放
+  globalProperties?.$GoPlayer.player?.on(Events.PLAY, () => {
+    if(globalProperties?.$GoPlayer.is_b_locked()){
+      //console.log("播放被拦截，锁已解开");
+      globalProperties?.$GoPlayer.b_unlock()
+      return
+    }
+    selectedIndex.value = globalProperties?.$GoPlayer.player?.plugins.music.index;
+    let _playerData:PlayerData = {
+      index: globalProperties?.$GoPlayer.player?.plugins.music.index,
+      url: "",
+      curTime: globalProperties?.$GoPlayer.player?.currentTime,
+      paused: false,
+      srcUserId : userId,
+      isExternal:true,
+    };
+    //console.log("-<<<(((房间内广播_播放)))>>>---");
+    broadcast_playerStatusChangeInRoom(_playerData);
+  });
+  //暂停
+  globalProperties?.$GoPlayer.player?.on(Events.PAUSE, () => {
+    if(globalProperties?.$GoPlayer.is_b_locked()){
+      //console.log("暂停被拦截，锁已解开");
+      globalProperties?.$GoPlayer.b_unlock()
+      return
+    }
+    let _playerData:PlayerData = {
+      index: globalProperties?.$GoPlayer.player?.plugins.music.index,
+      url: "",
+      curTime: globalProperties?.$GoPlayer.player?.currentTime,
+      paused: true,
+      srcUserId : userId,
+      isExternal:true,
+    };
+    //console.log("-<<<(((房间内广播_暂停)))>>>---");
+    broadcast_playerStatusChangeInRoom(_playerData);
+  });
+  //时间调整
+  globalProperties?.$GoPlayer.player?.on(Events.SEEKED, () => {
+    if(globalProperties?.$GoPlayer.is_b_locked()){
+      //console.log("调时间被拦截，锁已解开");
+      globalProperties?.$GoPlayer.b_unlock()
+      return
+    }
+    let _playerData:PlayerData = {
+      index: globalProperties?.$GoPlayer.player?.plugins.music.index,
+      url: "",
+      curTime: globalProperties?.$GoPlayer.player?.currentTime,
+      paused: false,
+      srcUserId : userId,
+      isExternal:true,
+    };
+    //console.log("-<<<(((房间内广播_调时间)))>>>---");
+    broadcast_playerStatusChangeInRoom(_playerData);
+  });
+
+}
+const roomPlayerEventUnreg = () => {
+  globalProperties?.$GoPlayer.player?.off(Events.PLAY, broadcast_playerStatusChangeInRoom)
+  globalProperties?.$GoPlayer.player?.off(Events.PAUSE, broadcast_playerStatusChangeInRoom)
+  globalProperties?.$GoPlayer.player?.off(Events.LOAD_START, broadcast_playerStatusChangeInRoom)
+  globalProperties?.$GoPlayer.player?.off(Events.SEEKED, broadcast_playerStatusChangeInRoom)
+}
+
+
+//开启ws，订阅端点
+let wsService:WebSocketService| null = null;
+const subscribeWebsocket = () => {
+  wsService = new WebSocketService(websocketRoot, userId, roomData.value.id);
+  wsService.subscribe(`/topic/${roomData.value?.id}/playerData`,receive_PlayerData_InRoom)
+  wsService.connect();
+}
+//播放器状态更改(需要管理员权限)
+const broadcast_playerStatusChangeInRoom = (playerData:PlayerData) => {
+  if(playerData == null||playerData==undefined) 
+    return
+  if(!HasRoomAdminPower(props.myUserInfo))
+    return
+  //console.log("send_pdata:",playerData);
+  wsService?.sendMessage(`/app/${roomData.value?.id}/${userId}/change/playerStatus`, JSON.stringify(playerData));
+}
+//订阅 播放器状态更新 /topic/房间id/playerData  (需要排除广播到自己)
+const receive_PlayerData_InRoom = (msg:IMessage)=>{
+  //console.log("上锁上锁上锁上锁上锁上锁上锁");
+  let _playerData = JSON.parse(msg.body) as PlayerData
+  
+  //排除自己发的
+  if(_playerData.srcUserId == userId)
+    return
+  globalProperties?.$GoPlayer.b_lock();//上锁。
+  console.log("🎵播放器状态更新👉");
+  updateMyPlayerData(_playerData);
+}
 
 
 </script>

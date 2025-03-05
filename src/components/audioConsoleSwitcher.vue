@@ -50,7 +50,7 @@ const { roomCode } = storeToRefs(roomStore);
   border-radius: 50%;
   border: none;
   background-color: #ffffff; /* 绿色，表示开启 */
-  color: white;
+  color: rgb(0, 0, 0);
   display: flex;
   align-items: center;
   justify-content: center;

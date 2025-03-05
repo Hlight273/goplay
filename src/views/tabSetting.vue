@@ -11,7 +11,7 @@
             <!-- <img :src="userinfo.avatarUrl" alt="avator" class="avator"> -->
             <div class="input_box">
                 <span class="stroke">用户名:</span>
-                <GoplayInput placeholder='输入用户名' v-model=curUserName :onSubmit=submitUserName></GoplayInput>
+                <GoplayInput placeholder='输入用户名' v-model=curUserName :onSubmit=submitUserName type='text'></GoplayInput>
             </div>
             <div class="input_box">
                 <span class="stroke">修改密码:</span>
