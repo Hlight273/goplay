@@ -8,18 +8,22 @@ import { App } from 'vue';
 import { Song } from '@/interface/song';
 import { getSongBlob } from '@/api/song';
 import { eventBus,MEventTypes } from "@/util/eventBus";
-import { fa } from 'element-plus/es/locale';
 
 
 export class GoPlayer {
     private static instance: GoPlayer;
-    private playerList: Array<Song.SongContent>|null = null;
-    private curIndex: number = 0;
-    player:Player | null = null;
-    public static broadcast_lock:boolean = false;
-    private hasSynced = false;
+    player4room:Player | null = null;
+    player4local:Player | null = null;
+    
+
     private static inRoomMode = false;
 
+    private roomPlaylist: Song.SongContent[] = [];
+    private personalPlaylist: Song.SongContent[] = [];
+    
+    public static broadcast_lock:boolean = false;
+    private hasSynced = false;
+   
     constructor() { 
         GoPlayer.broadcast_lock=false;
     }  
@@ -32,15 +36,15 @@ export class GoPlayer {
     }
 
     list(){
-        if (this.player==null)
+        if (this.player4room==null)
             return null
-        return this.player.plugins.music.list
+        return this.player4room.plugins.music.list
     }
 
-    registerPlayer(_id:string):void {
-        if (this.player) return;
+    registerPlayer4room(_id:string):void {
+        if (this.player4room) return;
         
-        this.player = new Player({
+        this.player4room = new Player({
             id: _id,
             url: '',
             volume: 0.8,
@@ -75,19 +79,62 @@ export class GoPlayer {
                 },
               },
         })
+        this.player4room.on(Events.PLAY, this.sendNewSongEv)
+        eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, ()=>{this.player4local?.pause(); });
+        console.log("🎵Goplayer4ROOM初始化完成🎵...");
+        console.log("\n");
         
+    }
+    registerPlayer4local(_id:string):void {
+        if (this.player4local) return;
         
-        this.player.on(Events.PLAY, this.sendNewSongEv)
-        console.log("🎵Goplayer初始化完成🎵...");
+        this.player4local = new Player({
+            id: _id,
+            url: '',
+            volume: 0.8,
+            width: window.innerWidth,
+            height: 50,
+            mediaType: 'audio',
+            presets: ['default', MusicPreset],
+            preloadNext: true,//预加载下一首
+            halfPass: true,
+            ignores: ['playbackrate'],
+            controls: {
+                initShow: true,
+                mode: 'flex'
+            },
+            marginControls: true,
+            videoConfig: {
+                crossOrigin: "anonymous"
+            },
+            music: {
+                list: [{}]
+            },
+            icons: {
+                play: () => {
+                    const imgSrc = require('@/assets/icons/play1.png');
+                    const dom = Util.createDom('div', `<img src="${imgSrc}"/>`, {}, 'mse_btn');
+                    return dom;
+                },
+                pause: ()=>{
+                    const imgSrc = require('@/assets/icons/pause1.png');
+                    const dom = Util.createDom('div', `<img src="${imgSrc}"/>`, {}, 'mse_btn');
+                    return dom;
+                },
+              },
+        })
+        this.setupPlayer4localListeners();
+        eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, ()=>{this.player4room?.pause(); });
+        console.log("🎵Goplayer4LOCAL初始化完成🎵...");
         console.log("\n");
         
     }
 
     
-    async syncPlayList(_playerList:Array<Song.SongContent>):Promise<void>{
+    async syncPlayList(_list:Array<Song.SongContent>):Promise<void>{
         this.list().length = 0;
         // 创建所有 getSongBlob 的 Promise
-        const promises = _playerList.map((song, i) =>
+        const promises = _list.map((song, i) =>
             getSongBlob(song.songUrl).then(res => ({ res, song, index: i }))
         );
         // 等待所有 Blob 加载完成
@@ -99,7 +146,7 @@ export class GoPlayer {
         // 按顺序添加到播放列表
         for (const { res, song, index } of results) {
             if (res) {
-                this.player?.plugins.music.add({
+                this.player4room?.plugins.music.add({
                     src: res,
                     title: song.songInfo.songName,
                     vid: '00000' + index,
@@ -108,56 +155,67 @@ export class GoPlayer {
                 console.log(`>>>> 歌曲 ${index} 已同步: ${song.songInfo.songName} >>>>`);
             }
         }
-        this.playerList = _playerList;
-        // console.log(results);
-        // console.log(this.list());
-        
+        this.roomPlaylist = _list;     
+    }
+    loadPlaylist4local(_list:Array<Song.SongContent>){
+        this.player4local?.plugins.music.list.splice(0); //清空
+        this.personalPlaylist = _list;
+        this.personalPlaylist.forEach((song, index) => {
+            
+            this.player4local?.plugins.music.add({
+                vid: `song_${index}`,
+                title: song.songInfo.songName,
+                poster: song.coverBase64,
+                // 使用占位符，实际播放时加载
+                src: 'about:blank' 
+            });
+        });
     }
 
     getCurSongContent():Song.SongContent|null{
-        if(!this.playerList)
+        if(!this.roomPlaylist)
             return null;
-        let index = this.player?.plugins.music.index;
-        let target = this.playerList[index];
+        let index = this.player4room?.plugins.music.index;
+        let target = this.roomPlaylist[index];
         if(target==null||target==undefined)
             return null;
         return target;
     }
 
     forceReset():void{
-        if(this.player)
-            this.player.plugins.music.list = null
-        this.player?.reset();
+        if(this.player4room)
+            this.player4room.plugins.music.list = null
+        this.player4room?.reset();
     }
 
     syncPlayerData(_data:PlayerData):void{
 
         //console.log("sync_pdata:",_data);
         
-        if (!this.player || this.player.plugins.music.list==null) 
+        if (!this.player4room || this.player4room.plugins.music.list==null) 
             return
 
-        let dataIsSetIndex = _data.curTime==0 && _data.index!=this.player.plugins.music.index;
+        let dataIsSetIndex = _data.curTime==0 && _data.index!=this.player4room.plugins.music.index;
 
         //状态为播放 才允许调时间(time为0走setindex而不是调时间)
         if(!_data.paused){
-            this.player.seek(_data.curTime);
+            this.player4room.seek(_data.curTime);
         }
 
         //来的数据时间为0，index和上一首不同才视为调index (有一种特殊情况那就是尚未初始化过)
         if(dataIsSetIndex || !this.hasSynced){
-            this.player.plugins.music.setIndex(_data.index);
+            this.player4room.plugins.music.setIndex(_data.index);
         }
 
         //仅仅切换暂停播放
-        if (_data.paused === this.player.paused) return;
+        if (_data.paused === this.player4room.paused) return;
         
         if(_data.paused){      
-            this.player.autoplay = false;
-            this.player.pause();
+            this.player4room.autoplay = false;
+            this.player4room.pause();
         }else{
-            this.player.autoplay = true;
-            this.player.play().then(() => {
+            this.player4room.autoplay = true;
+            this.player4room.play().then(() => {
                 
            }).catch(() => {
                //console.log("catch"); //未经用户交互时的自动播放
@@ -166,24 +224,76 @@ export class GoPlayer {
 
         this.hasSynced = true;
     }
+    setPlayer4RoomIndex(_index:number):void{
+        if (!this.player4room || this.player4room.plugins.music.list==null) 
+            return
+        this.player4room.plugins.music.setIndex(_index);
+        this.player4room.autoplay = true;
+        this.player4room.play();
+    } 
+    async setPlayer4localIndex(_index:number):Promise<void>{
+        if (!this.player4local || this.player4local.plugins.music.list==null) 
+            return
+        await this.preload(_index);
+        this.player4local.plugins.music.setIndex(_index);
+        this.player4local.autoplay = true;
+        this.player4local.play();
+    } 
+
 
     checkCache():Promise<any>{
-        return this.player?.plugins.music.checkOffline()
+        return this.player4room?.plugins.music.checkOffline()
+    }
+    // 在播放器事件监听中增加处理
+    private setupPlayer4localListeners() {
+        // 预加载下一首
+        this.player4local?.on(Events.TIME_UPDATE, async ({ currentTime }) => {   
+            const cIndex:number = this.player4local?.plugins.music.index;
+            if(!this.player4local?.duration)
+                return;
+            if(cIndex+1 > this.player4local?.plugins.music.list.length-1)//+1下一首防止越界
+                return;
+            if (currentTime > this.player4local?.duration - 30) { // 提前30秒加载
+                const nextrealURL = this.personalPlaylist[cIndex].songUrl;
+                if (nextrealURL) {
+                    const blob = await BlobCacheManager.getInstance().getBlob(nextrealURL);
+                    if(this.player4local)
+                        this.player4local.plugins.music.list[cIndex+1].src = URL.createObjectURL(blob)
+                }
+            }
+        });
+    }
+    private async preload(_index:number){
+        const cIndex:number = _index;
+        const realURL:string = this.personalPlaylist[cIndex].songUrl;
+
+        try {
+            const blob = await BlobCacheManager.getInstance().getBlob(realURL);
+            if(this.player4local)
+                this.player4local.plugins.music.list[cIndex].src = URL.createObjectURL(blob)
+            
+        } catch (e) {
+            console.error('加载失败:', realURL);
+        }
     }
 
 
 
-    isPaused():boolean{
-        if (!this.player) 
+    isPausedRoomPlayer():boolean{
+        if (!this.player4room) 
             return true
-        return this.player.paused;
+        return this.player4room.paused;
     }
 
     destroy() {
-        if (this.player) {
-            this.player.off(Events.PLAY, this.sendNewSongEv)
-            this.player.destroy();
-            this.player = null;
+        if (this.player4room) {
+            this.player4room.off(Events.PLAY, this.sendNewSongEv)
+            this.player4room.destroy();
+            this.player4room = null;
+        }
+        if (this.player4local) {
+            this.player4local.destroy();
+            this.player4room = null;
         }
     }
 
@@ -210,6 +320,7 @@ export class GoPlayer {
         this.inRoomMode = false;
         eventBus.emit(MEventTypes.GOPLAYER_MODE_CHANGED, false);
     }
+    static isRoomMode = ():boolean => this.inRoomMode==true
     
 }
 
@@ -222,3 +333,48 @@ const GoPlayerPlugin = {
 };
 
 export default GoPlayerPlugin;
+
+
+
+
+
+
+class BlobCacheManager {
+    private static instance: BlobCacheManager;
+    private cache: Map<string, Blob> = new Map(); // 使用歌曲URL作为key
+
+    static getInstance() {
+        if (!BlobCacheManager.instance) {
+            BlobCacheManager.instance = new BlobCacheManager();
+        }
+        return BlobCacheManager.instance;
+    }
+
+    async getBlob(url: string): Promise<Blob> {
+        if (this.cache.has(url)) {
+            return this.cache.get(url)!;
+        }
+        
+        const blobURL = await getSongBlob(url) as string;
+        const blob = await this.createBlobFromBlobUrl(blobURL);
+        this.cache.set(url, blob);
+        return blob;
+    }
+
+    clearCache() {
+        this.cache.clear();
+    }
+
+    deleteCache(url: string) {
+        this.cache.delete(url);
+    }
+
+    private async createBlobFromBlobUrl(blobUrl: string): Promise<Blob> {
+        const response = await fetch(blobUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const blob = await response.blob(); // 将 Blob URL 转换为 Blob
+        return blob;
+    }
+}

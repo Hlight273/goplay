@@ -101,7 +101,9 @@
       <div class="listZone">
           <GoSongList 
           :my-user-info="myUserInfo" 
-          :song-content-list="songContentList"/>
+          :playlist-id="-1"
+          :song-content-list="songContentList"
+          :is-room-playlist="true"/>
       </div>
       
     </div>

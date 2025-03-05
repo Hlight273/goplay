@@ -24,13 +24,15 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { UploadFilled, Upload, Refrigerator } from '@element-plus/icons-vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
-import { uploadAudio } from "@/api/upload";
+import { uploadAudio4Playlist, uploadAudio4Room } from "@/api/upload";
 import { allowedMimeTypes, maxFileSize } from '@/util/webConst';
 const { globalProperties } = useCurrentInstance();
 
 const props = defineProps<{
   roomCode: string;
   userId: number;
+  playlistId: number;
+  isRoomPlaylist: boolean;
 }>();
 
 const fileList = ref<UploadUserFile[]>([
@@ -49,16 +51,30 @@ const uploadFile = (options:any)=>{
     let rawFile:File = options.file
     fileList.value = []
     console.log("上传文件:",rawFile);
-    uploadAudio(props.userId, props.roomCode,rawFile).then(()=>{
-        fileList.value.push(
-        { 
-            name: rawFile.name,
-            url: require('@/assets/icons/audio_folder.png')
-        });
-        globalProperties?.$message.success('上传成功！')
-        loading.value = false;
-        fileList.value = []
-    })
+    if(props.isRoomPlaylist){//上传到房间歌单
+        uploadAudio4Room(props.userId, props.roomCode, rawFile).then(()=>{
+            fileList.value.push(
+            { 
+                name: rawFile.name,
+                url: require('@/assets/icons/audio_folder.png')
+            });
+            globalProperties?.$message.success('上传成功！')
+            loading.value = false;
+            fileList.value = []
+        })
+    }else{//上传到普通歌单
+        uploadAudio4Playlist(props.userId, props.playlistId, rawFile).then(()=>{
+            fileList.value.push(
+            { 
+                name: rawFile.name,
+                url: require('@/assets/icons/audio_folder.png')
+            });
+            globalProperties?.$message.success('上传成功！')
+            loading.value = false;
+            fileList.value = []
+        })
+    }
+   
 }
 
 const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {//限制总数

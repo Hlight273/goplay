@@ -1,7 +1,8 @@
 <template>
     <div class="mse_outline">
         <div class="gradient-border">
-            <div id="mse"></div>
+            <div id="mse_room" class="mse" v-show="isRoomMode"></div>
+            <div id="mse_local" class="mse" v-show="!isRoomMode"></div>
             <AudioConsoleSwitcher/>
         </div>
     </div>
@@ -14,11 +15,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount, Ref, computed } from 'vue'
+import { ref, onMounted, onUnmounted, Ref } from 'vue'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { GoPlayer } from '@/util/XgPlayer';
 import AudioConsoleSwitcher from './audioConsoleSwitcher.vue';
+import { eventBus, MEventTypes } from '@/util/eventBus';
 const { globalProperties } = useCurrentInstance();
+
+import { useRoomStore } from "@/store/roomStore";
+import { storeToRefs } from "pinia";
+const roomStore = useRoomStore();
+const { isRoomMode } = storeToRefs(roomStore);
 
 const currentTime = ref(new Date().toLocaleTimeString());
 
@@ -26,28 +33,23 @@ let locked:Ref<any> = ref();
 
 onMounted(()=>{
   //初始化播放器 绑定到home页面的mse上
-  console.log("\n");
-  console.log("🎵播放器已挂载🎵");
-  globalProperties?.$GoPlayer.registerPlayer("mse")
+ // console.log("\n");
+  //console.log("🎵播放器已挂载🎵");
+  globalProperties?.$GoPlayer.registerPlayer4room("mse_room")
+  globalProperties?.$GoPlayer.registerPlayer4local("mse_local")
 
   locked = ref(GoPlayer.broadcast_lock)
   let timer = setInterval(() => {
     currentTime.value = new Date().toLocaleTimeString();
     //console.log(GoPlayer.broadcast_lock);
   }, 1);
-  
 })  
-
-onBeforeMount(()=>{
-  globalProperties?.$GoPlayer.destroy()
-})
-
 
 
 </script>
 
 <style scoped>
-#mse {
+.mse {
   width: calc(100% - 0px) !important;
   position: fixed;
   bottom: 0vw;
@@ -61,14 +63,14 @@ onBeforeMount(()=>{
   z-index: 1; /* 确保文本在渐变边框上方 */
   text-align: center;
 }
-:deep(#mse .xgplayer-controls) {
+:deep(.mse .xgplayer-controls) {
   height: 0;
 }
-:deep(#mse .xg-pos){
+:deep(.mse .xg-pos){
   box-sizing: border-box;
   padding: 0px 22px;
 }
-:deep(#mse .xgplayer-progress-btn) {
+:deep(.mse .xgplayer-progress-btn) {
   display: block;
   background: rgba(231, 232, 255, 0.304);
   border: .5px solid rgba(255, 94, 94, .056545);
@@ -84,15 +86,15 @@ onBeforeMount(()=>{
   box-sizing: border-box;
   pointer-events: none;
 }
-:deep(#mse .xgplayer-error){
+:deep(.mse .xgplayer-error){
   display: none;
 }
-:deep(#mse .xgplayer-progress-played){
+:deep(.mse .xgplayer-progress-played){
   background: none;
   /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
   animation: backgroundDarkAnimation 3s linear infinite; /* 动画效果 */
 }
-:deep(#mse .xgplayer-slider){
+:deep(.mse .xgplayer-slider){
   background: #5e5e5e;
   border-radius: 10px;
   border: 0.01vh solid #c7c4d6;
@@ -100,19 +102,19 @@ onBeforeMount(()=>{
 }
 
 
-:deep(#mse .xgplayer-bar){
+:deep(.mse .xgplayer-bar){
   left: 12px;
   bottom: 16px;
   height: 68px;
 }
-:deep(#mse .xgplayer-drag){
+:deep(.mse .xgplayer-drag){
     /* bottom: 14px; */
   background: #ffd1d1;
   max-height: 66px;
   /* border: 0.01vh solid #000000; */
   box-shadow: 0px 0.3vh 0.4vh 0px rgb(255 0 111 / 82%);
 }
-:deep(#mse .xgplayer-drag:after){
+:deep(.mse .xgplayer-drag:after){
   content: " ";
     display: inline-block;
     width: 6px;
@@ -127,7 +129,7 @@ onBeforeMount(()=>{
     /* border: 1px solid #5d4f4f; */
     box-shadow: 0px .1vh 1.2vh 2px #ff6d8470;
 }
-:deep(#mse .mse_btn) {
+:deep(.mse .mse_btn) {
   width: 40px;
   height: 40px;
 }

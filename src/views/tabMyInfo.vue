@@ -29,7 +29,9 @@
         <h3>{{ selectedPlaylistInfo.playlist.title }}</h3>
         <GoSongList 
           :my-user-info="myUserinfo" 
-          :song-content-list="selectedPlaylistInfo.songContentList"/>
+          :playlist-id="selectedPlaylistInfo.playlist.id"
+          :song-content-list="selectedPlaylistInfo.songContentList"
+          :is-room-playlist="false"/>
         <!-- <ul>
           <li v-for="(song, index) in selectedPlaylistInfo.songContentList" :key="index">{{ song }}</li>
         </ul> -->
@@ -50,6 +52,7 @@ import { ResultCode } from '@/util/webConst';
 import { getPlaylistInfo } from '@/api/playlist';
 import { Playlist } from '@/interface/Playlist';
 import GoSongList from '@/components/goSongList.vue'
+import { GoPlayer } from '@/util/XgPlayer';
 const { globalProperties } = useCurrentInstance();
 
 const myUserinfo = ref<User.UserInfo>({
@@ -86,6 +89,7 @@ const playlistInfoInitData:Playlist.PlaylistInfo = {
 const selectedPlaylistInfo = reactive<Playlist.PlaylistInfo>({...playlistInfoInitData});
 const selectPlaylist = (playlistInfo:Playlist.PlaylistInfo) => {
   Object.assign(selectedPlaylistInfo, playlistInfo);
+  GoPlayer.getInstance().loadPlaylist4local(playlistInfo.songContentList)
 };
 const closePlaylist = ()=>{
   Object.assign(selectedPlaylistInfo, playlistInfoInitData);

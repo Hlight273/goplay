@@ -1,4 +1,5 @@
 import { Room } from "@/interface/room";
+import { eventBus, MEventTypes } from "@/util/eventBus";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -9,6 +10,8 @@ export const useRoomStore = defineStore("room", () => {
     const roomData = ref<Room.Room>({...rawRoomData})
     // 存储当前房间码
     const roomCode = ref(""); 
+    //播放器是否是roomMode
+    const isRoomMode = ref(false);
 
     const enterRoom = (_roomData: Room.Room) => {
         roomData.value = _roomData;
@@ -20,7 +23,15 @@ export const useRoomStore = defineStore("room", () => {
         roomCode.value = "";
     };
 
-    return { roomData, roomCode, enterRoom, leaveRoom };
+    const myUserHasRoom = ():boolean => roomCode.value!=""
+
+
+    const handleModeChanged = (val: boolean) => {
+        isRoomMode.value = val;
+    }
+    eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, handleModeChanged);
+    
+    return { roomData, roomCode, isRoomMode, enterRoom, leaveRoom, myUserHasRoom };
 });
 
 const rawRoomData = {

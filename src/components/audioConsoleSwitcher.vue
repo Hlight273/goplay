@@ -1,5 +1,5 @@
 <template>
-  <button @click="toggleGoplayerMode" class="toggle-btn">
+  <button v-show="roomStore.myUserHasRoom()" @click="toggleGoplayerMode" class="toggle-btn">
     <el-icon v-show="isRoomMode"><HomeFilled /></el-icon>
     <el-icon v-show="!isRoomMode"><Service /></el-icon>
   </button>
@@ -14,30 +14,25 @@ import { useRoomStore } from "@/store/roomStore";
 import { storeToRefs } from "pinia";
 import { isNothing } from '@/util/commonUtil';
 const roomStore = useRoomStore();
-const { roomCode } = storeToRefs(roomStore);
+const { roomCode,isRoomMode } = storeToRefs(roomStore);
 
-    const isRoomMode = ref(false);
 
-    const toggleGoplayerMode = ()=>{
-        if(isNothing(roomCode.value)) 
-            GoPlayer.quitRoomMode();
-        if (isRoomMode.value) {
-            GoPlayer.quitRoomMode();
-        } else {
-            GoPlayer.enterRoomMode();
-        }
-    }
-
-    onMounted(() => {
-        eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, (val:boolean) => { 
-            isRoomMode.value = val;
-        });
-    });
-
-    onUnmounted(() => {
-        eventBus.off(MEventTypes.GOPLAYER_MODE_CHANGED);
-    });
+const toggleGoplayerMode = ()=>{
+    console.log("isroommode",isRoomMode.value,"roomcode",roomCode.value);
     
+    if(!roomStore.myUserHasRoom()) {
+        console.log("没有房间");
+        
+        GoPlayer.quitRoomMode();
+        return;
+    }
+       
+    if (isRoomMode.value) {
+        GoPlayer.quitRoomMode();
+    } else {
+        GoPlayer.enterRoomMode();
+    }
+}
 </script>
 
 <style>
@@ -45,8 +40,8 @@ const { roomCode } = storeToRefs(roomStore);
     position: absolute;
     bottom: 7vh;
     right: 1vh;
-  width: 40px;
-  height: 40px;
+  width: 4vh;
+  height: 4vh;
   border-radius: 50%;
   border: none;
   background-color: #ffffff; /* 绿色，表示开启 */
@@ -55,7 +50,7 @@ const { roomCode } = storeToRefs(roomStore);
   align-items: center;
   justify-content: center;
   transition: background 0.3s ease-in-out, transform 0.2s;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px .4vh .6vh rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }
 
