@@ -19,6 +19,7 @@
     "filepond-plugin-file-validate-type": "^1.2.9",
     "filepond-plugin-image-preview": "^4.6.12",
     "mitt": "^3.0.1",
+    "pinia": "^3.0.1",
     "sockjs-client": "^1.6.1",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",

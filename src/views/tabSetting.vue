@@ -1,7 +1,14 @@
 <template>
     <div class="content">
+
+        <div class="infobox">
+            <img :src="userinfo?.avatarUrl" alt="avator" class="avatar">
+            <div class="usertitle">欢迎回来，{{ User.descForUser(userinfo) }}<span>{{ userinfo?.username }}</span>！</div>
+        </div>
+
         <div class="line_top">
             <div class="title"><el-icon><Avatar /></el-icon>个人信息</div>
+            <!-- <img :src="userinfo.avatarUrl" alt="avator" class="avator"> -->
             <div class="input_box">
                 <span class="stroke">用户名:</span>
                 <GoplayInput placeholder='输入用户名' v-model=curUserName :onSubmit=submitUserName></GoplayInput>
@@ -10,10 +17,12 @@
                 <span class="stroke">修改密码:</span>
                 <GoplayInput placeholder='输入原密码' v-model=curInputedPwd :onSubmit=submitUserName type='password'></GoplayInput>
             </div>
+            <span class="userId">#{{ userinfo.id }}</span>
             
         </div>
         <div class="line_top">
             <div class="title"><el-icon><Coin /></el-icon>积分充值</div>
+            lv{{vipinfo.level}} {{ vipinfo.startTime }}-{{ vipinfo.endTime }}
             <el-button class="super_submit" style="width: 8vh;">充值vip</el-button>
         </div>
     </div>
@@ -33,6 +42,13 @@ const userinfo = ref<User.UserInfo>({
   username: '',
   avatarUrl: '',
   level: 0
+});
+const vipinfo = ref<User.VipInfo>({
+  userId: 0,
+  level: 1,
+  startTime: new Date().toString(),
+  endTime: new Date().toString(), 
+  days: 0,
 });
 const userId = Number(localStorage.getItem("userid"));
 
@@ -67,8 +83,7 @@ onMounted(() => {
 <style scoped>
 .content {
     margin-right: 10px;
-    display: flex
-;
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
     color: #434343;
@@ -135,6 +150,46 @@ onMounted(() => {
     font-weight: bold;
     font-size: 1.4vh;
 }
+.content .line_top .avator{
+  margin-top: 0px;
+  height: 3.2vh;
+  width: 3.2vh;
+  border-radius: 2.5vh;
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, .3);
+}
+
+
+.infobox {
+  box-sizing: border-box;
+  padding: 60px 0;
+  /* height: 100%; */
+  width: 100%;
+  /* width: 500px;
+  height: 400px; */
+  text-align: center
+}
+.infobox .avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 100px;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+}
+.infobox .usertitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgb(75, 66, 89);
+  font-family: NSimSun;
+  margin-top: 20px
+}
+.infobox .usertitle>span{
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 </style>
 
 <!-- <style>

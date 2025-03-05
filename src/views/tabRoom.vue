@@ -100,7 +100,7 @@
     <div class="line listPanel" v-show="currentRoomState==RoomStatus.LIST">
       <div class="listZone">
 
-          <ul class="songUl">
+          <!-- <ul class="songUl">
             <li :class="[
                   'songLi', 
                   selectedIndex == i ? 'select' : '', 
@@ -125,7 +125,13 @@
           </ul>
           <li class="songLi uploadSong">
               <AudioUploader :user-id="userId" :room-code="roomData.roomCode"/>
-          </li>
+          </li> -->
+
+          <GoSongList 
+          :my-user-info="myUserInfo" 
+          :song-content-list="songContentList"
+          :room-code="roomData.roomCode"/>
+
       </div>
       
     </div>
@@ -163,28 +169,27 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted} from 'vue'
 import { ArrowLeft, Promotion} from '@element-plus/icons-vue'
-import { roomCreate,isUserInRoom,roomJoin,roomExit,roomMember,roomOwnerTransPrivilege,roomMemberPrivilege,roomSongContentList, roomSongRemove} from '@/api/room'
-import { userRoomInfo, getPrivilegeName, HasOwnerPower, HasRoomAdminPower} from '@/api/user'
-import { getSongBlob, getSongFile } from '@/api/song'
-import { formatDuration, formatBytes, copyToClipboard } from '@/util/commonUtil'
 
-import useCurrentInstance from "@/hooks/useCurrentInstance";
+import { IMessage } from '@stomp/stompjs';
+
+import { roomCreate,roomJoin,roomExit,roomMember,roomOwnerTransPrivilege,roomMemberPrivilege,roomSongContentList, roomSongRemove} from '@/api/room'
+import { userRoomInfo, getPrivilegeName, HasOwnerPower, HasRoomAdminPower} from '@/api/user'
 import { Room } from '@/interface/room'
 import { Privilege, User } from '@/interface/user'
+import { Song } from '@/interface/song';
+import { PlayerData } from '@/interface/playerData'
 import { WebSocketService } from '@/util/webSocketService';
 import { ResultCode, websocketRoot } from '@/util/webConst';
-import { Client, IMessage } from '@stomp/stompjs';
-import { TabsPaneContext } from 'element-plus';
-import { Song } from '@/interface/song';
-import {downloadWithAxios} from '@/util/request'
-import { PlayerData } from '@/interface/playerData'
-import AudioUploader from '@/components/audioUploader.vue'
+import {  copyToClipboard } from '@/util/commonUtil'
+
+
+import useCurrentInstance from "@/hooks/useCurrentInstance";
+const { globalProperties } = useCurrentInstance();
+
 import AudioCdPlayer from '@/components/audioCdPlayer.vue'
 import { Events } from 'xgplayer'
-import { eventBus,MEventTypes } from '@/util/eventBus'
+import GoSongList from '@/components/goSongList.vue'
 
-
-const { globalProperties } = useCurrentInstance();
 
 //room、user's data
 const userId = Number(localStorage.getItem("userid"))
@@ -194,17 +199,13 @@ const myUserInfo = ref<User.UserInfo>({
   avatarUrl: '',
   level:0
 })
+import { useRoomStore } from "@/store/roomStore";
+import { storeToRefs } from "pinia";
+import { GoPlayer } from '@/util/XgPlayer';
+const roomStore = useRoomStore();
 const roomCode_join = ref('');
-const roomData = ref<Room.Room>({
-  id: 0,
-  roomName: '',
-  ownerId: 0,
-  maxUsers: 0,
-  currentUsers: 0,
-  roomCode: '',
-  createdAt: '',
-  isActive: 0
-})
+const { roomCode, roomData } = storeToRefs(roomStore);
+
 const userInfoList = ref<User.UserInfo[]>()
 const songContentList = reactive<Song.SongContent[]>([])
 const selectedIndex = ref<number>(-1)
@@ -230,17 +231,18 @@ const setPageState = (pageState:PageStatus, _roomData?:Room.Room)=>{
   switch (currentPageState.value) {
     case PageStatus.IN_ROOM: //进入房间
       if(_roomData){
-        roomData.value = _roomData;
-        roomCode_join.value = _roomData.roomCode;
+        roomStore.enterRoom(_roomData);
         updateRoomUserInfo();//进入房间 刷新用户信息  
         updateSongContentInfo();//进入房间 刷新歌单信息  
-        subscribeWebsocket()//开启WebSocket
+        subscribeWebsocket();//开启WebSocket
         roomPlayerEventReg();  //监听播放器就绪事件
+        GoPlayer.enterRoomMode();
       }
       break;
     case PageStatus.WAIT_FOR_ROOM:
-      roomCode_join.value = '';
+      roomStore.leaveRoom();
       roomPlayerEventUnreg();  //清除播放器事件监听
+      GoPlayer.quitRoomMode();
       break;
     default:
       break;
@@ -372,8 +374,8 @@ const joinNewRoom = ()=>{
 }
 
 const exitRoom = ()=>{
-  if(roomCode_join.value==undefined) return
-  roomExit(roomCode_join.value, userId).then(
+  if(roomCode.value==undefined) return
+  roomExit(roomCode.value, userId).then(
     (res)=>{   
       switch (res.code) {
         case ResultCode.SUCCESS:
@@ -389,8 +391,8 @@ const exitRoom = ()=>{
 }
 
 const updateRoomUserInfo = () => {
-  if(roomCode_join.value==undefined) return
-  roomMember(roomCode_join.value).then(
+  if(roomCode.value==undefined) return
+  roomMember(roomCode.value).then(
       (res)=>{   
       switch (res.code) {
         case ResultCode.SUCCESS:
@@ -405,8 +407,8 @@ const updateRoomUserInfo = () => {
 }
 
 const updateSongContentInfo = () => {
-  if(roomCode_join.value==undefined) return
-  roomSongContentList(roomCode_join.value).then(
+  if(roomCode.value==undefined) return
+  roomSongContentList(roomCode.value).then(
       (res)=>{   
       switch (res.code) {
         case ResultCode.SUCCESS:
@@ -418,27 +420,6 @@ const updateSongContentInfo = () => {
     },(err)=>{
 
     });
-}
-
-const removeSong = (songId:number) => {
-  if(songId==undefined || songId<0 || songId == null) return ""
-  roomSongRemove(roomCode_join.value, songId, {userId: userId}).then(
-      (res)=>{   
-      switch (res.code) {
-        case ResultCode.SUCCESS:
-          globalProperties?.$message.success(res.message)
-          break;
-        default:
-          break;
-      }
-    },(err)=>{
-
-    });
-}
-
-const downloadSong = (songUrl:string) => {
-  if(songUrl==undefined || songUrl=="" || songUrl == null) return ""
-  getSongFile(songUrl)
 }
 
 //本地页面
@@ -480,27 +461,6 @@ const getMyUserInfoInList = (userInfoList:User.UserInfo[]):User.UserInfo|undefin
 
 //播放器相关 
 //播放列表点击事件
-const selectSong = (event: MouseEvent, songContent:Song.SongContent, i:number):void=>{
-  event.stopPropagation();//防止事件向下传递
-  //前端先检查 该歌曲是否已选中 && 浏览器用户是否有管理员房间权限
-  if(i==selectedIndex.value) return;
-  if(!HasRoomAdminPower(myUserInfo.value)) return;
-  //根据方法构造歌曲状态
-  let playerData:PlayerData = {
-    index: i,
-    url: "",
-    curTime: 0,
-    paused: false,
-    srcUserId : userId,
-    isExternal:false,
-  };
-  console.log("pdata:",playerData);
-  
-  //websocket转发歌曲状态
-  //broadcast_playerStatusChangeInRoom(playerData);
-  //浏览器更新播放器
-  updateMyPlayerData(playerData);
-}
 //其他播放器回调事件统一注册、卸载
 const roomPlayerEventReg = () => {
   //console.log(globalProperties?.$GoPlayer.player);
@@ -850,92 +810,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
 .listZone .listOutRange::-webkit-scrollbar{
   display: none;
 }
-.songUl {
-  position: relative;
-  width: calc(100% + 1.6vh);
-  overflow-y: scroll;
-  max-height: 52vh;
-  padding-right: 2vh;
-}
-.songLi {
-  margin: .6vh .6vh;
-  padding: 0.3vh 0;
-  display: flex;
-  align-items: center;
-  background-color: #ededf1;
-  border-radius: .6vh;
-  box-shadow: 0px 0px 0.2vh .1vh rgb(91 98 116 / 20%);
-  transition: all 0.5s ease-out;
-}
-.songLi .uploadSong {
-  position: sticky;
-  bottom: .4vh;
-}
-.songLi.admin:hover span.delete{
-  flex: 1 1 0%;
-}
-.songLi.select {
-  background-color: #fbfbfb;
-}
-.songLi span {
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 1.28vh;
-  color: #474747;
-}
-.songLi img:nth-child(1) {
-  margin: 0px 1.2vh 0 1vh;
-  width: 3.5vh;
-  height: 3.5vh;
-  border-radius: .4vh;
-}
-.songLi span:nth-child(2) {
-  flex: 8 1 0%;
-}
-.songLi span:nth-child(3) {
-  flex: 3 1 0%;
-}
-.songLi span:nth-child(4) {
-  flex: 3 1 0%;
-}
-.songLi span:nth-child(5) {
-  flex: 1.5 1 0%;
-}
-.songLi span:nth-child(6) {
-  /* margin-left: -3vh; */
-  flex: 1.5 1 0%;
-  padding-right: 2vh;
-}
-.songLi span:nth-child(6)>i {
-  cursor: pointer;
-  padding: .3vh;
-  font-size: 2vh;
-  color: #ab9bbb;
-}
-.songLi span.delete {
-  flex: 0 1 0%;
-  margin: 0 1vh;
-  cursor: pointer;
-  font-size: 1.6vh;
-  color: #ffffff;
-  border-radius: 2vh;
-  background-color: #6f6f95;
-  display: flex;
-  /* align-items: center; */
-  justify-content: center;
-  transition: all 0.3s ease-out;
-}
-.songLi span.delete i {
-  height: 2.4vh;
-  width: 2vh;
-}
-.songLi span.delete:hover {
-  background-color: #ffffff00;
-  color: #474747;
-}
+
 
 
 /* 点头像的 用户弹出框 */

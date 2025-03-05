@@ -36,6 +36,14 @@ export namespace User {
             return '';
         return Level.Enum[userInfo.level];
     }
+
+    export interface VipInfo {
+        userId: number;
+        level: number;
+        startTime: string;
+        endTime: string;
+        days: number;
+    }
 }
 export namespace Privilege {
     export enum Enum {

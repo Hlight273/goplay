@@ -18,6 +18,7 @@ export class GoPlayer {
     player:Player | null = null;
     public static broadcast_lock:boolean = false;
     private hasSynced = false;
+    private static inRoomMode = false;
 
     constructor() { 
         GoPlayer.broadcast_lock=false;
@@ -199,6 +200,15 @@ export class GoPlayer {
     sendNewSongEv = () =>  {
         let songContent = this.getCurSongContent();
         eventBus.emit(MEventTypes.PLAY_NEW_SONG, songContent)
+    }
+
+    static enterRoomMode = () => {
+        this.inRoomMode = true;
+        eventBus.emit(MEventTypes.GOPLAYER_MODE_CHANGED, true);
+    }
+    static quitRoomMode = () => {
+        this.inRoomMode = false;
+        eventBus.emit(MEventTypes.GOPLAYER_MODE_CHANGED, false);
     }
     
 }

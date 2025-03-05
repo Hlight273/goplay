@@ -67,5 +67,8 @@ export function copyToClipboard(textToCopy:string) {
 export function isNullorEmpty(text:string):boolean {
   return text == null || text=='';
 }
+export function isNothing(text:string):boolean {
+  return text == null || text==undefined || text=='';
+}
 
 

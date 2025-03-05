@@ -1,12 +1,9 @@
 <template>
-  <header>
-    <el-button class="logout_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
-
-  </header>
+  <Goheader></Goheader>
   <main>
     <el-tabs :tab-position="tabPosition" type="border-card" class="demo-tabs">
       <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><UserFilled/></el-icon></span></template>
+        <template #label><span class="custom-tabs-label"><el-icon><Promotion/></el-icon></span></template>
         <TabMyInfo></TabMyInfo>
       </el-tab-pane>
       <el-tab-pane>
@@ -26,7 +23,6 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router';
-import { logout } from '@/api/user'
 import { ResultCode, needDebugOutpot } from '@/util/webConst'
 
 import useCurrentInstance from "@/hooks/useCurrentInstance";
@@ -39,23 +35,8 @@ import TabMyInfo from './tabMyInfo.vue';
 import TabRoom from './tabRoom.vue';
 import AudioConsole from '@/components/audioConsole.vue';
 import TabSetting from './tabSetting.vue';
+import Goheader from '@/components/goheader.vue';
 
-const userLogout = ()=>{
-  logout().then(
-    (res)=>{   
-      switch (res.code) {
-        case ResultCode.SUCCESS:          
-          localStorage.removeItem("token")
-          globalProperties?.$router.replace("/login")
-          globalProperties?.$message.success(res.message)
-          break;
-        default:
-          break;
-      }
-    },(err)=>{
-
-    });
-}
 
 onMounted(()=>{
   if(needDebugOutpot)
@@ -66,17 +47,6 @@ onMounted(()=>{
 </script>
 
 <style scoped>
-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 100%;
-  height: 5vh;
-  box-sizing: border-box;
-  padding: .5vh;
-  box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
-}
-
 main {
   box-sizing: border-box;
   height: calc(calc(var(--i-window-height) - 6vh) - 1px);

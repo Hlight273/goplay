@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import GoPlayerPlugin from "@/util/XgPlayer";
 import ElementPlus from 'element-plus'
+import { createPinia } from "pinia";
 //import webSocketPlugin from '@/util/webSocketPlugin';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
@@ -21,5 +22,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.use(router);
 app.use(ElementPlus)
 app.use(GoPlayerPlugin);
+app.use(createPinia());
 //app.use(webSocketPlugin, { url: 'http://localhost:8085' });
 app.mount('#app');

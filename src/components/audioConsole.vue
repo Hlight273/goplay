@@ -2,45 +2,48 @@
     <div class="mse_outline">
         <div class="gradient-border">
             <div id="mse"></div>
+            <AudioConsoleSwitcher/>
         </div>
     </div>
 
     <div v-show="locked" style="position: fixed; top: 44%; left: 47%;">
       <img :src="require('@/assets/icons/lock.png')" alt="">
     </div>
+
+    
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount, Ref } from 'vue'
+import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount, Ref, computed } from 'vue'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { GoPlayer } from '@/util/XgPlayer';
+import AudioConsoleSwitcher from './audioConsoleSwitcher.vue';
 const { globalProperties } = useCurrentInstance();
-
 
 const currentTime = ref(new Date().toLocaleTimeString());
 
 let locked:Ref<any> = ref();
+
 onMounted(()=>{
   //初始化播放器 绑定到home页面的mse上
   console.log("\n");
   console.log("🎵播放器已挂载🎵");
   globalProperties?.$GoPlayer.registerPlayer("mse")
 
-
-
-
   locked = ref(GoPlayer.broadcast_lock)
   let timer = setInterval(() => {
     currentTime.value = new Date().toLocaleTimeString();
-    console.log(GoPlayer.broadcast_lock);
-    
+    //console.log(GoPlayer.broadcast_lock);
   }, 1);
+  
 })  
 
-  
 onBeforeMount(()=>{
   globalProperties?.$GoPlayer.destroy()
 })
+
+
+
 </script>
 
 <style scoped>
