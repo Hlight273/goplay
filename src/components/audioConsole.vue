@@ -165,6 +165,11 @@ onUnmounted(()=>{
     z-index: 1;
     text-align: center;
   }
+
+  /* 下一首用的不是我的api 故直接删除*/
+  :deep(#mse_local .xgplayer-next){
+    display: none;
+  }
   
 
   @keyframes gradient-border-animation {
@@ -175,7 +180,6 @@ onUnmounted(()=>{
         background-position: 100% 0%;
     }
   }
-
   @keyframes backgroundDarkAnimation {
     0% {
       background-color: #5900ff;
@@ -202,7 +206,6 @@ onUnmounted(()=>{
       background-color: #5900ff;
     }
   }
-
   @keyframes backgroundAnimation {
     0% {
       background-color: #ce9292;
