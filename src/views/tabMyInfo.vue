@@ -12,48 +12,25 @@
       <div class="recommend-container">
         <h2>推荐歌单</h2>
         <div class="recommend-list">
-          <div v-for="(playlistInfo, index) in recommendedPlaylists" :key="index" class="playlist-item" @click="selectPlaylist(playlistInfo)">
-            <img :src='(playlistInfo.playlist.cover_url!=null)?
-              ("data:image/png;base64," + playlistInfo.playlist.cover_url):
-              require("@/assets/icons/default_album.png")' class="playlist-cover" />
-            <p>{{ playlistInfo.playlist.title }}</p>
+          <div v-for="(playlistInfo, index) in recommendedPlaylists" :key="index" >
+            <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- 歌单详情弹出层 -->
-    <div v-if="selectedPlaylistInfo.playlist.id>=0" class="playlist-overlay" >
-      <div class="playlist-content">
-        <el-icon class="close_btn" @click="closePlaylist"><CloseBold/></el-icon>
-        <h3>{{ selectedPlaylistInfo.playlist.title }}</h3>
-        <GoSongList 
-          :my-user-info="myUserinfo" 
-          :playlist-id="selectedPlaylistInfo.playlist.id"
-          :song-content-list="selectedPlaylistInfo.songContentList"
-          :is-room-playlist="false"/>
-        <!-- <ul>
-          <li v-for="(song, index) in selectedPlaylistInfo.songContentList" :key="index">{{ song }}</li>
-        </ul> -->
-      </div>
-    </div>
-
   </div>
    
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted} from 'vue'
-
-import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { userInfo } from '@/api/user';
 import { User } from '@/interface/user';
 import { ResultCode } from '@/util/webConst';
 import { getPlaylistInfo } from '@/api/playlist';
-import { Playlist } from '@/interface/Playlist';
-import GoSongList from '@/components/goSongList.vue'
+import { Playlist } from '@/interface/playlist';
 import { GoPlayer } from '@/util/XgPlayer';
-const { globalProperties } = useCurrentInstance();
+import PlaylistBlock from '@/components/playlistBlock.vue'
 
 const myUserinfo = ref<User.UserInfo>({
   id: 0,
@@ -71,30 +48,6 @@ const banners = ref([
   "https://via.placeholder.com/800x300?text=Banner+2",
   "https://via.placeholder.com/800x300?text=Banner+3",
 ]);
-
-const playlistInfoInitData:Playlist.PlaylistInfo = {
-  playlist: {
-    id: -1,
-    user_id: 0,
-    title: '',
-    description: '',
-    cover_url: null,
-    added_at: '',
-    update_at: '',
-    is_active: 0,
-    is_public: 0
-  },
-  songContentList: []
-}
-const selectedPlaylistInfo = reactive<Playlist.PlaylistInfo>({...playlistInfoInitData});
-const selectPlaylist = (playlistInfo:Playlist.PlaylistInfo) => {
-  Object.assign(selectedPlaylistInfo, playlistInfo);
-  GoPlayer.getInstance().loadPlaylist4local(playlistInfo.songContentList)
-};
-const closePlaylist = ()=>{
-  Object.assign(selectedPlaylistInfo, playlistInfoInitData);
-}
-
 
 onMounted(() => {
   userInfo(userId).then(
@@ -156,54 +109,5 @@ onMounted(() => {
   padding: 2vh 0;
 }
 
-.playlist-item {
-  text-align: center;
-  cursor: pointer;
-}
 
-.playlist-cover {
-  width: 20vh;
-  height: 20vh;
-  border-radius: 5px;
-  transition: transform 0.3s ease-in-out;
-}
-
-.playlist-cover:hover {
-  transform: scale(1.05);
-}
-
-.playlist-overlay {
-  z-index: 100;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.playlist-content {
-  position: relative;
-  padding: 0 1vh;
-    padding-top: 1vh;
-    padding-bottom: 1.6vh;
-    width: 90%;
-    max-height: 64vh;
-    background-color: #f5f5f6;
-    border-radius: 1vh;
-    border: .1vh solid #e7e7e7;
-    box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
-    overflow: hidden;
-}
-.playlist-content .close_btn {
-  cursor: pointer;
-    color: var(--el-color-primary);
-    font-size: 3vh;
-    position: absolute;
-    top: 1vh;
-    right: 1vh;
-}
 </style>

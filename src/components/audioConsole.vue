@@ -16,11 +16,8 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, Ref } from 'vue'
-import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { GoPlayer } from '@/util/XgPlayer';
 import AudioConsoleSwitcher from './audioConsoleSwitcher.vue';
-import { eventBus, MEventTypes } from '@/util/eventBus';
-const { globalProperties } = useCurrentInstance();
 
 import { useRoomStore } from "@/store/roomStore";
 import { storeToRefs } from "pinia";
@@ -33,17 +30,20 @@ let locked:Ref<any> = ref();
 
 onMounted(()=>{
   //初始化播放器 绑定到home页面的mse上
- // console.log("\n");
-  //console.log("🎵播放器已挂载🎵");
-  globalProperties?.$GoPlayer.registerPlayer4room("mse_room")
-  globalProperties?.$GoPlayer.registerPlayer4local("mse_local")
+  console.log("\n");
+  console.log("🎵播放器已挂载🎵");
+  GoPlayer.getInstance().registerPlayer4room("mse_room")
+  GoPlayer.getInstance().registerPlayer4local("mse_local")
 
   locked = ref(GoPlayer.broadcast_lock)
   let timer = setInterval(() => {
     currentTime.value = new Date().toLocaleTimeString();
     //console.log(GoPlayer.broadcast_lock);
   }, 1);
-})  
+}) 
+onUnmounted(()=>{
+  GoPlayer.getInstance().destroy();
+})
 
 
 </script>

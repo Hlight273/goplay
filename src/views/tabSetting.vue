@@ -3,7 +3,7 @@
 
         <div class="infobox">
             <img :src="userinfo?.avatarUrl" alt="avator" class="avatar">
-            <div class="usertitle">欢迎回来，{{ User.descForUser(userinfo) }}<span>{{ userinfo?.username }}</span>！</div>
+            <div class="usertitle">欢迎回来，{{ User.describtionUser(userinfo) }}<span>{{ userinfo?.username }}</span>！</div>
         </div>
 
         <div class="line_top">

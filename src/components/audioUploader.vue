@@ -25,7 +25,7 @@ import { UploadFilled, Upload, Refrigerator } from '@element-plus/icons-vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { uploadAudio4Playlist, uploadAudio4Room } from "@/api/upload";
-import { allowedMimeTypes, maxFileSize } from '@/util/webConst';
+import { allowedAudioMimeTypes, maxAudioFileSize } from '@/util/webConst';
 const { globalProperties } = useCurrentInstance();
 
 const props = defineProps<{
@@ -89,12 +89,12 @@ const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {//限制�
 const BeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
     console.log("before",rawFile);
     return new Promise((resolve, reject)=>{
-        if (!allowedMimeTypes.includes(rawFile.type)) {
-            globalProperties?.$message.warning("音频格式支持: "+allowedMimeTypes.join('、')+" ！")
+        if (!allowedAudioMimeTypes.includes(rawFile.type)) {
+            globalProperties?.$message.warning("音频格式支持: "+allowedAudioMimeTypes.join('、')+" ！")
             reject();
-        }else if (rawFile.size > maxFileSize) {
+        }else if (rawFile.size > maxAudioFileSize) {
             
-            globalProperties?.$message.warning('文件大小不能超过'+maxFileSize/1024/1024+'MB!')
+            globalProperties?.$message.warning('文件大小不能超过'+maxAudioFileSize/1024/1024+'MB!')
             reject();
         }
         resolve();

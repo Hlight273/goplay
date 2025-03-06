@@ -20,3 +20,10 @@ export const uploadAudio4Playlist = (userId:number, playlistId:number, file:File
     
     return http.post<Result<string>>(URL, formData);
 }
+
+export const uploadPlaylistCover = (file:File) => {
+    let URL =  `/playlist/image`
+    let formData = new FormData();
+    formData.append('file', file);
+    return http.post<Result<string>>(URL, formData);
+}

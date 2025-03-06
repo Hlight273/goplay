@@ -11,6 +11,10 @@
         <TabRoom></TabRoom>
       </el-tab-pane>
       <el-tab-pane>
+        <template #label><span class="custom-tabs-label"><el-icon><Menu/></el-icon></span></template>
+        <TabMyPlaylist></TabMyPlaylist>
+      </el-tab-pane>
+      <el-tab-pane>
         <template #label><span class="custom-tabs-label"><el-icon><Tools/></el-icon></span></template>
         <TabSetting></TabSetting>
       </el-tab-pane>
@@ -36,6 +40,7 @@ import TabRoom from './tabRoom.vue';
 import AudioConsole from '@/components/audioConsole.vue';
 import TabSetting from './tabSetting.vue';
 import Goheader from '@/components/goheader.vue';
+import TabMyPlaylist from './tabMyPlaylist.vue';
 
 
 onMounted(()=>{

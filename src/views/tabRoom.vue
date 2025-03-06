@@ -232,7 +232,7 @@ onMounted(() => {
           globalProperties?.$message.success(res.message)
           setPageState(PageStatus.IN_ROOM, res.oData)
           break;
-        case 20002://没加入过房间
+        case ResultCode.EMPTY://没加入过房间
           globalProperties?.$message.success(res.message)
           break;
         default:

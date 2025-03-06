@@ -18,7 +18,7 @@ export const webRoot = isServerRelease?`http://${FinalIp}/api`:`http://${FinalIp
 
 export const needDebugOutpot = true;
 
-export const allowedMimeTypes:Array<string> = [
+export const allowedAudioMimeTypes:Array<string> = [
         "audio/mpeg",  // MP3
         "audio/wav",   // WAV
         "audio/flac",  // FLAC
@@ -26,4 +26,13 @@ export const allowedMimeTypes:Array<string> = [
         "audio/ogg"  // OGG
     ]
 
-export const maxFileSize = 100 * 1024 * 1024; // 允许上传最大100MB的音频文件
+export const maxAudioFileSize = 100 * 1024 * 1024; // 允许上传最大100MB的音频文件
+
+export const allowedImageMimeTypes: Array<string> = [
+    "image/png",  // PNG
+    "image/jpeg", // JPG
+    "image/webp", // WebP
+    "image/bmp"   // BMP
+];
+
+export const maxImageFileSize = 10 * 1024 * 1024; // 允许上传最大10MB的图片文件

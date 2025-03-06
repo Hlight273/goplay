@@ -1,4 +1,5 @@
 import useCurrentInstance from "@/hooks/useCurrentInstance";
+import { Playlist } from "@/interface/playlist";
 import { Result } from "@/interface/result";
 import { Room } from "@/interface/room";
 import { Privilege, User } from "@/interface/user";
@@ -26,7 +27,11 @@ export const userInfo = (userId:number) => {
 }
 
 export const userInfoByToken = (data:AxiosRequestConfig) => {
-    return http.get<Result<User.UserInfo>>(`/user/info`,data);
+    return http.get<Result<User.UserInfo>>(`/user/info`, data);
+}
+
+export const userPlaylistInfo = (playlistOwnerId:number) => {
+    return http.get<Result<Playlist.PlaylistInfo[]>>(`/user/${playlistOwnerId}/playlist/info`);
 }
 
 export const getPrivilegeName = (userinfo:User.UserInfo):string => {
