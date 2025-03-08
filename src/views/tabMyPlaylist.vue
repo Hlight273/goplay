@@ -22,17 +22,20 @@
       <el-form-item label="歌单描述" :rules="[ { required: true, message: '请输入歌单描述', trigger: 'blur' } ]">
         <el-input v-model="playlistFormData.description" placeholder="请输入歌单描述" />
       </el-form-item>
-      <el-form-item label="封面">
+      <el-form-item label="设置封面">
         <ImageUploader :upload-callback="onImageUpload"></ImageUploader>
       </el-form-item>
-      <el-form-item label="公开">
+      <el-form-item label="是否公开">
         <el-switch v-model="playlistFormData.isPublic" :active-value="1" :inactive-value="0" active-text="公开" inactive-text="私密" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button @click="dialogVisible = false" style="color: var(--el-color-primary);">取消</el-button>
       <el-button type="primary" @click="isUpdateDialog?submitUpdatePlaylist():submitAddPlaylist()">确定</el-button>
       <el-button v-show="isUpdateDialog" class="super_submit" @click="deletePlaylist">删除歌单</el-button>
+
+      <el-button v-show="isUpdateDialog" class="super_submit" @click="submitAddRecommend">推送歌单+</el-button>
+      <el-button v-show="isUpdateDialog" class="super_submit" @click="submitRemoveRecommend">去除推送-</el-button>
     </div>
   </el-dialog>
 </template>
@@ -49,13 +52,9 @@ import { uploadPlaylistCover } from '@/api/upload';
 import { ElMessage } from 'element-plus';
 import ImageUploader from '@/components/ImageUploader.vue'
 import PlaylistBlock from '@/components/playlistBlock.vue'
+import { addRecommend, removeRecommend } from '@/api/recommend';
 const userId = Number(localStorage.getItem("userid"));
-const myUserinfo = ref<User.UserInfo>({
-  id: 0,
-  username: '',
-  avatarUrl: '',
-  level:0
-});
+const myUserinfo = ref<User.UserInfo>({...User.UserInfo_InitData});
 
 const myPlaylistInfos = reactive<Playlist.PlaylistInfo[]>([]);
 
@@ -76,6 +75,7 @@ const openDialog_UpdatePlaylist = (playlist:Playlist.Playlist) => {
 
 const resetForm = () => {
   Object.assign(playlistFormData, {...Playlist.playlistForm_InitData})
+  isUpdateDialog.value = false;
 }
 
 const submitAddPlaylist = () => {
@@ -138,6 +138,19 @@ const deletePlaylist = () => {
       default:
         break;
     }
+  })
+}
+
+const submitAddRecommend =()=>{
+  addRecommend(playlistFormData.id)
+  .then((res)=>{
+    ElMessage.success(res.message);
+  })
+}
+const submitRemoveRecommend =()=>{
+  removeRecommend(playlistFormData.id)
+  .then((res)=>{
+    ElMessage.success(res.message);
   })
 }
 

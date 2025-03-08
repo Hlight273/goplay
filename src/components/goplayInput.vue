@@ -126,6 +126,7 @@ onBeforeUnmount(() => {
     border: none;
     font-size: 1.6vh;
     color: var(--font-dark);
+    background-color: #fcfcfc;
     transition: all 0.2s ease-out;
     border-radius: 2vh;
 }
@@ -137,6 +138,7 @@ input.gp_input[type="text" i],[type="password" i] {
 .gp_input.clicked {
     /* border-bottom: 0.1vh solid var(--border-light); */
     box-shadow: 0px 0vh .2vh 0px rgb(101 95 156 / 30%);
+    background-color: #fff;
 }
 .btn_submit {
     background-color: var(--el-color-primary);

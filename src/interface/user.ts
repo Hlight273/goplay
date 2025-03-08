@@ -12,6 +12,7 @@ export namespace User {
         room_id?: number
         privilege?: number
         level: number
+        nickname:string
     }
     
     export interface UserId {
@@ -33,6 +34,13 @@ export namespace User {
         if(userInfo.level == Level.Enum.普通 || Level.Enum[userInfo.level] == undefined) 
             return '';
         return Level.Enum[userInfo.level];
+    }
+    export const UserInfo_InitData:UserInfo = 
+    { id: -1, 
+        username: '', 
+        avatarUrl: '', 
+        level: 0 ,
+        nickname: ''
     }
 
     export interface VipInfo {

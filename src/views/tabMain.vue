@@ -12,7 +12,7 @@
       <div class="recommend-container">
         <h2>推荐歌单</h2>
         <div class="recommend-list">
-          <div v-for="(playlistInfo, index) in recommendedPlaylists" :key="index" >
+          <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
             <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
           </div>
         </div>
@@ -31,17 +31,13 @@ import { getPlaylistInfo } from '@/api/playlist';
 import { Playlist } from '@/interface/playlist';
 import { GoPlayer } from '@/util/XgPlayer';
 import PlaylistBlock from '@/components/playlistBlock.vue'
+import { getRecommendPlaylists } from '@/api/recommend';
 
-const myUserinfo = ref<User.UserInfo>({
-  id: 0,
-  username: '',
-  avatarUrl: '',
-  level:0
-});
+const myUserinfo = ref<User.UserInfo>({...User.UserInfo_InitData});
 
 const userId = Number(localStorage.getItem("userid"));
-const recommendPlaylistIds = [3,4,5]
-const recommendedPlaylists = ref<Playlist.PlaylistInfo[]>([]);
+const recommendPlaylistIds:number[] = []
+const recommendedPlaylistInfos = ref<Playlist.PlaylistInfo[]>([]);
 
 const banners = ref([
   "https://via.placeholder.com/800x300?text=Banner+1",
@@ -59,26 +55,36 @@ onMounted(() => {
         default:
           break;
       }
-    },(err)=>{
-
     });
 
-    recommendPlaylistIds.forEach(index => {
-      getPlaylistInfo(index).then(
-      (res)=>{   
-        switch (res.code) {
-          case ResultCode.SUCCESS:{
-            recommendedPlaylists.value?.push(res.oData);
-            break;
-          }
-          default:
-            break;
-        }
-      },(err)=>{
+    getRecommendPlaylists().then(
+    (res)=>{   
+      switch (res.code) {
+        case ResultCode.SUCCESS:          
+          recommendedPlaylistInfos.value = res.oData;
+          break;
+        default:
+          break;
+      }
+    });
 
-      });
+
+    // recommendPlaylistIds.forEach(index => {
+    //   getPlaylistInfo(index).then(
+    //   (res)=>{   
+    //     switch (res.code) {
+    //       case ResultCode.SUCCESS:{
+    //         recommendedPlaylistInfos.value?.push(res.oData);
+    //         break;
+    //       }
+    //       default:
+    //         break;
+    //     }
+    //   },(err)=>{
+
+    //   });
       
-    });
+    // });
     
 })
 

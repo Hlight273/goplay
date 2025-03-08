@@ -70,7 +70,7 @@ interface Props {
   isRoomPlaylist: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
-  myUserInfo: () => ({ id: 1, username: 'defaultUser', avatarUrl: '', level: 1 }),
+  myUserInfo: () => ({...User.UserInfo_InitData}),
   playlistInfo: ()=>({...Playlist.playlistInfo_InitData}),
   isRoomPlaylist: false,
 });

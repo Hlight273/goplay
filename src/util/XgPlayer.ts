@@ -132,7 +132,7 @@ export class GoPlayer {
         }
         if (this.player4local) {
             this.player4local.destroy();
-            this.player4room = null;
+            this.player4local = null;
         }
     }
 

@@ -4,7 +4,7 @@
     <el-tabs :tab-position="tabPosition" type="border-card" class="demo-tabs">
       <el-tab-pane>
         <template #label><span class="custom-tabs-label"><el-icon><Promotion/></el-icon></span></template>
-        <TabMyInfo></TabMyInfo>
+        <TabMain></TabMain>
       </el-tab-pane>
       <el-tab-pane>
         <template #label> <span class="custom-tabs-label"> <el-icon><HomeFilled/></el-icon></span></template>
@@ -35,7 +35,7 @@ const { globalProperties } = useCurrentInstance();
 import type { TabsInstance } from 'element-plus'
 const tabPosition = ref<TabsInstance['tabPosition']>('left') //tab栏暂时设在左边
 
-import TabMyInfo from './tabMyInfo.vue';
+import TabMain from './tabMain.vue';
 import TabRoom from './tabRoom.vue';
 import AudioConsole from '@/components/audioConsole.vue';
 import TabSetting from './tabSetting.vue';

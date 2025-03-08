@@ -3,7 +3,7 @@
 
         <div class="infobox">
             <img :src="userinfo?.avatarUrl" alt="avator" class="avatar">
-            <div class="usertitle">欢迎回来，{{ User.describtionUser(userinfo) }}<span>{{ userinfo?.username }}</span>！</div>
+            <div class="usertitle">欢迎回来，{{ User.describtionUser(userinfo) }}<span>{{ userinfo?.nickname }}</span>！</div>
         </div>
 
         <div class="line_top">
@@ -11,19 +11,24 @@
             <!-- <img :src="userinfo.avatarUrl" alt="avator" class="avator"> -->
             <div class="input_box">
                 <span class="stroke">用户名:</span>
-                <GoplayInput placeholder='输入用户名' v-model=curUserName :onSubmit=submitUserName type='text'></GoplayInput>
+                <span class="label">{{ userinfo.username }}</span>
             </div>
             <div class="input_box">
-                <span class="stroke">修改密码:</span>
-                <GoplayInput placeholder='输入原密码' v-model=curInputedPwd :onSubmit=submitUserName type='password'></GoplayInput>
+                <span class="stroke">昵称:</span>
+                <GoplayInput placeholder='输入昵称' v-model=curNickname :onSubmit=submitNickname type='text'></GoplayInput>
             </div>
+            <!-- <div class="input_box">
+                <span class="stroke">修改密码:</span>
+                <GoplayInput placeholder='输入原密码' v-model=curInputedOldPwd :onSubmit=submitNickname type='password'></GoplayInput>
+            </div> -->
+            <el-button class="super_submit floating_rightup" @click="">修改密码</el-button>
             <span class="userId">#{{ userinfo.id }}</span>
             
         </div>
         <div class="line_top">
             <div class="title"><el-icon><Coin /></el-icon>积分充值</div>
             lv{{vipinfo.level}} {{ vipinfo.startTime }}-{{ vipinfo.endTime }}
-            <el-button class="super_submit" style="width: 8vh;">充值vip</el-button>
+            <el-button class="super_submit floating_rightup" style="width: 8vh;">充值vip</el-button>
         </div>
     </div>
 </template>
@@ -32,7 +37,7 @@
 import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount } from 'vue'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { User } from '@/interface/user';
-import { userInfo } from '@/api/user';
+import { updateNickname, userInfo } from '@/api/user';
 import { ResultCode } from '@/util/webConst';
 import GoplayInput from '@/components/goplayInput.vue';
 const { globalProperties } = useCurrentInstance();
@@ -41,7 +46,8 @@ const userinfo = ref<User.UserInfo>({
   id: 0,
   username: '',
   avatarUrl: '',
-  level: 0
+  level: 0,
+  nickname: '',
 });
 const vipinfo = ref<User.VipInfo>({
   userId: 0,
@@ -52,15 +58,27 @@ const vipinfo = ref<User.VipInfo>({
 });
 const userId = Number(localStorage.getItem("userid"));
 
-const curUserName = ref('')
-const curInputedPwd = ref('')
+const curNickname = ref('')
+const curInputedOldPwd = ref('')
+const curInputedNewPwd1 = ref('')
+const curInputedNewPwd2 = ref('')
 
-const submitUserName = (text:string, callback: (text: string) => void)=>{
-    console.log("改名");
+const submitNickname = (text:string, callback: (text: string) => void)=>{
+  updateNickname(text).then(
+    (res)=>{   
+      switch (res.code) {
+        case ResultCode.SUCCESS:          
+          callback(text);
+          userinfo.value.nickname = curNickname.value;
+          break;
+        default:
+          break;
+      }
+    });
     // fetch('/api/submit', { body: childValue })
     // .then(() => callback(true))  // 🟢 通过回调返回结果
     // .catch(() => callback(false));
-    callback(text+'改') 
+    
 }
 
 onMounted(() => {
@@ -69,7 +87,7 @@ onMounted(() => {
       switch (res.code) {
         case ResultCode.SUCCESS:          
           userinfo.value = res.oData
-          curUserName.value = userinfo.value.username
+          curNickname.value = userinfo.value.nickname
           break;
         default:
           break;
@@ -105,13 +123,7 @@ onMounted(() => {
     border-radius: 1vh;
     box-shadow: 0px -.23vh .2vh 0px rgb(216 207 255 / 57%) inset;
 }
-.content .line_top .el-button {
-    background-color: var(--el-color-primary);
-}
-.content .line_top .el-button:hover {
-    background-color: var(--el-color-primary-light-3);
-    color: white;
-}
+
 .content .line_top .title{
     position: absolute;
     display: flex;
@@ -149,6 +161,24 @@ onMounted(() => {
     color: #ffffff;
     font-weight: bold;
     font-size: 1.4vh;
+}
+.content .line_top .input_box span.label {
+  margin-left: 0.8vh;
+  color: var(--font-grey);
+    font-size: 1.6vh;
+    font-weight: lighter;
+    font-family: ui-serif;
+}
+.content .line_top .userId {
+  height: 2vh;
+    line-height: 2vh;
+    position: absolute;
+    right: 1.2vh;
+    bottom: 1vh;
+    font-size: 2vh;
+    color: #d5ceef;
+    font-family: Segoe UI Black;
+    font-weight: bold;
 }
 .content .line_top .avator{
   margin-top: 0px;
@@ -188,6 +218,11 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.floating_rightup {
+  position: absolute;
+  right: 1vh;
 }
 
 </style>

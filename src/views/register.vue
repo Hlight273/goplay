@@ -64,7 +64,7 @@ const form = reactive<RegisterRuleForm>({
 })
 
 const validatePassword = (rule: any, value: string, callback: (message?: Error) => void) => {
-    console.log(form.password+" "+form.password2)
+    //console.log(form.password+" "+form.password2)
     if (value === '') {
         callback(new Error('请再次输入密码'));
     } else if (value !== form.password) {
@@ -88,7 +88,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     return
   await formEl.validate((valid, fields) => {
     if (!valid) {
-      globalProperties.$message.error(`格式有误！`)
+      globalProperties?.$message.error(`格式有误！`)
       return
     }
     let data0 = (({ username, password }) => ({ username, password }))(form);//加密前
@@ -99,8 +99,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     register(data).then((res)=>{
       switch (res.code) {
         case 20000:
-          globalProperties.$router.replace({path: "/login", query: data0})//跳转到登陆页面用的是加密前
-          globalProperties.$message.success(res.message)
+          globalProperties?.$router.replace({path: "/login", query: data0})//跳转到登陆页面用的是加密前
+          globalProperties?.$message.success(res.message)
           break;
         default:
           break;

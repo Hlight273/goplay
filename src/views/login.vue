@@ -43,6 +43,8 @@ import { User } from '@/interface/user';
 const addPassFlag=ref(false)//图标显示标识
 
 onMounted(() => {//login到reg自动填充账号密码
+  if(globalProperties==null)
+    return;
   let regdata = globalProperties.$router.currentRoute.value.query
   if (Object.keys(regdata).length > 0){
     console.log("路由从login切换到reg传输了："+regdata);
@@ -71,7 +73,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     return
   await formEl.validate((valid, fields) => {
     if (!valid){
-      globalProperties.$message.error(`格式有误！`)
+      globalProperties?.$message.error(`格式有误！`)
       return
     }
      
@@ -85,8 +87,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
           localStorage.setItem("username",res.data.username)
           localStorage.setItem("userid",res.data.userid.toString())
           localStorage.setItem("token",res.data.token)
-          globalProperties.$router.replace("/home")
-          globalProperties.$message.success(res.message)
+          globalProperties?.$router.replace("/home")
+          globalProperties?.$message.success(res.message)
           break;
         default:
           break;

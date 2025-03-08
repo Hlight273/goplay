@@ -34,6 +34,22 @@ export const userPlaylistInfo = (playlistOwnerId:number) => {
     return http.get<Result<Playlist.PlaylistInfo[]>>(`/user/${playlistOwnerId}/playlist/info`);
 }
 
+export const updateNickname = (newNickname:string) => {
+    let formData = new FormData();
+    formData.append('newNickname', newNickname);
+    return http.put<Result<boolean>>(`/user/nickname`, formData);
+}
+
+export const updatePwd = (oldPwd:string, newPwd:string) => {
+    let formData = new FormData();
+    formData.append('oldPwd', oldPwd);
+    formData.append('newPwd', newPwd);
+    return http.put<Result<boolean>>(`/user/pwd`, formData);
+}
+
+
+
+//非api
 export const getPrivilegeName = (userinfo:User.UserInfo):string => {
     try {
         if(userinfo.privilege!=undefined && userinfo.privilege!=null)

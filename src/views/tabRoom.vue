@@ -40,14 +40,14 @@
             <el-icon class="permissionIcon" v-show="userinfo.privilege==1"><Avatar color="#ffa46f" /></el-icon>
             <el-icon class="permissionIcon" v-show="userinfo.privilege==2"><Avatar color="#3fc271" /></el-icon>
             <img :src="userinfo.avatarUrl" alt="avator" class="avator">
-            <span>{{ userinfo.id==userId?'我':userinfo.username }}</span>
+            <span>{{ userinfo.id==userId?'我':userinfo.nickname }}</span>
           </div>
           <template #dropdown>
             <div class="playerInfoPanel">
               <div class="info">
                 <img :src="userinfo.avatarUrl" alt="avator" class="avator">
                 <div class="infoRight">
-                  <span class="userName">{{ userinfo.username }}</span>
+                  <span class="userName">{{ userinfo.nickname }}</span>
                   <span class="userPri">权限：{{getPrivilegeName(userinfo)}}</span>
                   <span class="userId">#{{ userinfo.id }}</span>
                 </div>
@@ -102,7 +102,6 @@
           <GoSongList 
           :my-user-info="myUserInfo" 
           :playlist-info="{...Playlist.playlistInfo_InitData, songContentList:songContentList}"
-          :song-content-list="songContentList"
           :is-room-playlist="true"/>
       </div>
       
@@ -114,7 +113,7 @@
         <div :class="msg.userInfo.id==userId?'msgbox me':'msgbox'" v-for="msg in msgList">
           <img :src="msg.userInfo.avatarUrl" alt="avator" class="avator">
           <div class="side">
-            <div :class="msg.userInfo.id==userId?'name me':'name'"> {{ msg.userInfo.username }}</div>
+            <div :class="msg.userInfo.id==userId?'name me':'name'"> {{ msg.userInfo.nickname }}</div>
             <div class="msg">{{ msg.msg }}</div>
           </div>
         </div>
@@ -165,12 +164,7 @@ import GoSongList from '@/components/goSongList.vue'
 
 //room、user's data
 const userId = Number(localStorage.getItem("userid"))
-const myUserInfo = ref<User.UserInfo>({
-  id: 0,
-  username: '',
-  avatarUrl: '',
-  level:0
-})
+const myUserInfo = ref<User.UserInfo>({...User.UserInfo_InitData})
 import { useRoomStore } from "@/store/roomStore";
 import { storeToRefs } from "pinia";
 import { GoPlayer } from '@/util/XgPlayer';
