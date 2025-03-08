@@ -3,9 +3,9 @@
         <li :class="[
             'songLi', 
             selectedIndex == i ? 'select' : '', 
-            HasRoomAdminPower(myUserInfo) ? 'admin' : ''
+            canDeleteSong(playlistInfo.playlist, myUserInfo) ? 'admin' : ''
           ]"
-          v-for="(songContent, i) in songContentList" 
+          v-for="(songContent, i) in playlistInfo.songContentList" 
           @click="(event:any) =>selectSong(event,i)">
             <img :src='(songContent.coverBase64!=null)?
             ("data:image/png;base64," + songContent.coverBase64):
@@ -24,7 +24,11 @@
         </li>
     </ul>
     <li class="songLi uploadSong">
-        <AudioUploader :user-id="myUserInfo.id" :playlist-id="playlistId" :room-code="roomCode" :is-room-playlist="isRoomPlaylist"/>
+        <AudioUploader :user-id="myUserInfo.id"
+          :playlist-id="playlistInfo.playlist.id"
+          :room-code="roomCode"
+          :is-room-playlist="isRoomPlaylist"
+          @upload-success="handleUploadSuccess"/>
     </li>
 </template>
 
@@ -37,7 +41,7 @@ import { eventBus, MEventTypes } from '@/util/eventBus';
 import { Events } from 'xgplayer';
 
 import { User } from '@/interface/user';
-import { HasRoomAdminPower} from '@/api/user'
+import { HasPlaylistPermission, HasRoomAdminPower} from '@/api/user'
 import { getSongFile } from '@/api/song';
 import { roomSongRemove } from '@/api/room';
 import { ResultCode, websocketRoot } from '@/util/webConst';
@@ -53,21 +57,21 @@ import { storeToRefs } from "pinia";
 import { WebSocketService } from '@/util/webSocketService';
 import { IMessage } from '@stomp/stompjs';
 import { GoPlayer } from '@/util/XgPlayer';
+import { Playlist } from '@/interface/playlist';
+import { removeSongInPlaylist } from '@/api/playlist';
 const roomStore = useRoomStore();
 const { roomCode,roomData } = storeToRefs(roomStore);
 
 const userId = Number(localStorage.getItem("userid"))
 
 interface Props {
-  songContentList: Song.SongContent[];
   myUserInfo: User.UserInfo;
-  playlistId: number;
+  playlistInfo: Playlist.PlaylistInfo;
   isRoomPlaylist: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
-  songContentList: undefined,
   myUserInfo: () => ({ id: 1, username: 'defaultUser', avatarUrl: '', level: 1 }),
-  playlistId: -1,
+  playlistInfo: ()=>({...Playlist.playlistInfo_InitData}),
   isRoomPlaylist: false,
 });
 
@@ -95,7 +99,15 @@ const handleModeChanged = (val: boolean) => {
     }
     roomPlayerEventUnreg();  // 清除播放器事件监听
   }
+
 };
+
+const canDeleteSong = (playlist:Playlist.Playlist, userInfo:User.UserInfo):boolean=>{
+  if(props.isRoomPlaylist)//房间内和其他的逻辑不通
+    return HasRoomAdminPower(userInfo)
+  else
+    return HasPlaylistPermission(playlist, userInfo)
+}
 
 //开启ws，订阅端点
 let wsService:WebSocketService| null = null;
@@ -228,19 +240,30 @@ const selectSong = (event: MouseEvent, i:number):void=>{
 const removeSong = (songId:number) => {
   if(songId==undefined || songId<0 || songId == null) return "";
   if(!props.isRoomPlaylist){//没有房间号走这个逻辑，是个人歌单则创建者可以删除 是公共歌单则只有负责人以上可以删除
-    return;
+    removeSongInPlaylist(props.playlistInfo.playlist.id, songId).then(
+      (res)=>{   
+      switch (res.code) {
+        case ResultCode.SUCCESS:
+          globalProperties?.$message.success(res.message);
+          props.playlistInfo.songContentList.forEach((songContent,i) => {
+            if(songContent.songInfo.id==songId)
+              props.playlistInfo.songContentList.splice(i,1);
+          });
+          break;
+        default:
+          break;
+      }
+    });
   }else{//在房间走这个逻辑
     roomSongRemove(roomCode.value, songId, {userId: props.myUserInfo.id}).then(
       (res)=>{   
       switch (res.code) {
         case ResultCode.SUCCESS:
-          globalProperties?.$message.success(res.message)
+          globalProperties?.$message.success(res.message);
           break;
         default:
           break;
       }
-    },(err)=>{
-
     });
   }
   
@@ -249,6 +272,12 @@ const removeSong = (songId:number) => {
 const downloadSong = (songUrl:string) => {
   if(songUrl==undefined || songUrl=="" || songUrl == null) return ""
   getSongFile(songUrl)
+}
+
+//上传回调
+const handleUploadSuccess = (songContent:Song.SongContent)=>{
+  if(!props.isRoomPlaylist)//普通歌单才需要回调
+    props.playlistInfo.songContentList.push(songContent);
 }
 </script>
 

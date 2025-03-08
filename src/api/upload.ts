@@ -1,5 +1,6 @@
 import {http} from '@/util/request'
 import { Result } from "@/interface/result";
+import { Song } from '@/interface/song';
 
 export const uploadAudio4Room = (userId:number, roomCode:String, file:File) => {
     let URL =  `/audio/room/${roomCode}/audio`
@@ -8,7 +9,7 @@ export const uploadAudio4Room = (userId:number, roomCode:String, file:File) => {
     formData.append('userId', userId.toString());
     formData.append('file', file);
     
-    return http.post<Result<string>>(URL, formData);
+    return http.post<Result<Song.SongContent>>(URL, formData);
 }
 
 export const uploadAudio4Playlist = (userId:number, playlistId:number, file:File) => {
@@ -18,7 +19,7 @@ export const uploadAudio4Playlist = (userId:number, playlistId:number, file:File
     formData.append('userId', userId.toString());
     formData.append('file', file);
     
-    return http.post<Result<string>>(URL, formData);
+    return http.post<Result<Song.SongContent>>(URL, formData);
 }
 
 export const uploadPlaylistCover = (file:File) => {

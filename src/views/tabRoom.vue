@@ -101,7 +101,7 @@
       <div class="listZone">
           <GoSongList 
           :my-user-info="myUserInfo" 
-          :playlist-id="-1"
+          :playlist-info="{...Playlist.playlistInfo_InitData, songContentList:songContentList}"
           :song-content-list="songContentList"
           :is-room-playlist="true"/>
       </div>
@@ -174,6 +174,7 @@ const myUserInfo = ref<User.UserInfo>({
 import { useRoomStore } from "@/store/roomStore";
 import { storeToRefs } from "pinia";
 import { GoPlayer } from '@/util/XgPlayer';
+import { Playlist } from '@/interface/playlist';
 const roomStore = useRoomStore();
 const roomCode_join = ref('');
 const { roomCode, roomData } = storeToRefs(roomStore);

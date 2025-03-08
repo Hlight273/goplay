@@ -14,6 +14,9 @@ export const updatePlaylist = (playlistId: number, playlistForm: Playlist.Playli
 export const removePlaylist = (playlistId: number) => {
     return http.delete<Result<boolean>>(`playlist/${playlistId}`);
 }
+export const removeSongInPlaylist = (playlistId: number, songId: number) => {
+    return http.delete<Result<boolean>>(`playlist/${playlistId}/song/${songId}`);
+}
 
 // export const getSongsFromPlaylist = (playlistId:number) => {
 //     return http.get<Result<Song.SongContent[]>>(`/${playlistId}/songs`,);

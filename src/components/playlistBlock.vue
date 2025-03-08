@@ -4,7 +4,7 @@
         <img :src='(playlistInfo.playlist.coverUrl!=null&&playlistInfo.playlist.coverUrl!="")?
             (getPlaylistCoverURL(playlistInfo.playlist.coverUrl)):
             require("@/assets/icons/audio_folder.png")' class="playlist-cover" />
-        <p>{{ playlistInfo.playlist.title }}</p>
+        <p class="super_submit">{{ playlistInfo.playlist.title }}</p>
     </div>
      <!-- 歌单详情弹出层 -->
     <div v-if="selectedPlaylistInfo.playlist.id>=0" class="playlist-overlay" >
@@ -14,8 +14,7 @@
             <span>{{ selectedPlaylistInfo.playlist.description }}</span>
             <GoSongList 
                 :my-user-info="myUserinfo" 
-                :playlist-id="selectedPlaylistInfo.playlist.id"
-                :song-content-list="selectedPlaylistInfo.songContentList"
+                :playlist-info="selectedPlaylistInfo"
                 :is-room-playlist="false"/>
         </div>
     </div>
@@ -28,7 +27,6 @@ import { User } from '@/interface/user';
 import { GoPlayer } from '@/util/XgPlayer';
 import {defineProps, reactive} from 'vue'
 import GoSongList from '@/components/goSongList.vue'
-import { isNothing } from '@/util/commonUtil';
 
 const props = defineProps<{
     playlistInfo: Playlist.PlaylistInfo;
@@ -46,20 +44,37 @@ const closePlaylist = ()=>{
 
 <style scoped>
 .playlist-item {
+    display: flex;
     position: relative;
-  text-align: center;
-  cursor: pointer;
+    text-align: center;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
 }
+.playlist-item p {
+    color: #ffffff;
+    display: flex;
+    font-size: 1.4vh;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2vh;
+    width: 14vh;
+    height: 2vh;
+    margin-top: 1vh;
+    font-family: auto;
+}
+
 
 .playlist-cover {
   width: 20vh;
   height: 20vh;
   border-radius: 5px;
   transition: transform 0.3s ease-in-out;
+  object-fit: cover;
 }
 
 .playlist-cover:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .playlist-overlay {
@@ -90,15 +105,24 @@ const closePlaylist = ()=>{
 }
 
 .playlist-content .close_btn {
-    cursor: pointer;
     color: var(--el-color-primary);
+    cursor: pointer;
     font-size: 2.2vh;
     position: absolute;
-    top: 1vh;
-    right: 1vh;
+    top: 1.4vh;
+    right: 2vh;
+}
+.playlist-content h3 {
+    margin-left: 2vh;
+    color: #6b5a7a;
+}
+.playlist-content span {
+    margin-left: 2vh;
+    color: #927f8a;
 }
 
 .tag {
+    left: 0.4vh;
     top: 1vh;
     z-index: 1000;
     position: absolute;

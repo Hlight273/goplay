@@ -19,14 +19,13 @@
 </template>
   
 <script lang="ts" setup>
-import { ref,defineProps } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ref,defineProps, defineEmits  } from 'vue'
+import { ElMessage } from 'element-plus'
 import { UploadFilled, Upload, Refrigerator } from '@element-plus/icons-vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
-import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { uploadAudio4Playlist, uploadAudio4Room } from "@/api/upload";
 import { allowedAudioMimeTypes, maxAudioFileSize } from '@/util/webConst';
-const { globalProperties } = useCurrentInstance();
+import { Song } from '@/interface/song';
 
 const props = defineProps<{
   roomCode: string;
@@ -34,14 +33,10 @@ const props = defineProps<{
   playlistId: number;
   isRoomPlaylist: boolean;
 }>();
+interface UploadEvents {(event: 'upload-success', songContent: Song.SongContent): void;}
+const emit = defineEmits<UploadEvents>();//父组件回调@upload-success
 
-const fileList = ref<UploadUserFile[]>([
-
-//   {
-//     name: 'element-plus-logo2.svg',
-//     url: 'https://element-plus.org/images/element-plus-logo.svg',
-//   },
-])
+const fileList = ref<UploadUserFile[]>([])
 const fileLimit = ref(1);
 const loading = ref(false)
 
@@ -52,24 +47,26 @@ const uploadFile = (options:any)=>{
     fileList.value = []
     console.log("上传文件:",rawFile);
     if(props.isRoomPlaylist){//上传到房间歌单
-        uploadAudio4Room(props.userId, props.roomCode, rawFile).then(()=>{
+        uploadAudio4Room(props.userId, props.roomCode, rawFile).then((res)=>{
+            emit('upload-success', res.oData);//给父组件上传成功的回调
             fileList.value.push(
             { 
                 name: rawFile.name,
                 url: require('@/assets/icons/audio_folder.png')
             });
-            globalProperties?.$message.success('上传成功！')
+            ElMessage.success('上传成功！')
             loading.value = false;
             fileList.value = []
         })
     }else{//上传到普通歌单
-        uploadAudio4Playlist(props.userId, props.playlistId, rawFile).then(()=>{
+        uploadAudio4Playlist(props.userId, props.playlistId, rawFile).then((res)=>{
+            emit('upload-success', res.oData);//给父组件上传成功的回调，返回songContent
             fileList.value.push(
             { 
                 name: rawFile.name,
                 url: require('@/assets/icons/audio_folder.png')
             });
-            globalProperties?.$message.success('上传成功！')
+            ElMessage.success('上传成功！')
             loading.value = false;
             fileList.value = []
         })
@@ -90,11 +87,11 @@ const BeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
     console.log("before",rawFile);
     return new Promise((resolve, reject)=>{
         if (!allowedAudioMimeTypes.includes(rawFile.type)) {
-            globalProperties?.$message.warning("音频格式支持: "+allowedAudioMimeTypes.join('、')+" ！")
+            ElMessage.warning("音频格式支持: "+allowedAudioMimeTypes.join('、')+" ！")
             reject();
         }else if (rawFile.size > maxAudioFileSize) {
             
-            globalProperties?.$message.warning('文件大小不能超过'+maxAudioFileSize/1024/1024+'MB!')
+            ElMessage.warning('文件大小不能超过'+maxAudioFileSize/1024/1024+'MB!')
             reject();
         }
         resolve();

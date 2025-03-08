@@ -2,7 +2,7 @@ import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { Playlist } from "@/interface/playlist";
 import { Result } from "@/interface/result";
 import { Room } from "@/interface/room";
-import { Privilege, User } from "@/interface/user";
+import { Level, Privilege, User } from "@/interface/user";
 import {http} from '@/util/request'
 import { AxiosRequestConfig } from "axios";
 
@@ -56,6 +56,12 @@ export const HasRoomAdminPower = (userinfo:User.UserInfo):boolean=>{
     if(userinfo.privilege!=undefined && userinfo.privilege!=null)
         return userinfo.privilege <= Privilege.Enum.管理员
     return false
+}
+
+export const HasPlaylistPermission = (playlist:Playlist.Playlist, userinfo:User.UserInfo):boolean=>{
+    const userId = userinfo.id;
+    const ownerId = playlist.userId;
+    return ownerId == userId || userinfo.level >= Level.Enum.负责人;
 }
 
 

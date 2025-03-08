@@ -3,9 +3,10 @@
 <div class="recommend-container">
     <h2>我的歌单 <el-button class="super_submit" @click="openDialog_AddPlaylist">新建歌单</el-button></h2>
     <div class="recommend-list">
-        <div v-for="(playlistInfo, index) in myPlaylistInfos" :key="index" >
-          
-          <el-button class="super_submit" @click="openDialog_UpdatePlaylist(playlistInfo.playlist)">编辑歌单</el-button>
+        <div v-for="(playlistInfo, index) in myPlaylistInfos" :key="index" style="position: relative;">
+          <el-button class="floating_btn" @click="openDialog_UpdatePlaylist(playlistInfo.playlist)">
+            <el-icon><Edit /></el-icon>
+          </el-button>
           <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
         </div>
     </div>
@@ -205,6 +206,18 @@ onMounted(() => {
     padding: 2vh 0;
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+.floating_btn {
+  z-index: 1000;
+    position: absolute;
+    top: 0.7vh;
+    right: 0.7vh;
+    color: var(--font-dark);
+    width: 1vh;
+    height: 3.1vh;
+    /* border-radius: 0.6vh; */
+    font-size: 1.6vh;
 }
 
 
