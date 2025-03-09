@@ -1,20 +1,30 @@
 <template>
-  <button v-show="roomStore.myUserHasRoom()" @click="toggleGoplayerMode" class="toggle-btn">
+  <button v-show="roomStore.myUserHasRoom() && !isDarkCDMode" @click="toggleGoplayerMode" class="toggle-btn">
     <el-icon v-show="isRoomMode"><HomeFilled /></el-icon>
     <el-icon v-show="!isRoomMode"><Service /></el-icon>
+  </button>
+
+  <button v-show="!isRoomMode" class="toggle-btn" @click="dissolveOn=!dissolveOn;isDarkCDMode=!isDarkCDMode" :style="roomStore.myUserHasRoom()&&!isDarkCDMode?'bottom: 13vh;':''">
+    <el-icon v-show="!isDarkCDMode"><CaretTop /></el-icon>
+    <el-icon v-show="isDarkCDMode"><CaretBottom /></el-icon>
   </button>
 </template>
 
 <script lang="ts" setup>
-import { eventBus, MEventTypes } from '@/util/eventBus';
 import { GoPlayer } from '@/util/XgPlayer';
-import { onMounted, onUnmounted, ref } from 'vue';
 
 import { useRoomStore } from "@/store/roomStore";
 import { storeToRefs } from "pinia";
-import { isNothing } from '@/util/commonUtil';
 const roomStore = useRoomStore();
 const { roomCode,isRoomMode } = storeToRefs(roomStore);
+
+import { useCommonStore } from "@/store/commonStore";
+import { ref } from 'vue';
+
+const commonStore = useCommonStore();
+const { dissolveOn } = storeToRefs(commonStore);
+
+const isDarkCDMode = ref(false);
 
 
 const toggleGoplayerMode = ()=>{
@@ -40,8 +50,8 @@ const toggleGoplayerMode = ()=>{
     position: absolute;
     bottom: 7vh;
     right: 1vh;
-  width: 4vh;
-  height: 4vh;
+  width: 4.4vh;
+  height: 4.4vh;
   border-radius: 50%;
   border: none;
   background-color: #ffffff; /* 绿色，表示开启 */
@@ -52,6 +62,11 @@ const toggleGoplayerMode = ()=>{
   transition: background 0.3s ease-in-out, transform 0.2s;
   box-shadow: 0px .4vh .6vh rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  border: .3vh solid #aca6c7;
+    background-color: #3c393c;
+    color: white;
+    z-index: 0;
+    font-size: 1.4vh;
 }
 
 .toggle-btn:hover {

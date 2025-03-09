@@ -26,6 +26,13 @@
             </template>
           </el-input>
         </el-form-item>
+
+        <el-form-item prop="agreeToTerms">
+          <el-checkbox v-model="form.agreeToTerms">
+            我保证上传的音乐为本人原创
+          </el-checkbox>
+        </el-form-item>
+
         <div class="button-box">
             <el-button type="primary" @click="onSubmit(formRef)" color="#333333">注册</el-button>
         </div>
@@ -39,15 +46,13 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
-import type { ComponentSize, FormInstance, FormRules} from 'element-plus'
-import service from '@/util/request'
+import type { FormInstance, FormRules} from 'element-plus'
 import {encrypt} from '@/util/encrypt'
 
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 const { globalProperties } = useCurrentInstance();
 
 import type {View, Hide} from '@element-plus/icons-vue'
-import { User } from '@/interface/user';
 import { register } from '@/api/user';
 const addPassFlag=ref(false)//图标显示标识
 
@@ -56,11 +61,13 @@ interface RegisterRuleForm {
     username: string
     password: string
     password2: string
+    agreeToTerms: boolean;
 }
 const form = reactive<RegisterRuleForm>({
   username: '',
   password: '',
   password2: '',
+  agreeToTerms: false
 })
 
 const validatePassword = (rule: any, value: string, callback: (message?: Error) => void) => {
@@ -84,6 +91,10 @@ const rules = reactive<FormRules<RegisterRuleForm>>({
 })
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
+  if(!form.agreeToTerms){
+    globalProperties?.$message.error(`请先同意版权协定！`)
+    return;
+  }
   if (!formEl) 
     return
   await formEl.validate((valid, fields) => {

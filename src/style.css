@@ -15,6 +15,7 @@
     --text-shadow: #7b7e93;
     --text-shadow-width: 0.2vh;
     --text-shadow-width-: -0.2vh;
+    --el-border-radius-base: 4vh;
 }
 
 
@@ -81,4 +82,9 @@ body {
 .super_submit:hover {
     color: #fff;
     background-color: #938493;
+}
+.limit_w {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

@@ -20,17 +20,19 @@
       </el-tab-pane>
     </el-tabs>
     <AudioConsole></AudioConsole>
+    <AudioPanel></AudioPanel>
     
   </main>
+  <DissolveTransition 
+        :isVisible="dissolveOn" 
+        :backgroundType="'pureColor'" 
+        :backgroundSource="require('@/assets/effect/back1.mp4')"
+        :noiseTexture="require('@/assets/effect/Super Perlin 14 - 512x512.png')"/>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount } from 'vue'
-import { useRoute } from 'vue-router';
-import { ResultCode, needDebugOutpot } from '@/util/webConst'
-
-import useCurrentInstance from "@/hooks/useCurrentInstance";
-const { globalProperties } = useCurrentInstance();
+import { ref, onMounted} from 'vue'
+import {  needDebugOutpot } from '@/util/webConst'
 
 import type { TabsInstance } from 'element-plus'
 const tabPosition = ref<TabsInstance['tabPosition']>('left') //tab栏暂时设在左边
@@ -41,6 +43,13 @@ import AudioConsole from '@/components/audioConsole.vue';
 import TabSetting from './tabSetting.vue';
 import Goheader from '@/components/goheader.vue';
 import TabMyPlaylist from './tabMyPlaylist.vue';
+import DissolveTransition from '@/components/dissolveTransition.vue';
+import AudioPanel from '@/components/audioPanel.vue';
+
+import { useCommonStore } from "@/store/commonStore";
+import { storeToRefs } from "pinia";
+const commonStore = useCommonStore();
+const { dissolveOn } = storeToRefs(commonStore);
 
 
 onMounted(()=>{

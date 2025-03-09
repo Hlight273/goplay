@@ -119,6 +119,7 @@ export class GoPlayer {
               },
         })
         this.setupPlayer4localListeners();
+        this.player4local.on(Events.PLAY, this.sendlocalSongURLChangeEv)
         eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, ()=>{this.player4room?.pause(); });
         console.log("🎵Goplayer4LOCAL初始化完成🎵...");
         console.log("\n");
@@ -283,13 +284,27 @@ export class GoPlayer {
 
     private sendNewSongEv = () =>  {
         let songContent = this.getCurRoomSongContent();
-        eventBus.emit(MEventTypes.PLAY_NEW_SONG, songContent)
+        eventBus.emit(MEventTypes.PLAY_NEW_SONG_ROOM, songContent)
     }
+    private sendlocalSongURLChangeEv =() =>{
+        let songContent = this.getCurLocalSongContent();
+        eventBus.emit(MEventTypes.PLAY_NEW_SONG_LOCAL, songContent)
+    }
+
     private getCurRoomSongContent():Song.SongContent|null{
         if(!this.roomPlaylist)
             return null;
         let index = this.player4room?.plugins.music.index;
         let target = this.roomPlaylist[index];
+        if(target==null||target==undefined)
+            return null;
+        return target;
+    }
+    private getCurLocalSongContent():Song.SongContent|null{
+        if(!this.personalPlaylist)
+            return null;
+        let index = this.player4local?.plugins.music.index;
+        let target = this.personalPlaylist[index];
         if(target==null||target==undefined)
             return null;
         return target;

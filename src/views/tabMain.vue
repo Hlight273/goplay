@@ -27,7 +27,6 @@ import { ref, reactive, onMounted} from 'vue'
 import { userInfo } from '@/api/user';
 import { User } from '@/interface/user';
 import { ResultCode } from '@/util/webConst';
-import { getPlaylistInfo } from '@/api/playlist';
 import { Playlist } from '@/interface/playlist';
 import { GoPlayer } from '@/util/XgPlayer';
 import PlaylistBlock from '@/components/playlistBlock.vue'
@@ -36,7 +35,6 @@ import { getRecommendPlaylists } from '@/api/recommend';
 const myUserinfo = ref<User.UserInfo>({...User.UserInfo_InitData});
 
 const userId = Number(localStorage.getItem("userid"));
-const recommendPlaylistIds:number[] = []
 const recommendedPlaylistInfos = ref<Playlist.PlaylistInfo[]>([]);
 
 const banners = ref([

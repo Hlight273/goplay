@@ -226,11 +226,13 @@ onMounted(() => {
     position: absolute;
     top: 0.7vh;
     right: 0.7vh;
-    color: var(--font-dark);
+    color: #ffffff;
     width: 1vh;
-    height: 3.1vh;
+    height: 3.3vh;
     /* border-radius: 0.6vh; */
     font-size: 1.6vh;
+    border: .2vh solid #aca6c7;
+    background-color: #3c393c;
 }
 
 

@@ -34,11 +34,11 @@ let curSong = reactive<Song.SongContent>({
     songUrl: ''
 })
 onMounted(() => {
-    eventBus.on(MEventTypes.PLAY_NEW_SONG, updateCurSong);
+    eventBus.on(MEventTypes.PLAY_NEW_SONG_ROOM, updateCurSong);
 });
 
 onUnmounted(() => {
-    eventBus.off(MEventTypes.PLAY_NEW_SONG, updateCurSong);
+    eventBus.off(MEventTypes.PLAY_NEW_SONG_ROOM, updateCurSong);
 });
 
 const updateCurSong = (songContent: Song.SongContent | null)=>{

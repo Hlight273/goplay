@@ -89,7 +89,7 @@ watch(
   (newValue, oldValue) => {
     if (newValue !== oldValue) {
       // 当 myProp 更新时触发事件
-      console.log(`更新，原来${oldValue}，现在${newValue}`);
+      //console.log(`更新，原来${oldValue}，现在${newValue}`);
       inputValue.value = newValue
       if(!isFirstChanged)
         oldInputValue = newValue

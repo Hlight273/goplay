@@ -1,9 +1,10 @@
 <template>
     <div class="mse_outline">
-        <div class="gradient-border">
+        <div :class="['gradient-border',!isRoomMode?'redStyle':'']">
             <div id="mse_room" class="mse" v-show="isRoomMode"></div>
             <div id="mse_local" class="mse" v-show="!isRoomMode"></div>
             <AudioConsoleSwitcher/>
+           
         </div>
     </div>
 
@@ -23,6 +24,8 @@ import { useRoomStore } from "@/store/roomStore";
 import { storeToRefs } from "pinia";
 const roomStore = useRoomStore();
 const { isRoomMode } = storeToRefs(roomStore);
+
+
 
 const currentTime = ref(new Date().toLocaleTimeString());
 
@@ -89,11 +92,19 @@ onUnmounted(()=>{
 :deep(.mse .xgplayer-error){
   display: none;
 }
+
 :deep(.mse .xgplayer-progress-played){
   background: none;
   /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
   animation: backgroundDarkAnimation 3s linear infinite; /* 动画效果 */
 }
+:deep(#mse_local .xgplayer-progress-played){
+  background: #ff4343;
+  animation: none;
+  /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
+  
+}
+
 :deep(.mse .xgplayer-slider){
   background: #5e5e5e;
   border-radius: 10px;
@@ -142,6 +153,7 @@ onUnmounted(()=>{
   height: 50px;
   border-top-left-radius: 36px;
   border-top-right-radius: 35px;
+  z-index: 99999999999; /* 确保文本在渐变边框上方 */
 }
 
 .gradient-border {
@@ -164,6 +176,10 @@ onUnmounted(()=>{
     border-top-right-radius: 34px;
     z-index: 1;
     text-align: center;
+  }
+  .redStyle {
+    animation: backgroundRedAnimation 3s linear infinite; /* 动画效果 */
+    background-color: #b74343;
   }
 
   /* 下一首用的不是我的api 故直接删除*/
@@ -256,6 +272,23 @@ onUnmounted(()=>{
     }
     100% {
         border-color: #ce9292; /* 重复开始颜色 */
+    }
+  }
+  @keyframes backgroundRedAnimation {
+    0% {
+        border-color: #bc2e24;
+    }
+    14% {
+        border-color: #ff3838;
+    }
+    42% {
+        border-color: #ff476f;
+    }
+    71% {
+        border-color: #ff3838;
+    }
+    100% {
+        border-color: #bc2e24; /* 重复开始颜色 */
     }
   }
 </style>

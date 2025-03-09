@@ -17,6 +17,9 @@ export const removePlaylist = (playlistId: number) => {
 export const removeSongInPlaylist = (playlistId: number, songId: number) => {
     return http.delete<Result<boolean>>(`playlist/${playlistId}/song/${songId}`);
 }
+export const addSongInPlaylist = (playlistId: number, songId: number) => {
+    return http.post<Result<boolean>>(`playlist/${playlistId}/song/${songId}`);
+}
 
 // export const getSongsFromPlaylist = (playlistId:number) => {
 //     return http.get<Result<Song.SongContent[]>>(`/${playlistId}/songs`,);

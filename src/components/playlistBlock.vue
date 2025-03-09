@@ -71,6 +71,8 @@ const closePlaylist = ()=>{
   border-radius: 5px;
   transition: transform 0.3s ease-in-out;
   object-fit: cover;
+  border: .2vh solid #aca6c7;
+  background-color: #3c393c;
 }
 
 .playlist-cover:hover {
@@ -135,5 +137,6 @@ const closePlaylist = ()=>{
     border-radius: 5vh;
     width: 4vh;
     color: white;
+    border: .2vh solid #aca6c7;
 }
 </style>
