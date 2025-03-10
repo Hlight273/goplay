@@ -27,4 +27,20 @@ export namespace Song {
         coverBase64: string;
         songUrl: string;
     }
+
+    export interface Comment {
+        id: number;
+        parentId: number | null; // null 表示是一级评论
+        songId: number;
+        addedBy: number;
+        addedByName: string;
+        addedAt: string;
+        contentText: string;
+        likeCount: number;
+        isActive: number;
+        replies?: Comment[]; // 已加载的二级评论
+        totalReplies?: number; // 该评论下的总二级评论数量
+        loadedRepliesCount?: number; // 已经加载的二级评论数量
+      }
+      
 }

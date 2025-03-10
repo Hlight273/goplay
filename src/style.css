@@ -83,8 +83,39 @@ body {
     color: #fff;
     background-color: #938493;
 }
+
+
+.noback_btn {
+    background-color: #ffffff00;
+    border: none;
+    color: darkgrey;
+}
+.noback_btn:hover {
+    color: #b74343;
+    background-color: #ffffff15;
+}
+
+
+.black_oil_btn{
+    background: #313131;
+    border-radius: 1.6vh;
+    border: 0.2vh solid #262627;
+    box-shadow: 1px -1.9vh 0.1vh 0px rgb(16 15 18 / 57%) inset;
+    --el-button-hover-bg-color: #575354;
+    --el-button-hover-border-color: #911e2f;
+}
+
+
+
 .limit_w {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/*父级需要overflow hidden*/
+.hide_scroll_child {
+    overflow-y: scroll;
+    padding-right: 2vh;
+    width: calc(100% + 1.6vh);
 }

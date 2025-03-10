@@ -33,6 +33,22 @@ export function formatBytes(bytes: number, decimals = 2): string {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  
+  if (isNaN(date.getTime())) {
+      console.error("Invalid date string:", dateString);
+      return "无效日期";
+  }
+
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // getMonth() 返回 0-11
+  const day = date.getDate();
+
+  return `${year}年${month}月${day}日`;
+};
+
+
 // 原文链接：https://blog.csdn.net/XH_jing/article/details/135824934
 export function copyToClipboard(textToCopy:string) {
     // navigator clipboard 需要https等安全上下文

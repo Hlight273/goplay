@@ -13,3 +13,24 @@ export const getSongFile = (songUrl:string):Promise<string|void> => { //返回�
 export const getSongBlob = (songUrl:string):Promise<string|void> => {
     return getFileBlobFromServer(`${webRoot}/song/${songUrl}`, songUrl)
 }
+
+/** 获取歌曲的一级评论（分页） */
+export const getCommentsBySong = (songId: number, page: number, pageSize: number) => {
+    return http.get<Result<{ comments: Song.Comment[], total: number }>>(
+        `/comment/song/${songId}`, 
+        { params: { page, pageSize } }
+    );
+};
+
+/** 获取某个评论的二级评论（分页） */
+export const getRepliesByComment = (commentId: number, page: number, pageSize: number) => {
+    return http.get<Result<{ replies: Song.Comment[], total: number }>>(
+        `/comment/replies/${commentId}`, 
+        { params: { page, pageSize } }
+    );
+};
+
+/** 提交新评论（一级或二级） */
+export const addComment = (comment: { songId: number, parentId?: number, contentText: string }) => {
+    return http.post<Result<string>>(`/comment`, comment);
+};
