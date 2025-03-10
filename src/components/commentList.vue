@@ -145,11 +145,12 @@ watch(() => props.curSong, (newMessage, oldMessage) => {
   
   <style scoped>
   .comment-section {
-    display: flex
-;
+    display: flex;
     padding: 1.0vh;
     flex-direction: column;
     height: 100%;
+    overflow: hidden;
+    transition: 0.3s ease-in-out, transform 0.2s;
   }
   .comment {
     border-bottom: .2vh solid #454545;
@@ -188,6 +189,7 @@ watch(() => props.curSong, (newMessage, oldMessage) => {
     background-color: #2a2a2a;
     box-shadow: 0 .1vh .1vh .01vh #00000024 inset;
     font-size: 1.4vh;
+    resize: none;
   }
   :deep(.comment-input .el-textarea__inner:focus){
     box-shadow: 0 0 0 .1vh #525252 inset;

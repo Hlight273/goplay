@@ -26,7 +26,7 @@
   <DissolveTransition 
         :isVisible="dissolveOn" 
         :backgroundType="'pureColor'" 
-        :backgroundSource="require('@/assets/effect/back1.mp4')"
+       
         :noiseTexture="require('@/assets/effect/Super Perlin 14 - 512x512.png')"/>
 </template>
 
