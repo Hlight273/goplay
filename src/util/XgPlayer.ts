@@ -182,6 +182,19 @@ export class GoPlayer {
             });
         });
     }
+    addSong_to_LocalPlaylist(song:Song.SongContent){
+        const curIndex = this.player4local?.plugins.music.index;
+        this.player4local?.plugins.music.add({
+            vid: `song_${curIndex+1}`,
+            title: song.songInfo.songName,
+            poster: song.coverBase64,
+            // 使用占位符，实际播放时加载
+            src: 'about:blank' 
+        });
+    }
+    removeSong_from_LocalPlaylist(index:number){
+        this.player4local?.plugins.music.splice(index,1);
+    }
 
     syncPlayerData(_data:PlayerData):void{
 
@@ -249,6 +262,8 @@ export class GoPlayer {
             if (this.preloadedIndex === nextIndex) // 检查是否已预加载该歌曲，避免重复请求
                 return;
             if (currentTime > this.player4local?.duration - 30) { // 提前30秒加载
+                if(!this.personalPlaylist[nextIndex])
+                    return;
                 const nextrealURL = this.personalPlaylist[nextIndex].songUrl;
                 if (nextrealURL) {
                     const blob = await BlobCacheManager.getInstance().getBlob(nextrealURL);

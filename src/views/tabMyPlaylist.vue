@@ -14,8 +14,9 @@
 
 
 <!-- 新建歌单弹出框 -->
-<el-dialog v-model="dialogVisible" :title="isUpdateDialog?'修改信息':'新建歌单'" @close="resetForm">
-    <el-form :model="playlistFormData" ref="formRef" label-width="80px">
+ <div class="playlist_info_modify">
+  <el-dialog v-model="dialogVisible" :title="isUpdateDialog?'修改信息':'新建歌单'" @close="resetForm">
+    <el-form :model="playlistFormData" ref="formRef" label-width="80px" class="playlist-form">
       <el-form-item label="歌单标题" :rules="[ { required: true, message: '请输入歌单标题', trigger: 'blur' } ]">
         <el-input v-model="playlistFormData.title" placeholder="请输入歌单标题" />
       </el-form-item>
@@ -38,6 +39,8 @@
       <el-button v-show="isUpdateDialog" class="super_submit" @click="submitRemoveRecommend">去除推送-</el-button>
     </div>
   </el-dialog>
+ </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -79,12 +82,13 @@ const resetForm = () => {
 }
 
 const submitAddPlaylist = () => {
-  addPlaylist(playlistFormData) .then(
+  addPlaylist(playlistFormData).then(
     (res) => {
     switch (res.code) {
       case ResultCode.SUCCESS:
         myPlaylistInfos.push({playlist:res.oData, songContentList:[]});
-
+        console.log("新增",myPlaylistInfos);
+        
         ElMessage.success(res.message);
         dialogVisible.value = false; // 关闭创建歌单弹框
         isUpdateDialog.value = false; // 状态恢复
@@ -236,4 +240,10 @@ onMounted(() => {
 }
 
 
+</style>
+
+<style>
+.playlist_info_modify .el-dialog{
+    min-width: 540px !important;
+}
 </style>

@@ -27,7 +27,10 @@
         </div>
         <div class="line_top">
             <div class="title"><el-icon><Coin /></el-icon>积分充值</div>
-            lv{{vipinfo.level}} {{ vipinfo.startTime }}-{{ vipinfo.endTime }}
+            <span class="" v-show="vipinfo.level>0">
+              lv{{vipinfo.level}} {{ formatDate(vipinfo.startTime) }}-{{ formatDate(vipinfo.endTime) }}
+            </span>
+            <span class="white_b_font stroke" v-show="vipinfo.level<=0">当前没有vip!</span>
             <el-button class="super_submit floating_rightup" style="width: 8vh;">充值vip</el-button>
         </div>
     </div>
@@ -35,12 +38,11 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount } from 'vue'
-import useCurrentInstance from "@/hooks/useCurrentInstance";
 import { User } from '@/interface/user';
 import { updateNickname, userInfo } from '@/api/user';
 import { ResultCode } from '@/util/webConst';
 import GoplayInput from '@/components/goplayInput.vue';
-const { globalProperties } = useCurrentInstance();
+import { formatDate } from '@/util/commonUtil';
 
 const userinfo = ref<User.UserInfo>({
   id: 0,
@@ -51,7 +53,7 @@ const userinfo = ref<User.UserInfo>({
 });
 const vipinfo = ref<User.VipInfo>({
   userId: 0,
-  level: 1,
+  level: 0,
   startTime: new Date().toString(),
   endTime: new Date().toString(), 
   days: 0,

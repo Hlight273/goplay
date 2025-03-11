@@ -105,13 +105,15 @@ const updateCurSong = (songContent: Song.SongContent | null)=>{
     align-items: center;
     height: 82vh;
     /* margin-top: 5vh; */
+    min-width: 50vh;
 }
 .content {
     margin-top: 4vh;
-    width: 63vh;
+    width: 90%;
     height: 71vh;
     box-shadow: 1px -1.23vh 0.4vh 0px rgb(16 15 18 / 57%) inset;
     border-radius: .8vh;
+    min-width: 40vh;
 }
 
 .tabBox {

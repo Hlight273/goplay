@@ -67,6 +67,12 @@ body {
     var(--text-shadow-width) var(--text-shadow-width-) var(--text-shadow), 
     var(--text-shadow-width-) var(--text-shadow-width) var(--text-shadow);
 }
+.white_b_font {
+    min-width: 8vh;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.4vh;
+}
 
 .super_submit{
     width: 9vh;
@@ -119,3 +125,5 @@ body {
     padding-right: 2vh;
     width: calc(100% + 1.6vh);
 }
+
+

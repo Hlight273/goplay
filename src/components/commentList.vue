@@ -242,9 +242,7 @@ watch(() => props.curSong, (newMessage, oldMessage) => {
     flex: 1;
 }
 
-.up {
 
-}
 .r-bottom {
     margin-bottom: 2.4vh;
 }

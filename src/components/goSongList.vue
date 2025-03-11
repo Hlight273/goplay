@@ -246,8 +246,10 @@ const removeSong = (songId:number) => {
         case ResultCode.SUCCESS:
           globalProperties?.$message.success(res.message);
           props.playlistInfo.songContentList.forEach((songContent,i) => {
-            if(songContent.songInfo.id==songId)
+            if(songContent.songInfo.id==songId){
               props.playlistInfo.songContentList.splice(i,1);
+              GoPlayer.getInstance().addSong_to_LocalPlaylist(songContent);
+            }
           });
           break;
         default:
@@ -277,7 +279,13 @@ const downloadSong = (songUrl:string) => {
 //上传回调
 const handleUploadSuccess = (songContent:Song.SongContent)=>{
   if(!props.isRoomPlaylist)//普通歌单才需要回调
+  {
     props.playlistInfo.songContentList.push(songContent);
+    let l = GoPlayer.getInstance().addSong_to_LocalPlaylist(songContent);
+    console.log("list ",l);
+    
+  }
+   
 }
 </script>
 

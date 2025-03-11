@@ -26,6 +26,7 @@ import type { UploadProps, UploadUserFile } from 'element-plus'
 import { uploadAudio4Playlist, uploadAudio4Room } from "@/api/upload";
 import { allowedAudioMimeTypes, maxAudioFileSize } from '@/util/webConst';
 import { Song } from '@/interface/song';
+import { GoPlayer } from '@/util/XgPlayer';
 
 const props = defineProps<{
   roomCode: string;

@@ -13,7 +13,7 @@
     isVisible: boolean;
     backgroundType: "pureColor" | "image" | "gif" | "video"; // 背景类型
     noiseTexture: string; //溶解贴图路径
-    backgroundSource: string; // 背景的资源路径
+    backgroundSource?: string; // 背景的资源路径
   }>();
   
   const container = ref<HTMLElement | null>(null);
@@ -55,10 +55,10 @@
         ctx.fillRect(0, 0, 2, 2);
       }
       backgroundTexture = new THREE.CanvasTexture(colorCanvas);
-    } else if (props.backgroundType === "image" || props.backgroundType === "gif") {
+    } else if (props.backgroundSource && (props.backgroundType === "image" || props.backgroundType === "gif")) {
       texture = new THREE.TextureLoader().load(props.backgroundSource);
       backgroundTexture = texture;
-    } else if (props.backgroundType === "video") {
+    } else if (props.backgroundSource && (props.backgroundType === "video")) {
       const videoElement = document.createElement("video");
       videoElement.src = props.backgroundSource;
       videoElement.loop = true;
