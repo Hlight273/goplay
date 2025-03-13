@@ -9,9 +9,24 @@
      <!-- 歌单详情弹出层 -->
     <div v-if="selectedPlaylistInfo.playlist.id>=0" class="playlist-overlay" >
         <div class="playlist-content">
-            <el-icon class="close_btn" @click="closePlaylist"><CloseBold/></el-icon>
-            <h3>{{ selectedPlaylistInfo.playlist.title }}</h3>
-            <span>{{ selectedPlaylistInfo.playlist.description }}</span>
+            <!-- <el-icon class="close_btn" @click="closePlaylist"><CloseBold/></el-icon> -->
+            <el-icon class="close_btn" @click="closePlaylist"><el-icon><CircleCloseFilled /></el-icon></el-icon>
+            <div class="infobox">
+                <img :src='(playlistInfo.playlist.coverUrl!=null&&playlistInfo.playlist.coverUrl!="")?
+                    (getPlaylistCoverURL(playlistInfo.playlist.coverUrl)):
+                    require("@/assets/icons/audio_folder.png")' class="playlist-cover mini-cover" />
+                <div class="column">
+                    <h3>{{ selectedPlaylistInfo.playlist.title }}</h3>
+                    <span>简介：{{ selectedPlaylistInfo.playlist.description }}</span>
+                </div>
+                <div class="creater">
+                    <span>{{ formatDate(selectedPlaylistInfo.playlist.addedAt) }}</span>
+                    用户<span class="username" @click="commonStore.openUserPage_byUserInfo(ownerUserInfo)">
+                        {{ ownerUserInfo.nickname }}
+                    </span>创建
+                </div>
+            </div>
+           
             <GoSongList 
                 :my-user-info="myUserinfo" 
                 :playlist-info="selectedPlaylistInfo"
@@ -25,8 +40,14 @@ import { getPlaylistCoverURL } from '@/api/static';
 import { Playlist } from '@/interface/playlist';
 import { User } from '@/interface/user';
 import { GoPlayer } from '@/util/XgPlayer';
-import {defineProps, reactive} from 'vue'
+import {defineProps, onMounted, reactive} from 'vue'
 import GoSongList from '@/components/goSongList.vue'
+import { userInfo } from '@/api/user';
+import { ResultCode } from '@/util/webConst';
+
+import { useCommonStore } from "@/store/commonStore";
+import { formatDate } from '@/util/commonUtil';
+const commonStore = useCommonStore();
 
 const props = defineProps<{
     playlistInfo: Playlist.PlaylistInfo;
@@ -40,6 +61,21 @@ const selectPlaylist = (playlistInfo:Playlist.PlaylistInfo) => {
 const closePlaylist = ()=>{
   Object.assign(selectedPlaylistInfo, Playlist.playlistInfo_InitData);
 }
+
+const ownerUserInfo = reactive<User.UserInfo>({
+        id: 0,
+        username: "",
+        avatarUrl: "",
+        level: 0,
+        nickname: ""
+    })
+onMounted(()=>{
+    userInfo(props.playlistInfo.playlist.userId).then((res)=>{
+        if(res.code == ResultCode.SUCCESS){
+            Object.assign(ownerUserInfo, res.oData);
+        }
+    })
+})
 </script>
 
 <style scoped>
@@ -93,6 +129,8 @@ const closePlaylist = ()=>{
 }
 
 .playlist-content {
+    display: flex;
+    flex-direction: column;
     position: relative;
     padding: 0 1vh;
     padding-top: 1vh;
@@ -113,14 +151,68 @@ const closePlaylist = ()=>{
     position: absolute;
     top: 1.4vh;
     right: 2vh;
+    color: #b99ec0;
 }
-.playlist-content h3 {
-    margin-left: 2vh;
-    color: #6b5a7a;
+.playlist-content .infobox {
+    display: flex;
 }
-.playlist-content span {
-    margin-left: 2vh;
-    color: #927f8a;
+.playlist-content .infobox .column {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-top: .5vh;
+    width: 60%;
+}
+.playlist-content .infobox .column h3 {
+    color: #907676;;
+    font-size: 1.8vh;
+    font-weight: lighter;
+    /* background: #9084ff; */
+    display: inline-block;
+    padding: .5vh 1vh;
+    border-radius: 1.6vh;
+    font-family: math;
+    max-width: 90%;
+}
+.playlist-content .infobox .column span {
+    margin-left: 1vh;
+    box-sizing: border-box;
+    color: #ae99a5;
+    font-size: 1.4vh;
+    padding: .4vh .8vh;
+    background: #f2f2f2;
+    border-radius: 1.5vh;
+    border: .1vh solid #d4c3da;
+}
+.playlist-content .infobox .mini-cover {
+    width: 10vh;
+    height: 10vh;
+    border-radius: 2vh;
+    border: .2vh solid #cdc6eb;
+    margin: .4vh;
+}
+.playlist-content .infobox .creater {
+    position: absolute;
+    font-size: 1.4vh;
+    /* background-color: #dedbed; */
+    border-radius: 2vh;
+    padding: .4vh .8vh;
+    margin: .4vh;
+    /* border: .1vh solid #d4c3da; */
+    right: 1vh;
+    top: 8vh;
+    color: #d1c7c7;
+}
+.playlist-content .infobox .creater .username {
+    padding: .1vh .6vh;
+    cursor: pointer;
+    color: white;
+    background-color: #e6b8dd;
+    border-radius: 1vh;
+    border: .4vh solid #bfd4ff;
+    box-shadow: 0px -.7vh .2vh 0px rgb(152 164 217 / 84%) inset;
+    font-size: 1.2vh;
+    font-weight: bold;
 }
 
 .tag {
@@ -139,4 +231,6 @@ const closePlaylist = ()=>{
     color: white;
     border: .2vh solid #aca6c7;
 }
+
+
 </style>

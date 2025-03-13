@@ -29,11 +29,12 @@
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { storeToRefs } from "pinia";
 import { useCommonStore } from "@/store/commonStore";
-import AudioCdPlayerDark from './audioCdPlayerDark.vue';
+import AudioCdPlayerDark from '@/components/audioCdPlayerDark.vue';
+import CommentList from '@/components/commentList.vue';
 
 import { Song } from '@/interface/song';
 import { eventBus, MEventTypes } from '@/util/eventBus';
-import CommentList from './commentList.vue';
+
 const commonStore = useCommonStore();
 const { dissolveOn } = storeToRefs(commonStore);
 

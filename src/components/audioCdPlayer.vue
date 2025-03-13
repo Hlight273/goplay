@@ -14,11 +14,9 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, watch, onUpdated, onActivated, onBeforeMount, Ref, onUnmounted } from 'vue'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
-import { GoPlayer } from '@/util/XgPlayer';
 import { eventBus, MEventTypes } from '@/util/eventBus';
 import { Song } from '@/interface/song';
 import { isNullorEmpty } from '@/util/commonUtil';
-const { globalProperties } = useCurrentInstance();
 
 const cdURL = require('@/assets/imgs/cd.png')
 let curSong = reactive<Song.SongContent>({

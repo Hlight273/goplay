@@ -216,10 +216,8 @@ onMounted(() => {
 }
 
 .recommend-list {
-  display: flex
-;
+    display: flex;
     gap: 2vh;
-    /* overflow-x: auto; */
     padding: 2vh 0;
     flex-direction: row;
     flex-wrap: wrap;

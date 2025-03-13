@@ -35,7 +35,7 @@
 
     <div class="line userlist">
       <div v-if="userInfoList" v-for="userinfo in userInfoList">
-        <el-dropdown placement="bottom" :hide-on-click="false" trigger="click" class="userDropdown">
+        <el-dropdown :ref="(el:any) => setDropdownRef(userinfo.id, el)" placement="bottom" :hide-on-click="false" trigger="click" class="userDropdown">
           <div class="userDisplay_mini">
             <el-icon class="permissionIcon" v-show="userinfo.privilege==1"><Avatar color="#ffa46f" /></el-icon>
             <el-icon class="permissionIcon" v-show="userinfo.privilege==2"><Avatar color="#3fc271" /></el-icon>
@@ -65,7 +65,7 @@
                  @click="roomMemberPrivilege(roomData.roomCode, userinfo.id, Privilege.Enum.成员, userId)"
                  color="#7365ff">移除权限</el-button>
 
-                <el-button color="#7365ff">查看主页</el-button>
+                <el-button color="#7365ff" @click="handleViewProfile(userinfo)">查看主页</el-button>
 
               </div>
             </div>
@@ -140,6 +140,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted} from 'vue'
 import { ArrowLeft, Promotion} from '@element-plus/icons-vue'
+import type { DropdownInstance } from 'element-plus'
 
 import { IMessage } from '@stomp/stompjs';
 
@@ -158,9 +159,23 @@ import useCurrentInstance from "@/hooks/useCurrentInstance";
 const { globalProperties } = useCurrentInstance();
 
 import AudioCdPlayer from '@/components/audioCdPlayer.vue'
-import { Events } from 'xgplayer'
 import GoSongList from '@/components/goSongList.vue'
 
+
+// 存储所有 dropdown 实例,动态设置 ref，为了打开主页时关闭dropdown
+const dropdownRefs = ref<Record<number, DropdownInstance>>({})
+const setDropdownRef = (id: number, el: DropdownInstance) => {
+  if (el) {
+    dropdownRefs.value[id] = el
+  }
+}
+const handleViewProfile = (userinfo: User.UserInfo) => {
+  commonStore.openUserPage_byUserInfo(userinfo)
+  const dropdown = dropdownRefs.value[userinfo.id]
+  if (dropdown) {
+    dropdown.handleClose() // 调用 Element Plus 的关闭方法
+  }
+}
 
 //room、user's data
 const userId = Number(localStorage.getItem("userid"))
@@ -172,6 +187,8 @@ import { Playlist } from '@/interface/playlist';
 const roomStore = useRoomStore();
 const roomCode_join = ref('');
 const { roomCode, roomData } = storeToRefs(roomStore);
+import { useCommonStore } from "@/store/commonStore";
+const commonStore = useCommonStore();
 
 const userInfoList = ref<User.UserInfo[]>()
 const songContentList = reactive<Song.SongContent[]>([])
