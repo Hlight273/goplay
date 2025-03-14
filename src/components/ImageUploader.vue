@@ -20,7 +20,6 @@ import { ref, defineProps } from 'vue'
 import { UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage, type UploadProps, type UploadUserFile } from 'element-plus'
 import useCurrentInstance from "@/hooks/useCurrentInstance";
-import { uploadPlaylistCover } from "@/api/upload";
 import { allowedImageMimeTypes, maxImageFileSize } from '@/util/webConst';
 
 const { globalProperties } = useCurrentInstance();
@@ -34,11 +33,11 @@ const fileLimit = ref(1);
 const loading = ref(false);
 
 const uploadFile = (options: any) => {
-    console.log("upload");
+    //console.log("upload");
     loading.value = true;
     let rawFile: File = options.file;
     fileList.value = [];
-    console.log("上传文件:", rawFile);
+    //console.log("上传文件:", rawFile);
 
     props.uploadCallback(rawFile).then((imageUrl) => {
         fileList.value.push(
@@ -65,7 +64,7 @@ const uploadFile = (options: any) => {
 }
 
 const handleExceed: UploadProps['onExceed'] = (files) => {
-    console.log("exceed");
+    //console.log("exceed");
     fileList.value = [files[0]];
 }
 

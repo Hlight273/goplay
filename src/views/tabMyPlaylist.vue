@@ -2,7 +2,7 @@
 <!-- 我的歌单 -->
 <div class="recommend-container">
     <h2>我的歌单 <el-button class="super_submit" @click="openDialog_AddPlaylist">新建歌单</el-button></h2>
-    <div class="recommend-list">
+    <div class="recommend-list hide_scroll_child">
         <div v-for="(playlistInfo, index) in myPlaylistInfos" :key="index" style="position: relative;">
           <el-button class="floating_btn" @click="openDialog_UpdatePlaylist(playlistInfo.playlist)">
             <el-icon><Edit /></el-icon>
@@ -197,7 +197,7 @@ onMounted(() => {
 })
 </script>
 
-<style>
+<style scoped>
 .home-container {
   width: 100vw;
   height: 100vh;
@@ -221,6 +221,8 @@ onMounted(() => {
     padding: 2vh 0;
     flex-direction: row;
     flex-wrap: wrap;
+    overflow: hidden;
+    height: 73vh;
 }
 
 .floating_btn {

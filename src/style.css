@@ -121,9 +121,9 @@ body {
 
 /*父级需要overflow hidden*/
 .hide_scroll_child {
-    overflow-y: scroll;
-    padding-right: 2vh;
-    width: calc(100% + 1.6vh);
+    overflow-y: scroll !important;
+    padding-right: 3vh !important;
+    width: calc(100% + 1.6vh) !important;
 }
 
 

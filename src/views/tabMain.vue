@@ -1,22 +1,25 @@
 <template>
   <div>
     <div class="home-container">
-      <!-- 轮播图 -->
-      <el-carousel height="40vh">
-        <el-carousel-item v-for="(item, index) in banners" :key="index">
-          <img :src="item" class="carousel-img" />
-        </el-carousel-item>
-      </el-carousel>
+      <div class="hide_scroll_child">
+         <!-- 轮播图 -->
+        <el-carousel height="40vh">
+          <el-carousel-item v-for="(item, index) in banners" :key="index">
+            <img :src="item" class="carousel-img" />
+          </el-carousel-item>
+        </el-carousel>
 
-      <!-- 推荐歌单 -->
-      <div class="recommend-container">
-        <h2>推荐歌单</h2>
-        <div class="recommend-list">
-          <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
-            <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
+        <!-- 推荐歌单 -->
+        <div class="recommend-container">
+          <h2>推荐歌单</h2>
+          <div class="recommend-list">
+            <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
+              <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
+            </div>
           </div>
         </div>
       </div>
+     
     </div>
   </div>
    
@@ -94,6 +97,7 @@ onMounted(() => {
   height: 84vh;
   background-color: #f5f5f5;
   padding: 2vh;
+  overflow: hidden;
 }
 
 .carousel-img {
