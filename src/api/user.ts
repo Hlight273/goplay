@@ -47,6 +47,14 @@ export const updatePwd = (oldPwd:string, newPwd:string) => {
     return http.put<Result<boolean>>(`/user/pwd`, formData);
 }
 
+export const userVipInfo = (userId:number) => {
+    return http.get<Result<User.VipInfo>>(`user/{userId}/vipInfo`);
+}
+
+export const renewVipInfo = (userId:number) => {
+    return http.put<Result<User.VipInfo>>(`user/renew/vipInfo`);
+}
+
 
 
 //非api

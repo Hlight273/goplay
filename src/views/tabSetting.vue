@@ -31,7 +31,7 @@
               lv{{vipinfo.level}} {{ formatDate(vipinfo.startTime) }}-{{ formatDate(vipinfo.endTime) }}
             </span>
             <span class="white_b_font stroke" v-show="vipinfo.level<=0">当前没有vip!</span>
-            <el-button class="super_submit floating_rightup" style="width: 8vh;">充值vip</el-button>
+            <el-button class="super_submit floating_rightup" @click="goRecharge" style="width: 8vh;">充值vip</el-button>
         </div>
     </div>
 </template>
@@ -81,6 +81,10 @@ const submitNickname = (text:string, callback: (text: string) => void)=>{
     // .then(() => callback(true))  // 🟢 通过回调返回结果
     // .catch(() => callback(false));
     
+}
+
+const goRecharge = ()=>{
+  window.open('/pay', '_blank')
 }
 
 onMounted(() => {

@@ -4,6 +4,13 @@ export enum ResultCode {
     EMPTY = 20002,
     EXPIRED = 20003,
 }
+export enum OrderStatus {
+    CREATED = "已创建",
+    PAYING = "支付中",
+    PAID = "支付成功",
+    FAILED = "支付失败",
+    EXPIRED = "已过期",
+}
 
 const isLocalTest:boolean = false;
 const isServerRelease:boolean = false;
