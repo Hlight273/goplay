@@ -2,8 +2,8 @@
     <div class="content">
 
         <div class="infobox">
-            <img :src="userinfo?.avatarUrl" alt="avator" class="avatar">
-            <div class="usertitle">欢迎回来，{{ User.describtionUser(userinfo) }}<span>{{ userinfo?.nickname }}</span>！</div>
+            <img :src="myUserinfo?.avatarUrl" alt="avator" class="avatar">
+            <div class="usertitle">欢迎回来，{{ User.describtionUser(myUserinfo) }}<span>{{ myUserinfo?.nickname }}</span>！</div>
         </div>
 
         <div class="line_top">
@@ -11,26 +11,30 @@
             <!-- <img :src="userinfo.avatarUrl" alt="avator" class="avator"> -->
             <div class="input_box">
                 <span class="stroke">用户名:</span>
-                <span class="label">{{ userinfo.username }}</span>
+                <span class="label">{{ myUserinfo.username }}</span>
             </div>
             <div class="input_box">
                 <span class="stroke">昵称:</span>
                 <GoplayInput placeholder='输入昵称' v-model=curNickname :onSubmit=submitNickname type='text'></GoplayInput>
+            </div>
+            <div class="input_box">
+                <span class="stroke">Go积分:</span>
+                <span class="label">{{ myUserinfo.hPoints??0 }}</span>
             </div>
             <!-- <div class="input_box">
                 <span class="stroke">修改密码:</span>
                 <GoplayInput placeholder='输入原密码' v-model=curInputedOldPwd :onSubmit=submitNickname type='password'></GoplayInput>
             </div> -->
             <el-button class="super_submit floating_rightup" @click="">修改密码</el-button>
-            <span class="userId">#{{ userinfo.id }}</span>
+            <span class="userId">#{{ myUserinfo.id }}</span>
             
         </div>
         <div class="line_top">
             <div class="title"><el-icon><Coin /></el-icon>积分充值</div>
-            <span class="" v-show="vipinfo.level>0">
-              lv{{vipinfo.level}} {{ formatDate(vipinfo.startTime) }}-{{ formatDate(vipinfo.endTime) }}
+            <span class="" v-show="myVipinfo.level>0">
+              lv{{myVipinfo.level}} {{ formatDate(myVipinfo.startTime) }}-{{ formatDate(myVipinfo.endTime) }}
             </span>
-            <span class="white_b_font stroke" v-show="vipinfo.level<=0">当前没有vip!</span>
+            <span class="white_b_font stroke" v-show="myVipinfo.level<=0">当前没有vip!</span>
             <el-button class="super_submit floating_rightup" @click="goRecharge" style="width: 8vh;">充值vip</el-button>
         </div>
     </div>
@@ -44,20 +48,14 @@ import { ResultCode } from '@/util/webConst';
 import GoplayInput from '@/components/goplayInput.vue';
 import { formatDate } from '@/util/commonUtil';
 
-const userinfo = ref<User.UserInfo>({
-  id: 0,
-  username: '',
-  avatarUrl: '',
-  level: 0,
-  nickname: '',
-});
-const vipinfo = ref<User.VipInfo>({
-  userId: 0,
-  level: 0,
-  startTime: new Date().toString(),
-  endTime: new Date().toString(), 
-  days: 0,
-});
+import { storeToRefs } from "pinia";
+import { useCommonStore } from "@/store/commonStore";
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const commonStore = useCommonStore();
+const { myUserinfo, myVipinfo } = storeToRefs(commonStore);
+
 const userId = Number(localStorage.getItem("userid"));
 
 const curNickname = ref('')
@@ -71,7 +69,7 @@ const submitNickname = (text:string, callback: (text: string) => void)=>{
       switch (res.code) {
         case ResultCode.SUCCESS:          
           callback(text);
-          userinfo.value.nickname = curNickname.value;
+          myUserinfo.value.nickname = curNickname.value;
           break;
         default:
           break;
@@ -84,7 +82,7 @@ const submitNickname = (text:string, callback: (text: string) => void)=>{
 }
 
 const goRecharge = ()=>{
-  window.open('/pay', '_blank')
+  router.push('/pay');
 }
 
 onMounted(() => {
@@ -92,8 +90,8 @@ onMounted(() => {
     (res)=>{   
       switch (res.code) {
         case ResultCode.SUCCESS:          
-          userinfo.value = res.oData
-          curNickname.value = userinfo.value.nickname
+          myUserinfo.value = res.oData
+          curNickname.value = myUserinfo.value.nickname
           break;
         default:
           break;

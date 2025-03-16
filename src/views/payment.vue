@@ -33,6 +33,10 @@
             <el-icon><warning /></el-icon>
             金额必须大于1
           </div>
+          <div class="error-tip" style="color: gray;">
+            <el-icon><warning /></el-icon>
+            {{RECHARGE_HPOINTS_RULE}}
+          </div>
         </div>
       </el-card>
   
@@ -100,15 +104,14 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-  import { 
-    createPaymentOrder,
-    queryPaymentStatus,
-    confirmMockPayment,
-  } from '@/api/pay';
+  import { ref, onBeforeUnmount, computed } from 'vue';
+  import { createPaymentOrder, queryPaymentStatus,confirmMockPayment, } from '@/api/pay';
   import { OrderStatus, ResultCode } from '@/util/webConst';
-import { ElMessage } from 'element-plus';
-import { CAN_PAY_TIME_LIMIT, canRecharge, formatTime, POLLING_INTERVAL } from '@/util/payUtil';
+  import { ElMessage } from 'element-plus';
+  import { CAN_PAY_TIME_LIMIT, canRecharge, formatTime, POLLING_INTERVAL, RECHARGE_HPOINTS_RULE } from '@/util/payUtil';
+
+  import { useCommonStore } from "@/store/commonStore";
+  const commonStore = useCommonStore();
   
   const amount = ref(0);
   const prepayId = ref('');
@@ -145,8 +148,9 @@ import { CAN_PAY_TIME_LIMIT, canRecharge, formatTime, POLLING_INTERVAL } from '@
         clearTimers();
         paid.value = true;
         paidAmount.value = res.oData.paidAmount;
-        if (res.oData.status === OrderStatus.PAID) {
+        if (res.oData.status === OrderStatus.PAID) { //支付成功后需要更新全局myUserInfo
           paymentResult.value = '支付成功';
+          commonStore.updateMyUserInfo();
         } else if (res.oData.status === OrderStatus.FAILED) {
           paymentResult.value = '支付失败';
         }else if (res.oData.status === OrderStatus.EXPIRED) {

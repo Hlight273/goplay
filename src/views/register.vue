@@ -28,8 +28,8 @@
         </el-form-item>
 
         <el-form-item prop="agreeToTerms">
-          <el-checkbox v-model="form.agreeToTerms">
-            我保证上传的音乐为本人原创
+          <el-checkbox v-model="form.agreeToTerms" @change="openAgreementDialog">
+            我已阅读并同意《免责申明》
           </el-checkbox>
         </el-form-item>
 
@@ -42,6 +42,21 @@
       </div>
     </div>
   </div>
+
+
+   <!-- 免责申明弹框 -->
+   <el-dialog v-model="agreementVisible" title="免责申明" width="600px">
+      <p>在使用 GoPlay 友音同享音乐平台（以下简称 Goplay）前，请您务必仔细阅读并透彻理解本声明。</p>
+      <p>本网站音乐资源大部分来自于互联网，如涉及侵权，请原作者联系管理员，我们将在 24 小时内删除。</p>
+      <p>音乐资源分享仅用于学习交流，不得用于商业行为，违规使用获取利益，由下载方承担法律责任。</p>
+      <p>上传者请保证音乐为本人原创，如涉及侵权，请联系管理员，我们将在 24 小时内删除。</p>
+      <template #footer>
+        <el-button :disabled="countdown > 0" type="primary" @click="confirmAgreement">
+          {{ countdown > 0 ? `请等待 ${countdown} 秒` : '确认' }}
+        </el-button>
+      </template>
+    </el-dialog>
+
 </template>
 
 <script lang="ts" setup>
@@ -121,6 +136,26 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
   })
 }
+
+const agreementVisible = ref(false) // 控制弹框显示
+const countdown = ref(5) // 5 秒倒计时
+const openAgreementDialog = () => {
+  form.agreeToTerms = false // 防止用户直接勾选
+  agreementVisible.value = true
+  countdown.value = 5
+  const timer = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timer)
+    }
+  }, 1000)
+}
+
+const confirmAgreement = () => {
+  form.agreeToTerms = true
+  agreementVisible.value = false
+}
+
 </script>
 
 <style scoped>

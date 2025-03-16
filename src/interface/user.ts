@@ -13,6 +13,7 @@ export namespace User {
         privilege?: number
         level: number
         nickname:string
+        hPoints?:number
     }
     
     export interface UserId {

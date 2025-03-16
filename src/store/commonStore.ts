@@ -1,4 +1,4 @@
-import { userInfo } from "@/api/user";
+import { updateNickname, userInfo, userVipInfo } from "@/api/user";
 import { User } from "@/interface/user";
 import { ResultCode } from "@/util/webConst";
 import { defineStore } from "pinia";
@@ -8,6 +8,39 @@ export const useCommonStore = defineStore("common", () => {
 
     const dissolveOn = ref<boolean>(false);
     const userPageOn = ref<boolean>(false);
+    
+    const myUserinfo = ref<User.UserInfo>({
+        id: 0,
+        username: '',
+        avatarUrl: '',
+        level: 0,
+        nickname: '',
+        hPoints: 0,
+      });
+    const myVipinfo = ref<User.VipInfo>({
+        userId: 0,
+        level: 0,
+        startTime: new Date().toString(),
+        endTime: new Date().toString(), 
+        days: 0,
+    });
+    const updateMyUserInfo = ()=>{
+        userPageOn.value = true;
+        userInfo(Number(localStorage.getItem("userid"))).then((res)=>{
+            if(res.code == ResultCode.SUCCESS){
+                Object.assign(myUserinfo, res.oData);
+            }
+        })
+    }
+    const updateMyVipInfo = ()=>{
+        userPageOn.value = true;
+        userVipInfo(Number(localStorage.getItem("userid"))).then((res)=>{
+            if(res.code == ResultCode.SUCCESS){
+                Object.assign(myVipinfo, res.oData);
+            }
+        })
+    }
+
     const targetUserInfo = reactive<User.UserInfo>({
         id: 0,
         username: "",
@@ -40,5 +73,7 @@ export const useCommonStore = defineStore("common", () => {
     
    
 
-    return { dissolveOn, userPageOn, targetUserInfo, targetUserVipInfo, openUserPage, closeUserPage, openUserPage_byUserInfo };
+    return { dissolveOn, userPageOn, targetUserInfo, targetUserVipInfo, openUserPage, closeUserPage, openUserPage_byUserInfo,
+        myUserinfo, myVipinfo, updateMyUserInfo, updateMyVipInfo
+     };
 });
