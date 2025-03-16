@@ -31,10 +31,10 @@
         </div>
         <div class="line_top">
             <div class="title"><el-icon><Coin /></el-icon>积分充值</div>
-            <div style="display: flex;align-items: center;">
+            <div v-show="myVipinfo.level>0" style="display: flex;align-items: center;">
               <VipTag :level="myVipinfo.level"></VipTag>
-              <span class="" v-show="myVipinfo.level>0">
-                {{ formatDate(myVipinfo.startTime) }}-{{ formatDate(myVipinfo.endTime) }}
+              <span>
+                <!-- {{ formatDate(myVipinfo.startTime) }}- -->{{ formatDate(myVipinfo.endTime) }}到期
               </span>
             </div>
             <span class="white_b_font stroke" v-show="myVipinfo.level<=0">当前没有vip!</span>
@@ -116,6 +116,7 @@ watch(
     color: #434343;
     min-height: 88vh;
     flex-wrap: wrap;
+    font-size: 1.4vh;
 }
 .content .line_top {
     position: relative;
@@ -126,7 +127,7 @@ watch(
     flex-direction: column;
     /* width: 100%; */
     width: calc(100vw - 175px);
-    padding: 1vh 2.2vh 1.4vh 2vh;
+    padding: 1vh 2.2vh 2.2vh 2vh;
     border: 1px solid #e9e9e9;
     background: #fcfcfc;
     border-radius: 1vh;
@@ -175,7 +176,7 @@ watch(
   margin-left: 0.8vh;
   color: var(--font-grey);
     font-size: 1.6vh;
-    font-weight: lighter;
+    font-weight: normal;
     font-family: ui-serif;
 }
 .content .line_top .userId {

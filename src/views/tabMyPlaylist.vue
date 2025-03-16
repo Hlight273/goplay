@@ -35,8 +35,8 @@
       <el-button type="primary" @click="isUpdateDialog?submitUpdatePlaylist():submitAddPlaylist()">确定</el-button>
       <el-button v-show="isUpdateDialog" class="super_submit" @click="deletePlaylist">删除歌单</el-button>
 
-      <el-button v-show="isUpdateDialog" class="super_submit" @click="submitAddRecommend">推送歌单+</el-button>
-      <el-button v-show="isUpdateDialog" class="super_submit" @click="submitRemoveRecommend">去除推送-</el-button>
+      <el-button v-show="isUpdateDialog&&CanRecommand(myUserinfo)" class="super_submit" @click="submitAddRecommend">推送歌单+</el-button>
+      <el-button v-show="isUpdateDialog&&CanRecommand(myUserinfo)" class="super_submit" @click="submitRemoveRecommend">去除推送-</el-button>
     </div>
   </el-dialog>
  </div>
@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { userInfo, userPlaylistInfo } from '@/api/user';
+import { CanRecommand, userInfo, userPlaylistInfo } from '@/api/user';
 import { Playlist } from '@/interface/playlist';
 import { User } from '@/interface/user';
 import { ResultCode } from '@/util/webConst';
@@ -223,6 +223,7 @@ onMounted(() => {
     flex-wrap: wrap;
     overflow: hidden;
     height: 73vh;
+    justify-content: center
 }
 
 .floating_btn {

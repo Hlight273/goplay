@@ -20,6 +20,9 @@ export const removeSongInPlaylist = (playlistId: number, songId: number) => {
 export const addSongInPlaylist = (playlistId: number, songId: number) => {
     return http.post<Result<boolean>>(`playlist/${playlistId}/song/${songId}`);
 }
+export const searchPlaylists = (keyword: string, page: number, size: number) => { 
+    return http.get<Result<Playlist.PlaylistInfo[]>>(`playlist/search?keyword=${keyword}&page=${page}&size=${size}`);
+  }
 
 // export const getSongsFromPlaylist = (playlistId:number) => {
 //     return http.get<Result<Song.SongContent[]>>(`/${playlistId}/songs`,);

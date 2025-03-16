@@ -163,5 +163,6 @@ watch(
     overflow: hidden;
     height: 60vh;
     justify-content: space-evenly;
+    justify-content: center
 }
 </style>

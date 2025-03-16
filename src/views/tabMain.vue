@@ -1,7 +1,29 @@
 <template>
   <div>
+
+    <!-- 动态面包屑 -->
+    <el-breadcrumb separator="/" class="breadcrumb">
+      <el-breadcrumb-item @click="handleBackHome" :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="!showSearchResults">推荐歌单</el-breadcrumb-item>
+      <el-breadcrumb-item v-else>搜索："{{ searchKeyword }}"</el-breadcrumb-item>
+    </el-breadcrumb>
+    
+     <!-- 搜索框 -->
+     <div class="search-bar">
+      <el-input 
+        v-model="searchKeyword"
+        placeholder="搜索歌单"
+        clearable
+        @keyup.enter="handleSearch"
+      >
+        <template #append>
+          <el-button :icon="Search" @click="handleSearch"/>
+        </template>
+      </el-input>
+    </div>
+
     <div class="home-container">
-      <div class="hide_scroll_child">
+      <div v-show="!showSearchResults" class="hide_scroll_child">
          <!-- 轮播图 -->
         <el-carousel height="40vh">
           <el-carousel-item v-for="(item, index) in banners" :key="index">
@@ -19,9 +41,24 @@
           </div>
         </div>
       </div>
+
+      <!-- 搜索结果 -->
+      <div v-show="showSearchResults" class="search-results">
+        <div v-loading="searchLoading" class="result-list hide_scroll_child">
+          <div v-if="!(searchResults.length === 0 && !searchLoading)" v-for="playlist in searchResults" :key="playlist.playlist.id">
+            <PlaylistBlock :playlist-info="playlist" :my-userinfo="myUserinfo"/>
+          </div>
+          <div v-if="searchResults.length === 0 && !searchLoading" class="no-result">
+            暂无搜索结果
+          </div>
+        </div>
+        
+      </div>
      
     </div>
   </div>
+
+
    
 </template>
 
@@ -68,36 +105,66 @@ onMounted(() => {
           break;
       }
     });
-
-
-    // recommendPlaylistIds.forEach(index => {
-    //   getPlaylistInfo(index).then(
-    //   (res)=>{   
-    //     switch (res.code) {
-    //       case ResultCode.SUCCESS:{
-    //         recommendedPlaylistInfos.value?.push(res.oData);
-    //         break;
-    //       }
-    //       default:
-    //         break;
-    //     }
-    //   },(err)=>{
-
-    //   });
-      
-    // });
-    
 })
+
+import { Search } from '@element-plus/icons-vue' // 引入图标
+import { useRouter } from 'vue-router'
+import { searchPlaylists } from '@/api/playlist';
+
+const router = useRouter()
+const searchKeyword = ref('')
+
+
+// 新增状态
+const showSearchResults = ref(false)
+const searchResults = ref<Playlist.PlaylistInfo[]>([])
+const searchLoading = ref(false)
+
+const handleSearch = async () => {
+  const keyword = searchKeyword.value.trim()
+  if (!keyword) {
+    showSearchResults.value = false
+    return
+  }
+
+  try {
+    searchLoading.value = true
+    showSearchResults.value = true
+    searchResults.value = [];
+    searchPlaylists(keyword, 1, 20).then(
+      (res)=>{   
+        switch (res.code) {
+          case ResultCode.SUCCESS:          
+            searchResults.value = res.oData
+            break;
+          default:
+            break;
+      }
+    });
+    // const res = await searchPlaylists(keyword) // 实际调用搜索接口
+    // searchResults.value = res.oData
+  } finally {
+    searchLoading.value = false
+  }
+}
+
+const handleBackHome = (e: MouseEvent) => {
+  e.preventDefault()
+  showSearchResults.value = false
+  searchKeyword.value = ''
+  searchResults.value = []
+}
 
 </script>
 
 <style scoped>
 .home-container {
   width: calc(100% - 46px);
-  height: 84vh;
+  height: 77vh;
   background-color: #f5f5f5;
   padding: 2vh;
   overflow: hidden;
+  margin-top: 1vh;
 }
 
 .carousel-img {
@@ -117,5 +184,30 @@ onMounted(() => {
   padding: 2vh 0;
 }
 
+
+.search-bar {
+  margin-top: 1vh;
+}
+.search-results {
+  height: 73vh;
+  overflow: hidden;
+}
+
+.result-list {
+  display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1vh;
+    height: 73vh;
+    justify-content: center;
+}
+
+.no-result {
+  text-align: center;
+  color: #666;
+  font-size: 1.6vh;
+  padding: 50px 0;
+  width: 100%;
+}
 
 </style>

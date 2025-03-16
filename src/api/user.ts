@@ -88,4 +88,8 @@ export const HasPlaylistPermission = (playlist:Playlist.Playlist, userinfo:User.
     return ownerId == userId || userinfo.level >= Level.Enum.负责人;
 }
 
+export const CanRecommand = (userInfo:User.UserInfo):boolean => {
+    return userInfo.level>=Level.Enum.负责人;
+}
+
 
