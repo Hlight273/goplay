@@ -5,6 +5,7 @@
         <div class="info">
           <img :src="targetUserInfo.avatarUrl" alt="avator" class="avator">
           <span class="nickname stroke">{{ targetUserInfo.nickname }}</span>
+          <span class="lvLabel"><VipTag :level="targetUserVipInfo.level"></VipTag></span>
           <span class="userId">#{{ targetUserInfo.id }}</span>
         </div>
         <div class="recommend-container">
@@ -28,8 +29,9 @@ import { ResultCode } from "@/util/webConst";
 import { storeToRefs } from "pinia";
 import { onMounted, reactive, watch } from "vue";
 import PlaylistBlock from '@/components/playlistBlock.vue'
+import VipTag from '@/components/vipTag.vue';
 const commonStore = useCommonStore();
-const { userPageOn, targetUserInfo } = storeToRefs(commonStore);
+const { userPageOn, targetUserInfo, targetUserVipInfo } = storeToRefs(commonStore);
 const myPlaylistInfos = reactive<Playlist.PlaylistInfo[]>([]);
 
 watch(
@@ -103,6 +105,11 @@ watch(
     border-radius: 10vh;
     box-shadow: 0px 0px .4vh .1vh rgba(0, 0, 0, 0.2);
 }
+.userPage .content .info .lvLabel{
+  position: relative;
+    left: 2vh;
+    top: -2.9vh;
+}
 .userPage .content .info .nickname {
   margin-top: 0.4vh;
   font-size: 2vh;
@@ -132,8 +139,7 @@ watch(
 .recommend-container {
   margin-top: 1vh;
   width: 90%;
-    display: flex
-;
+    display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     background: #e7e8ed;

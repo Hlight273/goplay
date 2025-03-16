@@ -7,7 +7,7 @@ import { ref } from "vue";
 export const useRoomStore = defineStore("room", () => {
 
     // 存储当前房间信息
-    const roomData = ref<Room.Room>({...rawRoomData})
+    const roomData = ref<Room.Room>({...rawRoomData});
     // 存储当前房间码
     const roomCode = ref(""); 
     //播放器是否是roomMode
@@ -23,7 +23,7 @@ export const useRoomStore = defineStore("room", () => {
         roomCode.value = "";
     };
 
-    const myUserHasRoom = ():boolean => roomCode.value!=""
+    const myUserHasRoom = ():boolean => roomCode.value!="";
 
 
     const handleModeChanged = (val: boolean) => {

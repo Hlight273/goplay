@@ -31,11 +31,14 @@
         </div>
         <div class="line_top">
             <div class="title"><el-icon><Coin /></el-icon>积分充值</div>
-            <span class="" v-show="myVipinfo.level>0">
-              lv{{myVipinfo.level}} {{ formatDate(myVipinfo.startTime) }}-{{ formatDate(myVipinfo.endTime) }}
-            </span>
+            <div style="display: flex;align-items: center;">
+              <VipTag :level="myVipinfo.level"></VipTag>
+              <span class="" v-show="myVipinfo.level>0">
+                {{ formatDate(myVipinfo.startTime) }}-{{ formatDate(myVipinfo.endTime) }}
+              </span>
+            </div>
             <span class="white_b_font stroke" v-show="myVipinfo.level<=0">当前没有vip!</span>
-            <el-button class="super_submit floating_rightup" @click="goRecharge" style="width: 8vh;">充值vip</el-button>
+            <el-button class="super_submit floating_rightup" @click="goRecharge" style="width: 8vh;">充值</el-button>
         </div>
     </div>
 </template>
@@ -51,6 +54,7 @@ import { formatDate } from '@/util/commonUtil';
 import { storeToRefs } from "pinia";
 import { useCommonStore } from "@/store/commonStore";
 import { useRouter } from 'vue-router';
+import VipTag from '@/components/vipTag.vue';
 const router = useRouter();
 
 const commonStore = useCommonStore();
@@ -76,7 +80,7 @@ const submitNickname = (text:string, callback: (text: string) => void)=>{
       }
     });
     // fetch('/api/submit', { body: childValue })
-    // .then(() => callback(true))  // 🟢 通过回调返回结果
+    // .then(() => callback(true))  //通过回调返回结果
     // .catch(() => callback(false));
     
 }
@@ -86,20 +90,21 @@ const goRecharge = ()=>{
 }
 
 onMounted(() => {
-  userInfo(userId).then(
-    (res)=>{   
-      switch (res.code) {
-        case ResultCode.SUCCESS:          
-          myUserinfo.value = res.oData
-          curNickname.value = myUserinfo.value.nickname
-          break;
-        default:
-          break;
-      }
-    },(err)=>{
-
-    });
+  commonStore.updateMyVipInfo();
+  commonStore.updateMyUserInfo();
+  
+  
 })
+
+watch(
+  () => myUserinfo.value,
+  (newVal, oldVal) => {
+    if(oldVal==undefined)return;
+    curNickname.value = myUserinfo.value.nickname
+    
+  },
+  { deep: true, immediate: true }
+)
 </script>
 
 <style scoped>

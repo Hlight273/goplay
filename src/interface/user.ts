@@ -36,13 +36,7 @@ export namespace User {
             return '';
         return Level.Enum[userInfo.level];
     }
-    export const UserInfo_InitData:UserInfo = 
-    { id: -1, 
-        username: '', 
-        avatarUrl: '', 
-        level: 0 ,
-        nickname: ''
-    }
+   
 
     export interface VipInfo {
         userId: number;
@@ -50,6 +44,22 @@ export namespace User {
         startTime: string;
         endTime: string;
         days: number;
+    }
+
+    export const UserInfo_InitData:UserInfo = 
+    {   id: -1, 
+        username: '', 
+        avatarUrl: '', 
+        level: 0 ,
+        nickname: ''
+    }
+    export const VipInfo_InitData:VipInfo = 
+    {
+        userId: 0,
+        level: 0,
+        startTime: new Date().toString(),
+        endTime: new Date().toString(), 
+        days: 0
     }
     
 }

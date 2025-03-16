@@ -9,23 +9,10 @@ export const useCommonStore = defineStore("common", () => {
     const dissolveOn = ref<boolean>(false);
     const userPageOn = ref<boolean>(false);
     
-    const myUserinfo = ref<User.UserInfo>({
-        id: 0,
-        username: '',
-        avatarUrl: '',
-        level: 0,
-        nickname: '',
-        hPoints: 0,
-      });
-    const myVipinfo = ref<User.VipInfo>({
-        userId: 0,
-        level: 0,
-        startTime: new Date().toString(),
-        endTime: new Date().toString(), 
-        days: 0,
-    });
+    const myUserinfo = reactive<User.UserInfo>({...User.UserInfo_InitData});
+    const myVipinfo = reactive<User.VipInfo>({...User.VipInfo_InitData});
     const updateMyUserInfo = ()=>{
-        userPageOn.value = true;
+        Object.assign(myUserinfo, {...User.UserInfo_InitData});
         userInfo(Number(localStorage.getItem("userid"))).then((res)=>{
             if(res.code == ResultCode.SUCCESS){
                 Object.assign(myUserinfo, res.oData);
@@ -33,7 +20,7 @@ export const useCommonStore = defineStore("common", () => {
         })
     }
     const updateMyVipInfo = ()=>{
-        userPageOn.value = true;
+        Object.assign(myVipinfo, {...User.VipInfo_InitData});//先需要清空，因为有可能切换账号，但是查到vip为空 就不会覆盖
         userVipInfo(Number(localStorage.getItem("userid"))).then((res)=>{
             if(res.code == ResultCode.SUCCESS){
                 Object.assign(myVipinfo, res.oData);
@@ -41,31 +28,32 @@ export const useCommonStore = defineStore("common", () => {
         })
     }
 
-    const targetUserInfo = reactive<User.UserInfo>({
-        id: 0,
-        username: "",
-        avatarUrl: "",
-        level: 0,
-        nickname: ""
-    })
-    const targetUserVipInfo = reactive<User.VipInfo>({
-        userId: 0,
-        level: 0,
-        startTime: "",
-        endTime: "",
-        days: 0
-    })
+    const targetUserInfo = reactive<User.UserInfo>({...User.UserInfo_InitData})
+    const targetUserVipInfo = reactive<User.VipInfo>({...User.VipInfo_InitData})
     const openUserPage = (targetUserId:number)=>{
         userPageOn.value = true;
+        Object.assign(myUserinfo, {...User.UserInfo_InitData});
         userInfo(targetUserId).then((res)=>{
             if(res.code == ResultCode.SUCCESS){
                 Object.assign(targetUserInfo, res.oData);
+            }
+        })
+        Object.assign(targetUserVipInfo, {...User.VipInfo_InitData});
+        userVipInfo(targetUserId).then((res)=>{
+            if(res.code == ResultCode.SUCCESS){
+                Object.assign(targetUserVipInfo, res.oData);
             }
         })
     }
     const openUserPage_byUserInfo = (_targetUserInfo:User.UserInfo)=>{
         userPageOn.value = true;
         Object.assign(targetUserInfo, _targetUserInfo);
+        Object.assign(targetUserVipInfo, {...User.VipInfo_InitData});
+        userVipInfo(_targetUserInfo.id).then((res)=>{
+            if(res.code == ResultCode.SUCCESS){
+                Object.assign(targetUserVipInfo, res.oData);
+            }
+        })
     }
     const closeUserPage = ()=>{
         userPageOn.value = false;
