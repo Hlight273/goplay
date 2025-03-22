@@ -8,6 +8,7 @@ import { App } from 'vue';
 import { Song } from '@/interface/song';
 import { getSongBlob } from '@/api/song';
 import { eventBus,MEventTypes } from "@/util/eventBus";
+import { HlsPlugin } from 'xgplayer-hls/es/plugin';
 
 
 export class GoPlayer {
@@ -47,8 +48,8 @@ export class GoPlayer {
             height: 50,
             mediaType: 'audio',
             presets: ['default', MusicPreset],
-            preloadNext: true,//预加载下一首
-            halfPass: true,
+           // preloadNext: true,//预加载下一首
+           // halfPass: true,
             ignores: ['playbackrate'],
             controls: {
                 initShow: true,
@@ -73,6 +74,23 @@ export class GoPlayer {
                     return dom;
                 },
               },
+            //   plugins: [HlsPlugin], // 添加 HLS 插件
+            //     // HLS 配置
+            //     hlsConfig: {
+            //         maxBufferLength: 30, // 缓冲区长度
+            //         maxMaxBufferLength: 60,
+            //         enableWorker: true
+            //     },
+            //     hls: {
+            //         retryCount: 3, // 重试 3 次，默认值
+            //         retryDelay: 1000, // 每次重试间隔 1 秒，默认值
+            //         loadTimeout: 10000, // 请求超时时间为 10 秒，默认值
+            //         fetchOptions: {
+            //             // 该参数会透传给 fetch，默认值为 undefined
+            //             token: localStorage.getItem("token") || '',
+            //             mode: 'cors'
+            //         }
+            //     }
         })
         this.player4room.on(Events.PLAY, this.sendNewSongEv)
         eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, ()=>{this.player4local?.pause(); });
@@ -280,6 +298,8 @@ export class GoPlayer {
         const realURL:string = this.personalPlaylist[cIndex].songUrl;
         try {
             const blob = await BlobCacheManager.getInstance().getBlob(realURL);
+            console.log('加载成功:', blob);
+            
             if(this.player4local)
                 this.player4local.plugins.music.list[cIndex].src = URL.createObjectURL(blob)
         } catch (e) {

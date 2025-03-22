@@ -273,7 +273,7 @@ const removeSong = (songId:number) => {
 
 const downloadSong = (songUrl:string) => {
   if(songUrl==undefined || songUrl=="" || songUrl == null) return ""
-  getSongFile(songUrl)
+  getSongFile(songUrl,0)
 }
 
 //上传回调

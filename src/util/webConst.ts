@@ -3,6 +3,7 @@ export enum ResultCode {
     ERROR = 20001,
     EMPTY = 20002,
     EXPIRED = 20003,
+    UPLOAD_ERROR = 30000,
 }
 export enum OrderStatus {
     CREATED = "已创建",

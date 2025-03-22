@@ -37,6 +37,7 @@ service.interceptors.response.use(
         let res = response.data;
         
         if (response.config.responseType === 'blob') {// 如果是返回的文件
+            response.config.timeout = 60000;// 下载文件的超时时间
             return response;
         }
         if (typeof res === 'string') { // 兼容服务端返回的字符串数据
@@ -49,7 +50,10 @@ service.interceptors.response.use(
             router.replace("/login")
             return Promise.reject(new Error(res.message))
         }
-        if (res.code === ResultCode.ERROR){ //业务错误，默认的业务错误全都是发这个消息
+        else if (res.code === ResultCode.ERROR){ //业务错误，默认的业务错误全都是发这个消息
+            msgErr("错误："+res.message);
+            return Promise.reject(new Error(res.message))
+        }else if(res.code === ResultCode.UPLOAD_ERROR){ //上传文件错误
             msgErr("错误："+res.message);
             return Promise.reject(new Error(res.message))
         }

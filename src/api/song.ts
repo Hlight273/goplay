@@ -6,12 +6,13 @@ import {downloadWithAxios, getFileBlobFromServer, http} from '@/util/request'
 import { webRoot } from "@/util/webConst";
 import { Axios } from "axios";
 
-export const getSongFile = (songUrl:string):Promise<string|void> => { //返回下载到本地的url
-    return downloadWithAxios(`/song/${songUrl}`, songUrl)
+export const getSongFile = (songUrl:string, isZipped:number):Promise<string|void> => { //返回下载到本地的url
+    return downloadWithAxios(`/song/${songUrl}/${isZipped}`, songUrl)
 }
 
 export const getSongBlob = (songUrl:string):Promise<string|void> => {
-    return getFileBlobFromServer(`${webRoot}/song/${songUrl}`, songUrl)
+    const isZipped:number = 1;
+    return getFileBlobFromServer(`${webRoot}/song/${songUrl}/${isZipped}`, songUrl)
 }
 
 /** 获取歌曲的一级评论（分页） */

@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "types": [
       "webpack-env",
-      "element-plus/global"
+      "element-plus/global",
+      "@element-plus/icons-vue"
     ],
     "paths": {
       "@/*": [
