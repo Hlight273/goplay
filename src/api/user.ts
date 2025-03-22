@@ -83,13 +83,20 @@ export const HasRoomAdminPower = (userinfo:User.UserInfo):boolean=>{
 }
 
 export const HasPlaylistPermission = (playlist:Playlist.Playlist, userinfo:User.UserInfo):boolean=>{
+    if(userInfo==undefined||userInfo==null)return false
     const userId = userinfo.id;
     const ownerId = playlist.userId;
     return ownerId == userId || userinfo.level >= Level.Enum.负责人;
 }
 
 export const CanRecommand = (userInfo:User.UserInfo):boolean => {
+    if(userInfo==undefined||userInfo==null)return false
     return userInfo.level>=Level.Enum.负责人;
 }
+
+export const isAdmin = (userInfo:User.UserInfo) => {
+    if(userInfo==undefined||userInfo==null)return false
+    return userInfo.level === Level.Enum.管理员
+  }
 
 

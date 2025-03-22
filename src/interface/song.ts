@@ -28,6 +28,11 @@ export namespace Song {
         songUrl: string;
     }
 
+    export interface SongDetailDTO {
+        song: Song;
+        songInfo: SongInfo;
+    }
+
     export interface Comment {
         id: number;
         parentId: number | null; // null 表示是一级评论

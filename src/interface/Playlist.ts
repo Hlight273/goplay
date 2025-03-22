@@ -24,8 +24,8 @@ export namespace Playlist{
     }
 
     export interface PlaylistInfo {
-        playlist: Playlist;              
-        songContentList: Song.SongContent[];             
+        playlist: Playlist;
+        songContentList: Song.SongContent[];
     }
 
     export interface PlaylistForm {     

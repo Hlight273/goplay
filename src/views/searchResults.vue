@@ -14,7 +14,8 @@
   </template>
   
   <script lang="ts" setup>
-  import { ref, onMounted } from 'vue'
+import { ref,onMounted } from 'vue'
+
   import { useRoute } from 'vue-router'
 //   import { searchPlaylists } from '@/api/search' // 需创建对应API接口
   import PlaylistBlock from '@/components/playlistBlock.vue'

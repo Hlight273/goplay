@@ -14,6 +14,14 @@
         <template #label><span class="custom-tabs-label"><el-icon><Menu/></el-icon></span></template>
         <TabMyPlaylist></TabMyPlaylist>
       </el-tab-pane>
+      <el-tab-pane v-if="isAdmin(myUserinfo)">
+        <template #label>
+          <span class="custom-tabs-label">
+            <el-icon><Histogram /></el-icon>
+          </span>
+        </template>
+        <TabAdmin></TabAdmin>
+      </el-tab-pane>
       <el-tab-pane>
         <template #label><span class="custom-tabs-label"><el-icon><Tools/></el-icon></span></template>
         <TabSetting></TabSetting>
@@ -33,10 +41,11 @@
 <script lang="ts" setup>
 import { ref, onMounted} from 'vue'
 import { needDebugOutpot } from '@/util/webConst'
+import {isAdmin} from '@/api/user'
 
 import type { TabsInstance } from 'element-plus'
 const tabPosition = ref<TabsInstance['tabPosition']>('left') //tab栏暂时设在左边
-
+  isAdmin
 import TabMain from './tabMain.vue';
 import TabRoom from './tabRoom.vue';
 import AudioConsole from '@/components/audioConsole.vue';
@@ -51,13 +60,20 @@ import { useCommonStore } from "@/store/commonStore";
 import { storeToRefs } from "pinia";
 
 const commonStore = useCommonStore();
-const { dissolveOn } = storeToRefs(commonStore);
+const { dissolveOn, myUserinfo } = storeToRefs(commonStore);
 
 
 onMounted(()=>{
+  commonStore.updateMyUserInfo();
   if(needDebugOutpot)
     console.log(localStorage.getItem("token"));
 })
+
+
+
+import { computed } from 'vue'
+import TabAdmin from './tabAdmin.vue'
+import { User, Level } from '@/interface/user'
 
 
 </script>

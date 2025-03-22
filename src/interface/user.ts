@@ -14,6 +14,7 @@ export namespace User {
         level: number
         nickname:string
         hPoints?:number
+        isActive?:number
     }
     
     export interface UserId {
