@@ -148,6 +148,7 @@ export const getFileBlobFromServer = (url: string, filename: string):Promise<str
         url,
         method: "GET",
         responseType: "blob",
+        timeout: 120000,
     }).then((response) => {
         const blob = new Blob([response.data]);
         const objectUrl:string = URL.createObjectURL(blob);
