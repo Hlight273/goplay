@@ -39,3 +39,8 @@ export const roomSongContentList = (roomCode:string) => {
 export const roomSongRemove = (roomCode:string, songId:Number, data:User.UserId) => {
     return http.post<Result<string>>(`room/${roomCode}/song/${songId}/remove`, data);
 }
+
+/** 将房间歌曲保存为歌单 */
+export const saveRoomSongsAsPlaylist = (roomCode: string) => {
+    return http.post<Result<string>>(`/room/${roomCode}/saveAsPlaylist`);
+};

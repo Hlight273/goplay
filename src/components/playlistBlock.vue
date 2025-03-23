@@ -4,7 +4,7 @@
         <img :src='(playlistInfo.playlist.coverUrl!=null&&playlistInfo.playlist.coverUrl!="")?
             (getPlaylistCoverURL(playlistInfo.playlist.coverUrl)):
             require("@/assets/icons/audio_folder.png")' class="playlist-cover" />
-        <p class="super_submit">{{ playlistInfo.playlist.title }}</p>
+        <p class="">{{ playlistInfo.playlist.title }}</p>
     </div>
      <!-- 歌单详情弹出层 -->
     <div v-if="selectedPlaylistInfo.playlist.id>=0" class="playlist-overlay" >
@@ -88,16 +88,21 @@ onMounted(()=>{
     align-items: center;
 }
 .playlist-item p {
-    color: #ffffff;
-    display: flex;
+    color: #6c69be;
+    display: flex
+;
     font-size: 1.4vh;
     align-items: center;
     justify-content: center;
     border-radius: 2vh;
-    width: 14vh;
+    /* width: 14vh; */
     height: 2vh;
     margin-top: 1vh;
     font-family: auto;
+    background-color: #fffbfb;
+    width: 100%;
+    font-family: fantasy;
+    border: 0.1vh solid #dcbeff;
 }
 
 

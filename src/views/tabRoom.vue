@@ -24,8 +24,7 @@
         <span>
           <el-icon><Avatar /></el-icon>
           {{ roomData?.currentUsers }}/{{ roomData?.maxUsers }}
-        </span>
-        
+        </span>      
       </div>
       <div class="roomCode" v-show="roomData">
         <el-icon @click="copyRoomCode()"><CopyDocument color="#434343"/></el-icon>
@@ -87,6 +86,18 @@
           <template #label><span class="custom-tabs-label"><el-icon><ChatLineRound/></el-icon></span></template>
         </el-tab-pane>
       </el-tabs>
+       <!-- 保存歌单 -->
+       <el-button 
+          v-if="HasOwnerPower(myUserInfo)"
+          type="primary" 
+          size="small" 
+          @click="saveAsPlaylist"
+          :disabled="songContentList.length === 0"
+          class="save-playlist-btn"
+        >
+          <el-icon><FolderAdd /></el-icon>
+          保存为歌单
+        </el-button>
     </div>
    
     <!-- 播放器面板 -->
@@ -139,12 +150,12 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted} from 'vue'
-import { ArrowLeft, Promotion} from '@element-plus/icons-vue'
-import type { DropdownInstance } from 'element-plus'
+import { ArrowLeft, Promotion, FolderAdd} from '@element-plus/icons-vue'
+import { ElMessageBox, type DropdownInstance, ElMessage } from 'element-plus'
 
 import { IMessage } from '@stomp/stompjs';
 
-import { roomCreate,roomJoin,roomExit,roomMember,roomOwnerTransPrivilege,roomMemberPrivilege,roomSongContentList, roomSongRemove} from '@/api/room'
+import { roomCreate,roomJoin,roomExit,roomMember,roomOwnerTransPrivilege,roomMemberPrivilege,roomSongContentList, roomSongRemove, saveRoomSongsAsPlaylist} from '@/api/room'
 import { userRoomInfo, getPrivilegeName, HasOwnerPower, HasRoomAdminPower} from '@/api/user'
 import { Room } from '@/interface/room'
 import { Privilege, User } from '@/interface/user'
@@ -422,6 +433,27 @@ const getMyUserInfoInList = (userInfoList:User.UserInfo[]):User.UserInfo|undefin
   return userInfoList?.find(userinfo => userinfo.id === userId);
 }
 
+// 添加保存歌单方法
+const saveAsPlaylist = () => {
+  if (!roomCode.value || songContentList.length === 0) return
+  
+  ElMessageBox.confirm(
+    '是否将当前房间的歌曲保存为个人歌单？',
+    '保存歌单',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'info'
+    }
+  ).then(() => {
+    saveRoomSongsAsPlaylist(roomCode.value).then((res) => {
+      if (res.code === ResultCode.SUCCESS) {
+        ElMessage.success('歌单保存成功！')
+      }
+    })
+  }).catch(() => {})
+}
+
 
 //播放器相关 
 //播放列表点击事件
@@ -479,6 +511,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   height: 7.5vh;
 }
 .content .tabBox {
+  position: relative;
   margin-left: 15px;
   margin-top: 1vh;
   height: 3vh;
@@ -487,6 +520,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   align-items: flex-start;
   /* justify-content: center; */
 }
+
 .content .room-tabs /deep/ .el-tabs__item {
   color: #9790d5;
   display: flex;
@@ -573,6 +607,17 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   color: #9f9f9f;
   display: flex;
   align-items: center;
+}
+.roomInfo .el-button {
+  margin-top: 0.5vh;
+  padding: 0.3vh 0.8vh;
+  font-size: 1.2vh;
+  display: flex;
+  align-items: center;
+  gap: 0.3vh;
+}
+.roomInfo .el-button .el-icon {
+  margin-right: 0.2vh;
 }
 
 .roomCode {
@@ -795,6 +840,39 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   background-color: #3c393c;
   font-family: 'NSimSun','Microsoft YaHei', sans-serif;
   font-weight: bold;
+}
+.save-playlist-btn {
+  right: .1vh;
+    height: 2.4vh;
+    width: 10vh;
+    position: absolute;
+    margin-right: 15px;
+    padding: 0 1vh;
+    font-size: 1.2vh;
+    background-color: #7365ff;
+    border-color: #7365ff;
+    display: flex;
+    align-items: center;
+    gap: 0.3vh;
+    display: flex
+;
+    border: 0.3vh solid #bbb1ff;
+    box-shadow: 0px -1.7vh 0.2vh 0px rgb(136 73 112 / 44%) inset;
+    align-items: flex-start;
+    padding-top: 0.45vh !important;
+    background-color: #b4b9ff;
+    color: #ffffff;
+    height: 2.6vh;
+}
+
+.save-playlist-btn:hover {
+  background-color: #a79dff;
+  border-color: #c6c0ff;
+}
+
+.save-playlist-btn:disabled {
+  background-color: #c0c4cc;
+  border-color: #c0c4cc;
 }
 </style>
 
