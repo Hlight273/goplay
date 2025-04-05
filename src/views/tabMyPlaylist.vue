@@ -3,11 +3,11 @@
 <div class="recommend-container">
     <h2>我的歌单 <el-button class="super_submit" @click="openDialog_AddPlaylist">新建歌单</el-button></h2>
     <div class="recommend-list hide_scroll_child">
-        <div v-for="(playlistInfo, index) in myPlaylistInfos" :key="index" style="position: relative;">
+        <div v-for="(playlistInfo, index) in commonStore.myPlaylistInfos" :key="index" style="position: relative;">
           <el-button class="floating_btn" @click="openDialog_UpdatePlaylist(playlistInfo.playlist)">
             <el-icon><Edit /></el-icon>
           </el-button>
-          <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
+          <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="commonStore.myUserinfo"/>
         </div>
     </div>
 </div>
@@ -35,8 +35,8 @@
       <el-button type="primary" @click="isUpdateDialog?submitUpdatePlaylist():submitAddPlaylist()">确定</el-button>
       <el-button v-show="isUpdateDialog" class="super_submit" @click="deletePlaylist">删除歌单</el-button>
 
-      <el-button v-show="isUpdateDialog&&CanRecommand(myUserinfo)" class="super_submit" @click="submitAddRecommend">推送歌单+</el-button>
-      <el-button v-show="isUpdateDialog&&CanRecommand(myUserinfo)" class="super_submit" @click="submitRemoveRecommend">去除推送-</el-button>
+      <el-button v-show="isUpdateDialog&&CanRecommand(commonStore.myUserinfo)" class="super_submit" @click="submitAddRecommend">推送歌单+</el-button>
+      <el-button v-show="isUpdateDialog&&CanRecommand(commonStore.myUserinfo)" class="super_submit" @click="submitRemoveRecommend">去除推送-</el-button>
     </div>
   </el-dialog>
  </div>
@@ -46,7 +46,6 @@
 <script lang="ts" setup>
 import { CanRecommand, userInfo, userPlaylistInfo } from '@/api/user';
 import { Playlist } from '@/interface/playlist';
-import { User } from '@/interface/user';
 import { ResultCode } from '@/util/webConst';
 import { onMounted, reactive, ref } from 'vue';
 import { addPlaylist, removePlaylist, updatePlaylist } from '@/api/playlist';
@@ -56,10 +55,9 @@ import { ElMessage } from 'element-plus';
 import ImageUploader from '@/components/ImageUploader.vue'
 import PlaylistBlock from '@/components/playlistBlock.vue'
 import { addRecommend, removeRecommend } from '@/api/recommend';
-const userId = Number(localStorage.getItem("userid"));
-const myUserinfo = ref<User.UserInfo>({...User.UserInfo_InitData});
+import { useCommonStore } from '@/store/commonStore'
 
-const myPlaylistInfos = reactive<Playlist.PlaylistInfo[]>([]);
+const commonStore = useCommonStore()
 
 const dialogVisible = ref(false); // 新建歌单显示与否
 const isUpdateDialog = ref(false); //控制删除歌单按钮是否显示
@@ -86,9 +84,8 @@ const submitAddPlaylist = () => {
     (res) => {
     switch (res.code) {
       case ResultCode.SUCCESS:
-        myPlaylistInfos.push({playlist:res.oData, songContentList:[]});
-        console.log("新增",myPlaylistInfos);
-        
+        commonStore.myPlaylistInfos.push({playlist:res.oData, songContentList:[]});
+       // console.log("新增",myPlaylistInfos);
         ElMessage.success(res.message);
         dialogVisible.value = false; // 关闭创建歌单弹框
         isUpdateDialog.value = false; // 状态恢复
@@ -103,8 +100,8 @@ const submitUpdatePlaylist = () => {
     (res) => {
     switch (res.code) {
       case ResultCode.SUCCESS:
-        for (let i = 0; i < myPlaylistInfos.length; i++) {
-          const info = myPlaylistInfos[i];
+        for (let i = 0; i < commonStore.myPlaylistInfos.length; i++) {
+          const info = commonStore.myPlaylistInfos[i];
           if(info.playlist.id == res.oData.id){
             info.playlist.title = res.oData.title;
             info.playlist.coverUrl = res.oData.coverUrl;
@@ -128,10 +125,10 @@ const deletePlaylist = () => {
     (res) => {
     switch (res.code) {
       case ResultCode.SUCCESS:
-        for (let i = 0; i < myPlaylistInfos.length; i++) {
-          const info = myPlaylistInfos[i];
+        for (let i = 0; i < commonStore.myPlaylistInfos.length; i++) {
+          const info = commonStore.myPlaylistInfos[i];
           if(info.playlist.id == playlistFormData.id){
-            myPlaylistInfos.splice(i, 1);
+            commonStore. myPlaylistInfos.splice(i, 1);
             ElMessage.success(res.message);
             dialogVisible.value = false; // 关闭创建歌单弹框
             isUpdateDialog.value = false; // 状态恢复
@@ -171,29 +168,8 @@ const onImageUpload = (file: File):Promise<string> => {
 }
 
 onMounted(() => {
-  userInfo(userId).then(
-    (res)=>{   
-      switch (res.code) {
-        case ResultCode.SUCCESS:          
-          myUserinfo.value = res.oData;
-          break;
-        default:
-          break;
-      }
-    });
-
-    userPlaylistInfo(userId).then(
-    (res)=>{   
-      switch (res.code) {
-        case ResultCode.SUCCESS:
-          Object.assign(myPlaylistInfos,res.oData);
-          break;
-        case ResultCode.EMPTY:          
-          break;
-        default:
-          break;
-      }
-    });
+  commonStore.updateMyUserInfo();
+  commonStore.updateMyPlaylistInfo();
 })
 </script>
 

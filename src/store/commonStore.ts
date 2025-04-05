@@ -1,4 +1,5 @@
-import { updateNickname, userInfo, userVipInfo } from "@/api/user";
+import { updateNickname, userInfo, userPlaylistInfo, userVipInfo } from "@/api/user";
+import { Playlist } from "@/interface/playlist";
 import { User } from "@/interface/user";
 import { ResultCode } from "@/util/webConst";
 import { defineStore } from "pinia";
@@ -11,6 +12,9 @@ export const useCommonStore = defineStore("common", () => {
     
     const myUserinfo = reactive<User.UserInfo>({...User.UserInfo_InitData});
     const myVipinfo = reactive<User.VipInfo>({...User.VipInfo_InitData});
+
+    const myPlaylistInfos = reactive<Playlist.PlaylistInfo[]>([]);
+
     const updateMyUserInfo = ()=>{
         Object.assign(myUserinfo, {...User.UserInfo_InitData});
         userInfo(Number(localStorage.getItem("userid"))).then((res)=>{
@@ -26,6 +30,23 @@ export const useCommonStore = defineStore("common", () => {
                 Object.assign(myVipinfo, res.oData);
             }
         })
+    }
+
+    const updateMyPlaylistInfo = () => {
+        const userId = Number(localStorage.getItem("userid"));
+        userPlaylistInfo(userId).then(
+            (res) => {   
+                switch (res.code) {
+                    case ResultCode.SUCCESS:
+                        Object.assign(myPlaylistInfos, res.oData);
+                        break;
+                    case ResultCode.EMPTY:          
+                        break;
+                    default:
+                        break;
+                }
+            }
+        );
     }
 
     const targetUserInfo = reactive<User.UserInfo>({...User.UserInfo_InitData})
@@ -62,6 +83,7 @@ export const useCommonStore = defineStore("common", () => {
    
 
     return { dissolveOn, userPageOn, targetUserInfo, targetUserVipInfo, openUserPage, closeUserPage, openUserPage_byUserInfo,
-        myUserinfo, myVipinfo, updateMyUserInfo, updateMyVipInfo
+        myUserinfo, myVipinfo, updateMyUserInfo, updateMyVipInfo, 
+        myPlaylistInfos, updateMyPlaylistInfo
      };
 });

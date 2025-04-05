@@ -1,6 +1,4 @@
 <template>
-
-   
     <div class="panel" :class="{'panel-hidden': !dissolveOn}">
         <div class="tabBox">
                 <el-tabs v-model="currentPageState" type="card" class="room-tabs">
@@ -9,6 +7,9 @@
                     </el-tab-pane>
                     <el-tab-pane v-if="curSong.songInfo.id>=0" label="歌单" :name="PageStatus.RECOMMEND" add-icon>
                         <template #label><span class="custom-tabs-label"><el-icon><ChatDotSquare /></el-icon></span></template>
+                    </el-tab-pane>
+                    <el-tab-pane v-if="curSong.songInfo.id>=0" label="分析" :name="PageStatus.ANALYSIS">
+                        <template #label><span class="custom-tabs-label"><el-icon><DataAnalysis /></el-icon></span></template>
                     </el-tab-pane>
                 </el-tabs>
             </div>
@@ -20,6 +21,10 @@
             <div v-show="currentPageState==PageStatus.RECOMMEND" class="content">
                 <CommentList :cur-song="curSong"></CommentList>
             </div>
+            <div v-show="currentPageState==PageStatus.ANALYSIS" class="content">
+                <AudioAnalysis :cur-song="curSong" />
+            </div>
+                
         </div>
     </div>
     
@@ -31,6 +36,7 @@ import { storeToRefs } from "pinia";
 import { useCommonStore } from "@/store/commonStore";
 import AudioCdPlayerDark from '@/components/audioCdPlayerDark.vue';
 import CommentList from '@/components/commentList.vue';
+import AudioAnalysis from '@/components/audioAnalysis.vue';
 
 import { Song } from '@/interface/song';
 import { eventBus, MEventTypes } from '@/util/eventBus';
@@ -39,8 +45,9 @@ const commonStore = useCommonStore();
 const { dissolveOn } = storeToRefs(commonStore);
 
 enum PageStatus {
-  MUSIC = 0,
-  RECOMMEND = 1,
+    MUSIC = 0,
+    RECOMMEND = 1,
+    ANALYSIS = 2,
 }
 const currentPageState = ref(PageStatus.MUSIC)
 

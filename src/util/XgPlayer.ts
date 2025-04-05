@@ -15,7 +15,8 @@ export class GoPlayer {
     private static instance: GoPlayer;
     player4room:Player | null = null;
     player4local:Player | null = null;
-    
+
+    private localSongBlob:Blob|null = null; 
 
     private static inRoomMode = false;
 
@@ -302,13 +303,21 @@ export class GoPlayer {
         const realURL:string = this.personalPlaylist[cIndex].songUrl;
         try {
             const blob = await BlobCacheManager.getInstance().getBlob(realURL);
-            console.log('加载成功:', blob);
+            //console.log('加载成功:', blob);
             
-            if(this.player4local)
+            if(this.player4local){
+                console.log('当前歌曲blob更新:', blob);
+                this.localSongBlob = blob;
                 this.player4local.plugins.music.list[cIndex].src = URL.createObjectURL(blob)
+            }
+                
         } catch (e) {
-            console.error('加载失败:', realURL);
+            //console.error('加载失败:', realURL);
         }
+    }
+
+    public getCurLocalSongBlob():Blob|null{
+        return this.localSongBlob;
     }
 
     b_lock():void{

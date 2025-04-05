@@ -1,65 +1,75 @@
 <template>
   <div class="main-container">
+
+   
+
     <!-- 现有的欢迎信息 -->
     <div class="welcome-section">
       <div>
 
-<!-- 动态面包屑 -->
-<el-breadcrumb separator="/" class="breadcrumb">
-  <el-breadcrumb-item @click="handleBackHome" :to="{ path: '/' }">首页</el-breadcrumb-item>
-  <el-breadcrumb-item v-if="!showSearchResults">推荐歌单</el-breadcrumb-item>
-  <el-breadcrumb-item v-else>搜索："{{ searchKeyword }}"</el-breadcrumb-item>
-</el-breadcrumb>
+      <!-- 动态面包屑 -->
+      <el-breadcrumb separator="/" class="breadcrumb">
+        <el-breadcrumb-item @click="handleBackHome" :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item v-if="!showSearchResults">推荐歌单</el-breadcrumb-item>
+        <el-breadcrumb-item v-else>搜索："{{ searchKeyword }}"</el-breadcrumb-item>
+      </el-breadcrumb>
 
- <!-- 搜索框 -->
- <div class="search-bar">
-  <el-input 
-    v-model="searchKeyword"
-    placeholder="搜索歌单"
-    clearable
-    @keyup.enter="handleSearch"
-  >
-    <template #append>
-      <el-button :icon="Search" @click="handleSearch"/>
-    </template>
-  </el-input>
-</div>
+      <!-- 搜索框 -->
+      <div class="search-bar">
+        <el-input 
+          v-model="searchKeyword"
+          placeholder="搜索歌单"
+          clearable
+          @keyup.enter="handleSearch"
+        >
+          <template #append>
+            <el-button :icon="Search" @click="handleSearch"/>
+          </template>
+        </el-input>
+      </div>
 
-<div class="home-container">
-  <div v-show="!showSearchResults" class="hide_scroll_child">
-     <!-- 轮播图 -->
-    <el-carousel height="40vh">
-      <el-carousel-item v-for="(item, index) in banners" :key="index">
-        <img :src="item" class="carousel-img" />
-      </el-carousel-item>
-    </el-carousel>
+       <!-- 欢迎卡片 -->
+      <WelcomeCard 
+        :user-info="myUserinfo" 
+        @mood-change="handleMoodChange"
+      />
 
-    <!-- 推荐歌单 -->
-    <div class="recommend-container">
-      <h2>网站推荐歌单</h2>
-      <div class="recommend-list">
-        <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
-          <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
+      <div class="home-container">
+        <div v-show="!showSearchResults" class="hide_scroll_child">
+          <!-- 轮播图
+          <el-carousel height="40vh">
+            <el-carousel-item v-for="(item, index) in banners" :key="index">
+              <img :src="item" class="carousel-img" />
+            </el-carousel-item>
+          </el-carousel> -->
+
+          <!-- 推荐歌单 -->
+          <div class="recommend-container">
+            <h2>网站推荐歌单</h2>
+            <div class="recommend-list">
+              <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
+                <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- 搜索结果 -->
-  <div v-show="showSearchResults" class="search-results">
-    <div v-loading="searchLoading" class="result-list hide_scroll_child">
-      <div v-if="!(searchResults.length === 0 && !searchLoading)" v-for="playlist in searchResults" :key="playlist.playlist.id">
-        <PlaylistBlock :playlist-info="playlist" :my-userinfo="myUserinfo"/>
+        <!-- 搜索结果 -->
+        <div v-show="showSearchResults" class="search-results">
+          <div v-loading="searchLoading" class="result-list hide_scroll_child">
+            <div v-if="!(searchResults.length === 0 && !searchLoading)" v-for="playlist in searchResults" :key="playlist.playlist.id">
+              <PlaylistBlock :playlist-info="playlist" :my-userinfo="myUserinfo"/>
+            </div>
+            <div v-if="searchResults.length === 0 && !searchLoading" class="no-result">
+              暂无搜索结果
+            </div>
+          </div>
+          
+        </div>
+      
       </div>
-      <div v-if="searchResults.length === 0 && !searchLoading" class="no-result">
-        暂无搜索结果
-      </div>
+
     </div>
-    
-  </div>
- 
-</div>
-</div>
     </div>
 
     <!-- 添加推荐区域 -->
@@ -90,6 +100,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import PlaylistBlock from '@/components/playlistBlock.vue'
 import HotSongList from '@/components/hotSongList.vue'
+import WelcomeCard from '@/components/welcomeCard.vue'
 import { getRecommendPlaylists, getHotSongs, getRecommendAutoPlaylists } from '@/api/recommend'
 import { Song } from '@/interface/song'
 import { Playlist } from '@/interface/playlist'
@@ -249,14 +260,39 @@ const goToRanking = () => {
 }
 
 h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
-  font-weight: bold;
+  position: relative;
+  margin-bottom: 25px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  color: #655d75;
+  padding-left: 15px;
+  display: flex;
+  align-items: center;
+}
+
+h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 4px;
+  height: 20px;
+  background: var(--el-color-primary);
+  border-radius: 2px;
+}
+
+h2::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--el-border-color) 0%, transparent 100%);
+  margin-left: 15px;
 }
 
 .home-container {
   width: calc(100% - 46px);
-  height: 77vh;
+  /* height: 77vh; */
+  height: 30vh;
   background-color: #f5f5f5;
   padding: 2vh;
   overflow: hidden;
@@ -270,14 +306,14 @@ h2 {
 }
 
 .recommend-container {
-  margin-top: 5vh;
+  /* margin-top: 5vh; */
 }
 
 .recommend-list {
   display: flex;
   gap: 2vh;
   overflow-x: auto;
-  padding: 2vh 0;
+  /* padding: 2vh 0; */
 }
 
 
