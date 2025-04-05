@@ -77,5 +77,11 @@ export namespace Level {
         负责人 = 1,
         管理员 = 2,
     }
+    export const LevelRef = Object.keys(Enum)
+    .filter(key => isNaN(Number(key)))  // 排除数字的反向映射
+    .reduce((result, key) => {
+      result[key] = Enum[key as keyof typeof Enum];
+      return result;
+    }, {} as { [key: string]: number });
 }
 

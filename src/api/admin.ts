@@ -95,3 +95,8 @@ export const deactivatePlaylist = (playlistId: number) => {
 export const deactivateSong = (songId: number) => {
     return http.post<Result<any>>(`/admin/song/${songId}/deactivate`)
 }
+
+// 修改用户权限级别
+export const updateUserLevel = (userId: number, level: number) => {
+    return http.put<Result<any>>(`/admin/user/${userId}/level`, { level })
+}

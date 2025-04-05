@@ -123,7 +123,7 @@
           <el-table-column prop="email" label="邮箱" />
           <el-table-column prop="level" label="等级">
             <template #default="scope">
-              {{ Level[scope.row.level] }}
+              {{ Level.Enum[scope.row.level] }}
             </template>
           </el-table-column>
           <el-table-column prop="isActive" label="状态">
@@ -140,10 +140,44 @@
               >
                 {{ scope.row.isActive === 1 ? '禁用' : '启用' }}
               </el-button>
+              <el-button
+                type="primary"
+                size="small"
+                @click="openUserLevelDialog(scope.row)"
+              >
+                修改权限
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
+       <!-- 添加用户权限修改弹窗 -->
+  <el-dialog 
+    v-model="userLevelDialogVisible" 
+    title="修改用户权限" 
+    width="30%"
+  >
+    <!-- 修改用户权限弹窗部分 -->
+    <el-form :model="userLevelForm" label-width="100px">
+      <el-form-item label="当前权限">
+        <span>{{ Level.Enum[userLevelForm.currentLevel] }}</span>
+      </el-form-item>
+      <el-form-item label="新权限">
+        <el-select v-model="userLevelForm.newLevel">
+          <el-option
+            v-for="(value, key) in Level.LevelRef"
+            :key="key"
+            :label="key"
+            :value="value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+      <template #footer>
+        <el-button @click="userLevelDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitUpdateUserLevel">确定</el-button>
+      </template>
+    </el-dialog>
 
       <!-- 歌单编辑弹窗 -->
       <el-dialog v-model="playlistDialogVisible" title="编辑歌单信息" @close="resetPlaylistForm">
@@ -221,7 +255,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import { User, Level } from '@/interface/user'
 import { Playlist } from '@/interface/playlist'
@@ -236,8 +270,6 @@ import {
   deactivateSong,
   updatePlaylistAdmin,
   updateSongAdmin,
-takedownSong,
-takedownPlaylist
 } from '@/api/admin'
 import { getPlaylistCoverURL } from '@/api/static'
 import GoSongList from '@/components/goSongList.vue'
@@ -284,6 +316,7 @@ const noResults = computed(() => {
     default: return true
   }
 })
+
 
 // 搜索处理
 const handleSearch = () => {
@@ -346,46 +379,6 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val
   handleSearch()
 }
-
-// 操作处理
-const handlePlaylistTakedown = (playlistId: number) => {
-  ElMessageBox.confirm('确定要下架该歌单吗？').then(() => {
-    takedownPlaylist(playlistId).then((res) => {
-      if(res.code === ResultCode.SUCCESS) {
-        ElMessage.success('下架成功')
-        handleSearch() // 刷新列表
-      }
-    })
-  }).catch(() => {
-    // 用户取消操作
-  })
-}
-
-const handleSongTakedown = (songId: number) => {
-  ElMessageBox.confirm('确定要下架该歌曲吗？').then(() => {
-    takedownSong(songId).then((res) => {
-      if(res.code === ResultCode.SUCCESS) {
-        ElMessage.success('下架成功')
-        handleSearch() // 刷新列表
-      }
-    })
-  }).catch(() => {
-    // 用户取消操作
-  })
-}
-
-// const handleUserBan = (userId: number) => {
-//   ElMessageBox.confirm('确定要禁用该用户吗？').then(() => {
-//     banUser(userId).then((res) => {
-//       if(res.code === ResultCode.SUCCESS) {
-//         ElMessage.success('操作成功')
-//         handleSearch() // 刷新列表
-//       }
-//     })
-//   }).catch(() => {
-//     // 用户取消操作
-//   })
-// }
 
 // 编辑相关的状态
 const playlistDialogVisible = ref(false)
@@ -516,6 +509,47 @@ const selectedPlaylist = ref<Playlist.PlaylistInfo | null>(null)
 const openPlaylistDetail = (playlist: Playlist.PlaylistInfo) => {
   selectedPlaylist.value = playlist
   playlistDetailVisible.value = true
+}
+
+import { updateUserLevel } from '@/api/admin'
+
+// 添加用户权限修改相关的状态
+const userLevelDialogVisible = ref(false)
+const userLevelForm = ref({
+  userId: 0,
+  currentLevel: 0,
+  newLevel: 0
+})
+
+// 打开用户权限修改弹窗
+const openUserLevelDialog = (user: User.UserInfo) => {
+  userLevelForm.value = {
+    userId: user.id,
+    currentLevel: user.level,
+    newLevel: user.level
+  }
+  userLevelDialogVisible.value = true
+}
+
+// 提交用户权限修改
+const submitUpdateUserLevel = () => {
+  if (userLevelForm.value.currentLevel === userLevelForm.value.newLevel) {
+    ElMessage.info('权限未发生变化')
+    return
+  }
+
+  ElMessageBox.confirm('确定要修改该用户的权限吗？').then(() => {
+    updateUserLevel(userLevelForm.value.userId, userLevelForm.value.newLevel)
+      .then(res => {
+        if (res.code === ResultCode.SUCCESS) {
+          ElMessage.success('权限修改成功')
+          userLevelDialogVisible.value = false
+          handleSearch() // 刷新列表
+        }
+      })
+  }).catch(() => {
+    // 用户取消操作
+  })
 }
 </script>
 
