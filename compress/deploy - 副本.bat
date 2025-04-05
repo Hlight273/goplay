@@ -18,10 +18,11 @@ echo 开始编译项目...
 npm run build
 
 :: 打印编译输出的路径
-echo 编译完成，输出目录：dist/
+set OUTPUT_DIR=dist
+echo 编译完成，输出目录为 %OUTPUT_DIR%
 pause
 
 echo 准备传输dist静态文件包!
-wsl rsync -av --delete dist/ root@IPPPPPPPPPPP:/usr/share/nginx/html/dist/
+wsl rsync -av --delete %OUTPUT_DIR%/ root@IPPPPPPPPPPP:/usr/share/nginx/html/dist/
 echo dist包传输完成!
 pause
