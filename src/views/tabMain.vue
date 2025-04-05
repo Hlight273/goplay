@@ -1,76 +1,102 @@
 <template>
-  <div>
+  <div class="main-container">
+    <!-- 现有的欢迎信息 -->
+    <div class="welcome-section">
+      <div>
 
-    <!-- 动态面包屑 -->
-    <el-breadcrumb separator="/" class="breadcrumb">
-      <el-breadcrumb-item @click="handleBackHome" :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item v-if="!showSearchResults">推荐歌单</el-breadcrumb-item>
-      <el-breadcrumb-item v-else>搜索："{{ searchKeyword }}"</el-breadcrumb-item>
-    </el-breadcrumb>
-    
-     <!-- 搜索框 -->
-     <div class="search-bar">
-      <el-input 
-        v-model="searchKeyword"
-        placeholder="搜索歌单"
-        clearable
-        @keyup.enter="handleSearch"
-      >
-        <template #append>
-          <el-button :icon="Search" @click="handleSearch"/>
-        </template>
-      </el-input>
-    </div>
+<!-- 动态面包屑 -->
+<el-breadcrumb separator="/" class="breadcrumb">
+  <el-breadcrumb-item @click="handleBackHome" :to="{ path: '/' }">首页</el-breadcrumb-item>
+  <el-breadcrumb-item v-if="!showSearchResults">推荐歌单</el-breadcrumb-item>
+  <el-breadcrumb-item v-else>搜索："{{ searchKeyword }}"</el-breadcrumb-item>
+</el-breadcrumb>
 
-    <div class="home-container">
-      <div v-show="!showSearchResults" class="hide_scroll_child">
-         <!-- 轮播图 -->
-        <el-carousel height="40vh">
-          <el-carousel-item v-for="(item, index) in banners" :key="index">
-            <img :src="item" class="carousel-img" />
-          </el-carousel-item>
-        </el-carousel>
+ <!-- 搜索框 -->
+ <div class="search-bar">
+  <el-input 
+    v-model="searchKeyword"
+    placeholder="搜索歌单"
+    clearable
+    @keyup.enter="handleSearch"
+  >
+    <template #append>
+      <el-button :icon="Search" @click="handleSearch"/>
+    </template>
+  </el-input>
+</div>
 
-        <!-- 推荐歌单 -->
-        <div class="recommend-container">
-          <h2>推荐歌单</h2>
-          <div class="recommend-list">
-            <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
-              <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
-            </div>
-          </div>
+<div class="home-container">
+  <div v-show="!showSearchResults" class="hide_scroll_child">
+     <!-- 轮播图 -->
+    <el-carousel height="40vh">
+      <el-carousel-item v-for="(item, index) in banners" :key="index">
+        <img :src="item" class="carousel-img" />
+      </el-carousel-item>
+    </el-carousel>
+
+    <!-- 推荐歌单 -->
+    <div class="recommend-container">
+      <h2>网站推荐歌单</h2>
+      <div class="recommend-list">
+        <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
+          <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
         </div>
       </div>
-
-      <!-- 搜索结果 -->
-      <div v-show="showSearchResults" class="search-results">
-        <div v-loading="searchLoading" class="result-list hide_scroll_child">
-          <div v-if="!(searchResults.length === 0 && !searchLoading)" v-for="playlist in searchResults" :key="playlist.playlist.id">
-            <PlaylistBlock :playlist-info="playlist" :my-userinfo="myUserinfo"/>
-          </div>
-          <div v-if="searchResults.length === 0 && !searchLoading" class="no-result">
-            暂无搜索结果
-          </div>
-        </div>
-        
-      </div>
-     
     </div>
   </div>
 
+  <!-- 搜索结果 -->
+  <div v-show="showSearchResults" class="search-results">
+    <div v-loading="searchLoading" class="result-list hide_scroll_child">
+      <div v-if="!(searchResults.length === 0 && !searchLoading)" v-for="playlist in searchResults" :key="playlist.playlist.id">
+        <PlaylistBlock :playlist-info="playlist" :my-userinfo="myUserinfo"/>
+      </div>
+      <div v-if="searchResults.length === 0 && !searchLoading" class="no-result">
+        暂无搜索结果
+      </div>
+    </div>
+    
+  </div>
+ 
+</div>
+</div>
+    </div>
 
-   
+    <!-- 添加推荐区域 -->
+    <div class="recommend-section">
+      <div class="left-section">
+        <h2>为你推荐</h2>
+        <div class="playlist-grid">
+          <PlaylistBlock
+            v-for="playlist in recommendPlaylists"
+            :my-userinfo="myUserinfo"
+            :key="playlist.playlist.id"
+            :playlist-info="playlist"
+          />
+        </div>
+      </div>
+      
+      <div class="right-section">
+        <HotSongList
+          :songs="state.hotSongs"
+        />
+      </div>
+    </div>
+  </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, reactive, onMounted} from 'vue'
-import { userInfo } from '@/api/user';
-import { User } from '@/interface/user';
-import { ResultCode } from '@/util/webConst';
-import { Playlist } from '@/interface/playlist';
-import { GoPlayer } from '@/util/XgPlayer';
+<script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import PlaylistBlock from '@/components/playlistBlock.vue'
-import { getRecommendPlaylists } from '@/api/recommend';
+import HotSongList from '@/components/hotSongList.vue'
+import { getRecommendPlaylists, getHotSongs, getRecommendAutoPlaylists } from '@/api/recommend'
+import { Song } from '@/interface/song'
+import { Playlist } from '@/interface/playlist'
+import { ResultCode } from '@/util/webConst'
+import { userInfo } from '@/api/user'
+import { User } from '@/interface/user'
+import { GoPlayer } from '@/util/XgPlayer'
 
 const myUserinfo = ref<User.UserInfo>({...User.UserInfo_InitData});
 
@@ -78,12 +104,19 @@ const userId = Number(localStorage.getItem("userid"));
 const recommendedPlaylistInfos = ref<Playlist.PlaylistInfo[]>([]);
 
 const banners = ref([
-  "https://via.placeholder.com/800x300?text=Banner+1",
-  "https://via.placeholder.com/800x300?text=Banner+2",
-  "https://via.placeholder.com/800x300?text=Banner+3",
+  require("@/assets/imgs/banner/banner1.png"), // 推荐歌单
+   require("@/assets/imgs/banner/banner2.png"), // 新歌首发
+   require("@/assets/imgs/banner/banner3.png"), // 热门歌曲
 ]);
 
-onMounted(() => {
+
+const router = useRouter()
+const state = reactive({
+  hotSongs: [] as Song.SongContent[]
+})
+const recommendPlaylists = ref<Playlist.PlaylistInfo[]>([])
+
+onMounted(async () => {
   userInfo(userId).then(
     (res)=>{   
       switch (res.code) {
@@ -95,7 +128,7 @@ onMounted(() => {
       }
     });
 
-    getRecommendPlaylists().then(
+  getRecommendPlaylists().then(
     (res)=>{   
       switch (res.code) {
         case ResultCode.SUCCESS:          
@@ -105,15 +138,31 @@ onMounted(() => {
           break;
       }
     });
+
+    try {
+    const [playlistsRes, songsRes] = await Promise.all([
+      getRecommendAutoPlaylists(),
+      getHotSongs()
+    ])
+    
+    if (playlistsRes.code === ResultCode.SUCCESS) {
+      recommendPlaylists.value = playlistsRes.oData || []
+    }
+    
+    if (songsRes.code === ResultCode.SUCCESS) {
+      state.hotSongs = songsRes.oData || []
+    }
+  } catch (error) {
+    console.error('获取推荐数据失败:', error)
+    state.hotSongs = []
+    recommendPlaylists.value = []
+  }
 })
 
 import { Search } from '@element-plus/icons-vue' // 引入图标
-import { useRouter } from 'vue-router'
 import { searchPlaylists } from '@/api/playlist';
 
-const router = useRouter()
 const searchKeyword = ref('')
-
 
 // 新增状态
 const showSearchResults = ref(false)
@@ -155,9 +204,56 @@ const handleBackHome = (e: MouseEvent) => {
   searchResults.value = []
 }
 
+const handlePlaylistClick = (playlist: Playlist.PlaylistInfo) => {
+  // 处理歌单点击
+}
+
+const handleSongPlay = (song: Song.SongDetailDTO) => {
+  // 处理歌曲播放
+}
+
+const goToRanking = () => {
+  router.push('/ranking')
+}
 </script>
 
 <style scoped>
+
+
+.main-container {
+  padding: 20px;
+    overflow-y: scroll;
+    height: 83vh;
+  padding: 20px;
+}
+
+.recommend-section {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.left-section {
+  flex: 1;
+}
+
+.right-section {
+  width: 300px;
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  margin-top: 15px;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
 .home-container {
   width: calc(100% - 46px);
   height: 77vh;
@@ -209,5 +305,4 @@ const handleBackHome = (e: MouseEvent) => {
   padding: 50px 0;
   width: 100%;
 }
-
 </style>

@@ -190,16 +190,20 @@ export class GoPlayer {
         this.player4local?.plugins.music.list.splice(0); //清空
         this.personalPlaylist = _list;
         this.personalPlaylist.forEach((song, index) => {
-            
-            this.player4local?.plugins.music.add({
-                vid: `song_${index}`,
-                title: song.songInfo.songName,
-                poster: song.coverBase64,
-                // 使用占位符，实际播放时加载
-                src: 'about:blank' 
-            });
+            this.addLocalPlayerSong(song);
         });
     }
+
+    addLocalPlayerSong(_song:Song.SongContent){
+        this.player4local?.plugins.music.add({
+            vid: `song_${this.player4local?.plugins.music.list.length}`,
+            title: _song.songInfo.songName,
+            poster: _song.coverBase64,
+            // 使用占位符，实际播放时加载
+            src: 'about:blank'
+        }); 
+    }
+
     addSong_to_LocalPlaylist(song:Song.SongContent){
         const curIndex = this.player4local?.plugins.music.index;
         this.player4local?.plugins.music.add({
