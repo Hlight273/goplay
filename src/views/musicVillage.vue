@@ -42,7 +42,7 @@
 
         <!-- 动态列表 -->
         <div class="post-list">
-            <el-card v-for="post in posts" :key="post.id" class="post-card">
+            <el-card v-for="post in posts" :key="post.id" class="post-card white_backpanel">
                 <div class="post-header">
                     <el-avatar :src="post.addedByAvatar" />
                     <div class="post-info">
@@ -341,10 +341,6 @@ onMounted(() => {
 
 .post-card {
     margin-bottom: 20px;
-    background-color: #fbfbfb;
-    border-radius: 1vh;
-    border: .1vh solid #f0f1ff;
-    box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
 }
 
 .post-header {

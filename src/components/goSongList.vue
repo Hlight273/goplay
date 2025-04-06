@@ -23,7 +23,7 @@
             </span>
         </li>
     </ul>
-    <li class="songLi uploadSong">
+    <li v-if="canShowUploader" class="songLi uploadSong">
         <AudioUploader :user-id="myUserInfo.id"
           :playlist-id="playlistInfo.playlist.id"
           :room-code="roomCode"
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts"> 
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Song } from '@/interface/song';
 import { formatDuration, formatBytes, isNothing } from '@/util/commonUtil'
 
@@ -73,6 +73,16 @@ const props = withDefaults(defineProps<Props>(), {
   myUserInfo: () => ({...User.UserInfo_InitData}),
   playlistInfo: ()=>({...Playlist.playlistInfo_InitData}),
   isRoomPlaylist: false,
+});
+
+const canShowUploader = computed(() => {
+  if (props.isRoomPlaylist) {
+    // 房间模式：只有管理员可以看到
+    return HasRoomAdminPower(props.myUserInfo);
+  } else {
+    // 普通歌单模式：只有歌单创建者可以看到
+    return props.playlistInfo.playlist.userId === props.myUserInfo.id;
+  }
 });
 
 

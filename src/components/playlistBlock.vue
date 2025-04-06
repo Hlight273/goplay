@@ -1,10 +1,15 @@
 <template>
     <div class="playlist-item" @click="selectPlaylist(playlistInfo)">
         <div class="tag">{{ playlistInfo.playlist.isPublic? '公开':'私密'}}</div>
-        <img :src='(playlistInfo.playlist.coverUrl!=null&&playlistInfo.playlist.coverUrl!="")?
-            (getPlaylistCoverURL(playlistInfo.playlist.coverUrl)):
-            require("@/assets/icons/audio_folder.png")' class="playlist-cover" />
-        <p class="">{{ playlistInfo.playlist.title }}</p>
+        <div class="cover-container">
+            <img :src='(playlistInfo.playlist.coverUrl!=null&&playlistInfo.playlist.coverUrl!="")?
+                (getPlaylistCoverURL(playlistInfo.playlist.coverUrl)):
+                require("@/assets/icons/audio_folder.png")' class="playlist-cover" />
+            <div class="title-overlay">
+                <p>{{ playlistInfo.playlist.title }}</p>
+                <span class="song-count">{{ playlistInfo.songContentList.length }}首</span>
+            </div>
+        </div>
     </div>
      <!-- 歌单详情弹出层 -->
     <div v-if="selectedPlaylistInfo.playlist.id>=0" class="playlist-overlay" >
@@ -86,39 +91,65 @@ onMounted(()=>{
     cursor: pointer;
     flex-direction: column;
     align-items: center;
-}
-.playlist-item p {
-    color: #6c69be;
-    display: flex
-;
-    font-size: 1.4vh;
-    align-items: center;
-    justify-content: center;
-    border-radius: 2vh;
-    /* width: 14vh; */
-    height: 2vh;
-    margin-top: 1vh;
-    font-family: auto;
-    background-color: #fffbfb;
-    width: 100%;
-    font-family: fantasy;
-    border: 0.1vh solid #dcbeff;
+    width: 20vh;
 }
 
+.cover-container {
+    position: relative;
+    width: 20vh;
+    height: 20vh;
+    overflow: hidden;
+    border-radius: 5px;
+}
 
 .playlist-cover {
-  width: 20vh;
-  height: 20vh;
-  border-radius: 5px;
-  transition: transform 0.3s ease-in-out;
-  object-fit: cover;
-  border: .2vh solid #aca6c7;
-  background-color: #3c393c;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+    background-color: #3c393c;
 }
 
-.playlist-cover:hover {
-    transform: scale(1.02);
+.title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.title-overlay p {
+    color: white;
+    margin: 0;
+    font-size: 1.4vh;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    flex: 1;
+    margin-right: 8px;
+}
+
+.song-count {
+    color: #ffffff;
+    font-size: 1.2vh;
+    white-space: nowrap;
+    opacity: 0.8;
+}
+
+.cover-container:hover .playlist-cover {
+    transform: scale(1.01);
+}
+
+.cover-container:hover .title-overlay {
+    transform: translateY(0);
+}
+
 
 .playlist-overlay {
     z-index: 1001;
@@ -139,7 +170,7 @@ onMounted(()=>{
     position: relative;
     padding: 0 1vh;
     padding-top: 1vh;
-    padding-bottom: 1.6vh;
+    padding-bottom: 4.6vh;
     width: 90%;
     max-height: 64vh;
     background-color: #f5f5f6;

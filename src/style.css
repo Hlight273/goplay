@@ -140,4 +140,11 @@ body {
     width: calc(100% + 1.6vh) !important;
 }
 
+/* 背景 */
+.white_backpanel {
+    background-color: #fbfbfb;
+    border-radius: 1vh;
+    border: .1vh solid #f0f1ff;
+    box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
+}
 

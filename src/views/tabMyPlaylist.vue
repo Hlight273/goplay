@@ -199,7 +199,8 @@ onMounted(() => {
     flex-wrap: wrap;
     overflow: hidden;
     height: 73vh;
-    justify-content: center
+    justify-content: center;
+    align-content: flex-start;
 }
 
 .floating_btn {
