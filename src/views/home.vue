@@ -2,18 +2,27 @@
   <Goheader></Goheader>
   <main>
     <el-tabs :tab-position="tabPosition" type="border-card" class="demo-tabs">
+
       <el-tab-pane>
         <template #label><span class="custom-tabs-label"><el-icon><Promotion/></el-icon></span></template>
         <TabMain></TabMain>
       </el-tab-pane>
+
       <el-tab-pane>
         <template #label> <span class="custom-tabs-label"> <el-icon><HomeFilled/></el-icon></span></template>
         <TabRoom></TabRoom>
       </el-tab-pane>
+
+      <el-tab-pane>
+        <template #label><span class="custom-tabs-label"><el-icon><HelpFilled /></el-icon></span></template>
+        <MusicVillage></MusicVillage>
+      </el-tab-pane>
+
       <el-tab-pane>
         <template #label><span class="custom-tabs-label"><el-icon><Menu/></el-icon></span></template>
         <TabMyPlaylist></TabMyPlaylist>
       </el-tab-pane>
+
       <el-tab-pane v-if="isAdmin(myUserinfo)">
         <template #label>
           <span class="custom-tabs-label">
@@ -22,10 +31,12 @@
         </template>
         <TabAdmin></TabAdmin>
       </el-tab-pane>
+
       <el-tab-pane>
         <template #label><span class="custom-tabs-label"><el-icon><Tools/></el-icon></span></template>
         <TabSetting></TabSetting>
       </el-tab-pane>
+
     </el-tabs>
     <AudioConsole></AudioConsole>
     <AudioPanel></AudioPanel>
@@ -55,6 +66,8 @@ import TabMyPlaylist from './tabMyPlaylist.vue';
 import DissolveTransition from '@/components/dissolveTransition.vue';
 import AudioPanel from '@/views/audioPanel.vue';
 import UserPage from './userPage.vue';
+import TabAdmin from './tabAdmin.vue'
+import MusicVillage from './musicVillage.vue'
 
 import { useCommonStore } from "@/store/commonStore";
 import { storeToRefs } from "pinia";
@@ -68,13 +81,6 @@ onMounted(()=>{
   if(needDebugOutpot)
     console.log(localStorage.getItem("token"));
 })
-
-
-
-import { computed } from 'vue'
-import TabAdmin from './tabAdmin.vue'
-import { User, Level } from '@/interface/user'
-
 
 </script>
 

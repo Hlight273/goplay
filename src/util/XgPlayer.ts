@@ -348,7 +348,7 @@ export class GoPlayer {
             return null;
         return target;
     }
-    private getCurLocalSongContent():Song.SongContent|null{
+    public getCurLocalSongContent():Song.SongContent|null{
         if(!this.personalPlaylist)
             return null;
         let index = this.player4local?.plugins.music.index;

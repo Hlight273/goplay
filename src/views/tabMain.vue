@@ -31,7 +31,6 @@
        <!-- 欢迎卡片 -->
       <WelcomeCard 
         :user-info="myUserinfo" 
-        @mood-change="handleMoodChange"
       />
 
       <div class="home-container">

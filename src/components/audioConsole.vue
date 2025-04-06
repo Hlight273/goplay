@@ -153,7 +153,7 @@ onUnmounted(()=>{
   height: 50px;
   border-top-left-radius: 36px;
   border-top-right-radius: 35px;
-  z-index: 99999999999; /* 确保文本在渐变边框上方 */
+  z-index: 666; /* 确保文本在渐变边框上方 */
 }
 
 .gradient-border {

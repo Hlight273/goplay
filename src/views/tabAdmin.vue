@@ -157,22 +157,22 @@
     title="修改用户权限" 
     width="30%"
   >
-    <!-- 修改用户权限弹窗部分 -->
     <el-form :model="userLevelForm" label-width="100px">
-      <el-form-item label="当前权限">
-        <span>{{ Level.Enum[userLevelForm.currentLevel] }}</span>
-      </el-form-item>
-      <el-form-item label="新权限">
-        <el-select v-model="userLevelForm.newLevel">
-          <el-option
-            v-for="(value, key) in Level.LevelRef"
-            :key="key"
-            :label="key"
-            :value="value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-    </el-form>
+        <el-form-item label="当前权限">
+          <span>{{ Level.Enum[userLevelForm.currentLevel] }}</span>
+        </el-form-item>
+        <el-form-item label="新权限">
+          <el-select v-model="userLevelForm.newLevel">
+            <el-option
+              v-for="(label, value) in Level.Enum"
+              :key="Number(value)"
+              :label="label"
+              :value="Number(value)"
+              v-if="typeof value === 'number'"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
       <template #footer>
         <el-button @click="userLevelDialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitUpdateUserLevel">确定</el-button>
@@ -255,7 +255,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import { User, Level } from '@/interface/user'
 import { Playlist } from '@/interface/playlist'
@@ -270,6 +270,8 @@ import {
   deactivateSong,
   updatePlaylistAdmin,
   updateSongAdmin,
+takedownSong,
+takedownPlaylist
 } from '@/api/admin'
 import { getPlaylistCoverURL } from '@/api/static'
 import GoSongList from '@/components/goSongList.vue'
@@ -316,7 +318,6 @@ const noResults = computed(() => {
     default: return true
   }
 })
-
 
 // 搜索处理
 const handleSearch = () => {
@@ -379,6 +380,46 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val
   handleSearch()
 }
+
+// 操作处理
+const handlePlaylistTakedown = (playlistId: number) => {
+  ElMessageBox.confirm('确定要下架该歌单吗？').then(() => {
+    takedownPlaylist(playlistId).then((res) => {
+      if(res.code === ResultCode.SUCCESS) {
+        ElMessage.success('下架成功')
+        handleSearch() // 刷新列表
+      }
+    })
+  }).catch(() => {
+    // 用户取消操作
+  })
+}
+
+const handleSongTakedown = (songId: number) => {
+  ElMessageBox.confirm('确定要下架该歌曲吗？').then(() => {
+    takedownSong(songId).then((res) => {
+      if(res.code === ResultCode.SUCCESS) {
+        ElMessage.success('下架成功')
+        handleSearch() // 刷新列表
+      }
+    })
+  }).catch(() => {
+    // 用户取消操作
+  })
+}
+
+// const handleUserBan = (userId: number) => {
+//   ElMessageBox.confirm('确定要禁用该用户吗？').then(() => {
+//     banUser(userId).then((res) => {
+//       if(res.code === ResultCode.SUCCESS) {
+//         ElMessage.success('操作成功')
+//         handleSearch() // 刷新列表
+//       }
+//     })
+//   }).catch(() => {
+//     // 用户取消操作
+//   })
+// }
 
 // 编辑相关的状态
 const playlistDialogVisible = ref(false)

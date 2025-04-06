@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref,computed } from 'vue'
+import { onMounted, ref,computed, markRaw } from 'vue'
 import { Calendar, Star, Sunny, Moon, Cloudy, Lightning } from '@element-plus/icons-vue'
 import { User } from '@/interface/user'
 import { userPlaylistInfo } from '@/api/user';
@@ -57,10 +57,10 @@ const myPlaylistCount = computed(() => commonStore.myPlaylistInfos.length)
 const emit = defineEmits(['mood-change'])
 
 const moodList = ref([
-  { type: 'happy', name: '愉悦', icon: Sunny, color: '#FFB74D' },
-  { type: 'calm', name: '平静', icon: Moon, color: '#90CAF9' },
-  { type: 'melancholy', name: '忧郁', icon: Cloudy, color: '#7986CB' },
-  { type: 'energetic', name: '激情', icon: Lightning, color: '#F44336' },
+  { type: 'happy', name: '愉悦', icon: markRaw(Sunny), color: '#FFB74D' },
+  { type: 'calm', name: '平静', icon: markRaw(Moon), color: '#90CAF9' },
+  { type: 'melancholy', name: '忧郁', icon: markRaw(Cloudy), color: '#7986CB' },
+  { type: 'energetic', name: '激情', icon: markRaw(Lightning), color: '#F44336' },
 ])
 
 const selectedMood = ref('')

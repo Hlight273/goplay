@@ -28,3 +28,14 @@ export const uploadPlaylistCover = (file:File) => {
     formData.append('file', file);
     return http.post<Result<string>>(URL, formData);
 }
+
+/** 上传动态图片 */
+export function uploadPostImage(file: File) {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post<Result<string>>('/upload/post/image', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}

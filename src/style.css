@@ -19,6 +19,8 @@
 }
 
 
+
+
 body, html {
     height: var(--i-window-height);
 }
@@ -109,6 +111,18 @@ body {
     box-shadow: 1px -1.9vh 0.1vh 0px rgb(16 15 18 / 57%) inset;
     --el-button-hover-bg-color: #575354;
     --el-button-hover-border-color: #911e2f;
+    --el-button-hover-text-color: #ffffff;
+}
+
+.village_btn{
+    background: #a3acff;
+    border-radius: 1.6vh;
+    border: 0.2vh solid #ccccff;
+    box-shadow: 0px -0.2vh 0.2vh 0px rgb(129 82 82 / 47%) inset;
+    --el-button-hover-bg-color: #d2bcff;
+    --el-button-hover-border-color: #e5b5fe;
+    --el-button-hover-text-color: #ffffff;
+    line-height: 1vh;
 }
 
 

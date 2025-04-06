@@ -9,6 +9,10 @@ export const getUserAvatarURL = (fileName:string):string => {
     return  `${webRoot}/static/image/user-avatar/${fileName}`;
 }
 
+export const getPostImageURL = (filename: string):string => {
+    return `${webRoot}/static/image/post-img/${filename}`
+}
+
 // export const getPlaylistCover = async (fileName:string):Promise<string> => {
 //     const url =  `/static/image/playlist-cover/${fileName}`;
 //     return http.get<string>(`/user/${fileName}/room`);
@@ -17,3 +21,4 @@ export const getUserAvatarURL = (fileName:string):string => {
 // export const getUserAvatar = (fileName:string):string => {
 //     return `/static/image/user-avatar/${fileName}`;
 // }
+

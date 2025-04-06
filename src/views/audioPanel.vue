@@ -85,7 +85,7 @@ const updateCurSong = (songContent: Song.SongContent | null)=>{
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 2000;
+    z-index: 600;
     top: 0;
     opacity: 1;
     visibility: visible;
