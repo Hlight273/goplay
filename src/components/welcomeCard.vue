@@ -87,6 +87,18 @@ const selectMood = (mood: any) => {
   }, 2000)
   emit('mood-change', mood)
 }
+const refreshMood = () => {
+  // 重置当前选中的心情
+  selectedMood.value = ''
+  
+  // 随机打乱心情列表顺序
+  const shuffled = [...moodList.value]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  moodList.value = shuffled
+}
 
 //问候语
 const greetingText = computed(() => {
@@ -135,7 +147,7 @@ onMounted(() => {
 }
 .welcome-cards {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 4.3fr 1fr;
   gap: 20px;
   margin: 20px 0;
 }

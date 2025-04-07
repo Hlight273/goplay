@@ -4,38 +4,76 @@
     <el-tabs :tab-position="tabPosition" type="border-card" class="demo-tabs">
 
       <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><Promotion/></el-icon></span></template>
+        <template #label>
+          <el-tooltip content="推荐音乐" placement="right" :show-after="300">
+            <div class="nav-item">
+              <el-icon><Promotion/></el-icon>
+              <span class="nav-text">推荐</span>
+            </div>
+          </el-tooltip>
+        </template>
         <TabMain></TabMain>
       </el-tab-pane>
 
       <el-tab-pane>
-        <template #label> <span class="custom-tabs-label"> <el-icon><HomeFilled/></el-icon></span></template>
+        <template #label>
+          <el-tooltip content="音乐房间" placement="right" :show-after="300">
+            <div class="nav-item">
+              <el-icon><HomeFilled/></el-icon>
+              <span class="nav-text">房间</span>
+            </div>
+          </el-tooltip>
+        </template>
         <TabRoom></TabRoom>
       </el-tab-pane>
 
-      <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><HelpFilled /></el-icon></span></template>
-        <MusicVillage></MusicVillage>
-      </el-tab-pane>
+     <el-tab-pane>
+    <template #label>
+      <el-tooltip content="音乐社区" placement="right" :show-after="300">
+        <div class="nav-item">
+          <el-icon><HelpFilled /></el-icon>
+          <span class="nav-text">社区</span>
+        </div>
+      </el-tooltip>
+    </template>
+    <MusicVillage></MusicVillage>
+  </el-tab-pane>
 
-      <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><Menu/></el-icon></span></template>
-        <TabMyPlaylist></TabMyPlaylist>
-      </el-tab-pane>
+  <el-tab-pane>
+    <template #label>
+      <el-tooltip content="我的歌单" placement="right" :show-after="300">
+        <div class="nav-item">
+          <el-icon><Menu /></el-icon>
+          <span class="nav-text">歌单</span>
+        </div>
+      </el-tooltip>
+    </template>
+    <TabMyPlaylist></TabMyPlaylist>
+  </el-tab-pane>
 
-      <el-tab-pane v-if="isAdmin(myUserinfo)">
-        <template #label>
-          <span class="custom-tabs-label">
-            <el-icon><Histogram /></el-icon>
-          </span>
-        </template>
-        <TabAdmin></TabAdmin>
-      </el-tab-pane>
+  <el-tab-pane v-if="isAdmin(myUserinfo)">
+    <template #label>
+      <el-tooltip content="管理面板" placement="right" :show-after="300">
+        <div class="nav-item">
+          <el-icon><Histogram /></el-icon>
+          <span class="nav-text">管理</span>
+        </div>
+      </el-tooltip>
+    </template>
+    <TabAdmin></TabAdmin>
+  </el-tab-pane>
 
-      <el-tab-pane>
-        <template #label><span class="custom-tabs-label"><el-icon><Tools/></el-icon></span></template>
-        <TabSetting></TabSetting>
-      </el-tab-pane>
+  <el-tab-pane>
+    <template #label>
+      <el-tooltip content="设置" placement="right" :show-after="300">
+        <div class="nav-item">
+          <el-icon><Tools /></el-icon>
+          <span class="nav-text">设置</span>
+        </div>
+      </el-tooltip>
+    </template>
+    <TabSetting></TabSetting>
+  </el-tab-pane>
 
     </el-tabs>
     <AudioConsole></AudioConsole>
@@ -117,194 +155,82 @@ main {
 }
 .el-tabs {
   height: calc(calc(var(--i-window-height) - 6vh) - 1px);
-  --el-tabs-header-height: 60px;
+  --el-tabs-header-height: 40px;
   box-sizing: border-box;
 }
 
-:deep(.el-tabs--border-card>.el-tabs__content) {
-    padding: 1vh;
-}
-:deep(.el-tabs--border-card>.el-tabs__header .el-tabs__item){
-  padding: 0px 20px;
+
+  .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  transition: all 0.3s ease;
 }
 
-
-#mse {
-  width: calc(100% - 0px) !important;
-  position: fixed;
-  bottom: 0vw;
-  background: #a5a6c6c9;
-  height: 50px;
-  border-top-left-radius: 30px;
-  border-top-right-radius: 30px;
-  background: #363636;
-  box-shadow: 0px -1.3vh .2vh 0px rgb(35 21 31 / 42%) inset;
-  position: relative; /* 相对定位，确保文字在前面 */
-  z-index: 1; /* 确保文本在渐变边框上方 */
-  text-align: center;
-}
-:deep(#mse .xgplayer-controls) {
-  height: 0;
-}
-:deep(#mse .xg-pos){
-  box-sizing: border-box;
-  padding: 0px 22px;
-}
-:deep(#mse .xgplayer-progress-btn) {
-  display: block;
-  background: rgba(231, 232, 255, 0.304);
-  border: .5px solid rgba(255, 94, 94, .056545);
-  box-shadow: 0 0 1px #a09bcc62;
-  width: 20px;
-  height: 20px;
-  border-radius: 30px;
-  left: 0;
-  top: 50%;
-  position: absolute;
-  z-index: 1;
-  transform: translate(-50%, -50%);
-  box-sizing: border-box;
-  pointer-events: none;
-}
-:deep(#mse .xgplayer-error){
-  display: none;
-}
-:deep(#mse .xgplayer-progress-played){
-  background: none;
-  /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
-  animation: backgroundAnimation 10s linear infinite; /* 动画效果 */
-}
-:deep(#mse .xgplayer-slider){
-  background: #5e5e5e;
-  border-radius: 10px;
-  border: 0.01vh solid #c7c4d6;
-  box-shadow: 0px -.7vh .2vh 0px rgb(42 42 42 / 76%) inset;
+.nav-text {
+  font-size: 13px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-family: serif;
 }
 
-
-:deep(#mse .xgplayer-bar){
-  left: 12px;
-  bottom: 16px;
-  height: 68px;
-}
-:deep(#mse .xgplayer-drag){
-    /* bottom: 14px; */
-  background: #ffd1d1;
-  max-height: 66px;
-  /* border: 0.01vh solid #000000; */
-  box-shadow: 0px 0.3vh 0.4vh 0px rgb(255 0 111 / 82%);
-}
-:deep(#mse .xgplayer-drag:after){
-  content: " ";
-    display: inline-block;
-    width: 6px;
-    height: 4px;
-    background: #f4f4f4;
-    box-shadow: 0 0 5px #00000042;
-    position: absolute;
-    border-radius: 28%;
-    left: -1px;
-    top: -4px;
-    /* box-shadow: 0px 0.3vh 0.4vh 0px rgb(141 141 141 / 63%); */
-    /* border: 1px solid #5d4f4f; */
-    box-shadow: 0px .1vh 1.2vh 2px #ff6d8470;
-}
-:deep(#mse .mse_btn) {
-  width: 40px;
-  height: 40px;
+:deep(.el-tabs--border-card) {
+  border: none;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
-.mse_outline {
-  border: 3px solid #3e3e3eba;
-  width: calc(100% - 5px) !important;
-  position: fixed;
-  bottom: -2px;
-  height: 50px;
-  border-top-left-radius: 36px;
-  border-top-right-radius: 35px;
+:deep(.el-tabs--border-card > .el-tabs__header) {
+  background: linear-gradient(180deg, var(--el-color-primary-light-9), #ffffff);
+  border: none;
 }
 
-.gradient-border {
-    padding: 2px;
-    background-color: #ffffffff; /* 内部背景色，可以根据需要调整 */
-    border-top-left-radius: 51px;
-    border-top-right-radius: 51px;
-    position: relative;
-    border: 1px solid transparent; /* 设置 border 为透明以展示渐变效果 */
-    /* background-image: linear-gradient(white, white), linear-gradient(45deg, red, yellow, green, cyan, blue, magenta, red); */
-    background-origin: border-box; /* 确保背景从边框开始 */
-    /*background-clip: content-box, border-box; *//* 确保背景只展示在内容框和边框上 */
-    animation: backgroundAnimation 10s linear infinite; /* 动画效果 */
+:deep(.el-tabs--border-card > .el-tabs__header .el-tabs__item) {
+  border: none;
+  margin: 1px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
 
-    width: calc(100% - 10px) !important;
-    position: fixed;
-    bottom: -4px;
-    height: 50px;
-    border-top-left-radius: 34px;
-    border-top-right-radius: 34px;
-    z-index: 1;
-    text-align: center;
+:deep(.el-tabs--border-card > .el-tabs__header .el-tabs__item:hover) {
+  background: var(--el-color-primary-light-8);
+  .nav-text {
+    opacity: 1;
+    transform: translateX(0);
   }
-  
+}
 
-  @keyframes gradient-border-animation {
-    0% {
-        background-position: 0% 0%;
-    }
-    100% {
-        background-position: 100% 0%;
-    }
+:deep(.el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active) {
+  background: var(--el-color-primary-light-7);
+  color: #ffffff;
+  .nav-text {
+    opacity: 1;
+    transform: translateX(0);
   }
-  @keyframes backgroundAnimation {
-    0% {
-      background-color: #ce9292;
-    }
-    14% {
-      background-color: #ff27a1;
-    }
-    28% {
-      background-color: #bb87ca;
-    }
-    42% {
-      background-color: #6b92de;
-    }
-    57% {
-      background-color: #4fa1a8;
-    }
-    71% {
-      background-color: #6b92de;
-    }
-    85% {
-      background-color: #ff27a1;
-    }
-    100% {
-      background-color: #ce9292;
-    }
-  }
-  @keyframes borderAnimation {
-    0% {
-        border-color: #ce9292;
-    }
-    14% {
-        border-color: #ff27a1;
-    }
-    28% {
-        border-color: #be99c9;
-    }
-    42% {
-        border-color: #959fce;
-    }
-    57% {
-        border-color: #4fa1a8;
-    }
-    71% {
-        border-color: #959fce;
-    }
-    85% {
-        border-color: #ff27a1;
-    }
-    100% {
-        border-color: #ce9292; /* 重复开始颜色 */
-    }
-  }
+}
+
+:deep(.el-tabs--left.el-tabs--border-card .el-tabs__item.is-left.is-active) {
+  /* border: 2px solid #bdbeff;
+    box-shadow: 0px -8px 2px 0px rgb(131 51 98 / 31%) inset;
+    padding-bottom: 8px;
+    background: #b3c1de;
+    border-radius: 10px; */
+    border: 2px solid #d8d8d8;
+    box-shadow: 0px -6px 1px 0px rgb(63 6 50 / 49%) inset;
+    padding-bottom: 5px;
+    background: #35373b;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+:deep(.el-tabs--border-card > .el-tabs__header .el-tabs__nav){
+  width: 120px;
+}
+
+.demo-tabs .custom-tabs-label .el-icon {
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
 </style>

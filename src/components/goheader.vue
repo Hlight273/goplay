@@ -1,7 +1,7 @@
 <template>
   <header>
     <span class="logo">GOPLAY</span>
-    <el-button class="logout_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
+    <el-button class="logout_btn black_oil_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
   </header>
 </template>
 
@@ -32,20 +32,71 @@ const userLogout = ()=>{
 <style scoped>
 header {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 100%;
-  height: 5vh;
-  box-sizing: border-box;
-  padding: .5vh;
-  justify-content: space-between;
-  box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
+    justify-content: flex-end;
+    align-items: center;
+    width: calc(100% - 0.1vh);
+    height: 4.9vh;
+    box-sizing: border-box;
+    padding: .5vh;
+    justify-content: space-between;
+    box-shadow: 0px -2.4vh 1.4vh 0px rgb(40 24 36 / 71%) inset;
+    padding-bottom: .8vh;
+    background: linear-gradient(45deg, var(--start-color, #3e3e3e), var(--mid-color, #4a3e46), var(--end-color, #3e3e3e));
+    border: .1vh solid var(--border-color, #652f2f);
+    border-top: none;
+    animation: headerAnimation 8s infinite ease-in-out;
 }
 header .logo {
-  margin-left: 1vh;
+  margin-left: 1.2vh;
   font-size: 2.2vh;
-    font-family: ui-monospace;
-    font-weight: bold;
-    color: #5a4d62;
+  font-family: ui-monospace;
+  font-weight: bold;
+  background: linear-gradient(90deg, 
+    #ff4759, 
+    #ff7272, 
+    #f27e95, 
+    #ff98b9, 
+    #ff6565);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textFlow 8s linear infinite;
+}
+
+@keyframes textFlow {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes headerAnimation {
+  0% {
+    --start-color: #2a2a2a;
+    --mid-color: #332d33;
+    --end-color: #2a2a2a;
+    --border-color: #4a1f1f;
+  }
+  33% {
+    --start-color: #2a2a33;
+    --mid-color: #2d2a33;
+    --end-color: #2d2a33;
+    --border-color: #1f2d4a;
+  }
+  66% {
+    --start-color: #332a2a;
+    --mid-color: #2a3333;
+    --end-color: #2a2a33;
+    --border-color: #4a1f4a;
+  }
+  100% {
+    --start-color: #2a2a2a;
+    --mid-color: #332d33;
+    --end-color: #2a2a2a;
+    --border-color: #4a1f1f;
+  }
 }
 </style>

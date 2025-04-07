@@ -1,6 +1,8 @@
 <template>
     <div class="playlist-item" @click="selectPlaylist(playlistInfo)">
-        <div class="tag">{{ playlistInfo.playlist.isPublic? '公开':'私密'}}</div>
+        <div class="tag" :class="{ 'private-tag': !playlistInfo.playlist.isPublic }">
+            {{ playlistInfo.playlist.isPublic? '公开':'私密'}}
+        </div>
         <div class="cover-container">
             <img :src='(playlistInfo.playlist.coverUrl!=null&&playlistInfo.playlist.coverUrl!="")?
                 (getPlaylistCoverURL(playlistInfo.playlist.coverUrl)):
@@ -15,7 +17,7 @@
     <div v-if="selectedPlaylistInfo.playlist.id>=0" class="playlist-overlay" >
         <div class="playlist-content">
             <!-- <el-icon class="close_btn" @click="closePlaylist"><CloseBold/></el-icon> -->
-            <el-icon class="close_btn" @click="closePlaylist"><el-icon><CircleCloseFilled /></el-icon></el-icon>
+            <el-icon class="close_btn" @click="closePlaylist"><el-icon><CloseBold /></el-icon></el-icon>
             <div class="infobox">
                 <img :src='(playlistInfo.playlist.coverUrl!=null&&playlistInfo.playlist.coverUrl!="")?
                     (getPlaylistCoverURL(playlistInfo.playlist.coverUrl)):
@@ -175,20 +177,11 @@ onMounted(()=>{
     max-height: 64vh;
     background-color: #f5f5f6;
     border-radius: 3vh;
-    border: .4vh solid #867789;
-    box-shadow: 0px -.7vh .2vh 0px rgb(94 90 133 / 84%) inset;
+    border: .3vh solid #f6ccff;
+    box-shadow: 0px -.5vh .2vh 0px rgb(94 90 133 / 84%) inset;
     overflow: hidden;
 }
 
-.playlist-content .close_btn {
-    color: var(--el-color-primary);
-    cursor: pointer;
-    font-size: 2.2vh;
-    position: absolute;
-    top: 1.4vh;
-    right: 2vh;
-    color: #b99ec0;
-}
 .playlist-content .infobox {
     display: flex;
 }
@@ -205,7 +198,7 @@ onMounted(()=>{
     font-weight: lighter;
     /* background: #9084ff; */
     display: inline-block;
-    padding: .5vh 1vh;
+    padding: .5vh 2vh;
     border-radius: 1.6vh;
     font-family: math;
     max-width: 90%;
@@ -213,12 +206,17 @@ onMounted(()=>{
 .playlist-content .infobox .column span {
     margin-left: 1vh;
     box-sizing: border-box;
-    color: #ae99a5;
+    color: #ffffff;
     font-size: 1.4vh;
-    padding: .4vh .8vh;
-    background: #f2f2f2;
+    padding: 0.4vh 1.3vh;
+    padding-bottom: 0.7vh;
+    background: #fcf3fd;
     border-radius: 1.5vh;
     border: .1vh solid #d4c3da;
+    background: #ced7ff;
+    border-radius: 1.6vh;
+    border: 0.2vh solid #ccccff;
+    box-shadow: 0px -0.2vh 0.2vh 0px rgb(129 82 82 / 47%) inset;
 }
 .playlist-content .infobox .mini-cover {
     width: 10vh;
@@ -252,21 +250,76 @@ onMounted(()=>{
 }
 
 .tag {
-    left: 0.4vh;
-    top: 1vh;
-    z-index: 1000;
     position: absolute;
-    display: flex;
+    left: 0.8vh;
+    top: 0.8vh;
+    z-index: 400;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    background-color: #85849d;
-    padding: 0.3vh;
-    font-size: 1.4vh;
-    font-weight: bold;
-    border-radius: 5vh;
-    width: 4vh;
+    padding: 0.4vh 1.2vh;
+    font-size: 1.2vh;
+    font-weight: 500;
     color: white;
-    border: .2vh solid #aca6c7;
+    background: linear-gradient(135deg, #ff71bc, #43bdff);
+    border-radius: 1vh;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    border: none;
+    min-width: auto;
+    white-space: nowrap;
 }
 
+.tag::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1vh;
+    padding: 0.1vh;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+.private-tag {
+    background: linear-gradient(135deg, #a940ff, #e09e8b);
+}
 
+.playlist-item:hover .tag {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.playlist-content .close_btn {
+    cursor: pointer;
+    font-size: 1.4vh;
+    position: absolute;
+    top: 1.4vh;
+    right: 2vh;
+    width: 1.6vh;
+    height: 1.6vh;
+    border-radius: 50%;
+    display: flex
+;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #ffcbec, #a384fe);
+    transition: all 0.3s ease;
+    color: #ffe9fe;
+    border: .3vh solid #dedbff;
+}
+
+.playlist-content .close_btn:hover {
+    transform: scale(1.1);
+    color: #ffffff;
+    border: .3vh solid #f1f3ff;
+}
+
+.playlist-content .close_btn:active {
+    transform: scale(1.1);
+    color: #ffffff;
+    border: .3vh solid  #f1f3ff;
+}
 </style>

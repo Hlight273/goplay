@@ -11,7 +11,7 @@
     :limit="fileLimit"
   >
   <!-- :before-remove="handleRemove" -->
-    <el-button type="primary" :icon="UploadFilled" style="width: 10vh;"></el-button>
+    <el-button class="village_btn" type="primary" :icon="UploadFilled" style="width: 10vh;">上传音乐</el-button>
     <!-- <el-icon class="el-icon--upload"><upload-filled /></el-icon> -->
     <div class="el-upload__text">
     </div>

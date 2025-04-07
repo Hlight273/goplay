@@ -55,7 +55,7 @@
 
         <!-- 搜索结果 -->
         <div v-show="showSearchResults" class="search-results">
-          <div v-loading="searchLoading" class="result-list hide_scroll_child">
+          <div v-loading="searchLoading" class="result-list">
             <div v-if="!(searchResults.length === 0 && !searchLoading)" v-for="playlist in searchResults" :key="playlist.playlist.id">
               <PlaylistBlock :playlist-info="playlist" :my-userinfo="myUserinfo"/>
             </div>

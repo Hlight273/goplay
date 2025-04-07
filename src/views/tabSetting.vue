@@ -141,7 +141,7 @@ watch(
     top: -3.4vh;
     left: 1vh;
     color: #ffffff;
-    font-size: 1.6vh;
+    font-size: 1.3vh;
     font-weight: bold;
     box-shadow: 0px -.23vh .2vh 0px rgb(255 129 181 / 57%) inset;
     background: #313131;
