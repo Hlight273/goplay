@@ -1,5 +1,10 @@
 <template>
     <div class="village-container">
+        <!-- Logo -->
+        <div class="village-header">
+            <span class="logo">GOPLAY·音乐村</span>
+        </div>
+        
         <!-- 发布动态区域 -->
         <div class="post-creator">
             <el-input
@@ -403,6 +408,7 @@ onMounted(() => {
     align-items: center;
     margin-top: 16px;
     padding: 0 2vh;
+    flex-wrap: wrap;
 }
 
 /* 添加新的样式 */
@@ -488,4 +494,6 @@ onMounted(() => {
   :deep(.post-list .el-card__body) {
     padding: 1.5vh !important;
 }
+
+
 </style>

@@ -87,4 +87,50 @@ export function isNothing(text:string|null|undefined):boolean {
   return text == null || text==undefined || text=='';
 }
 
+interface DragOptions {
+  handleClass?: string;  // 拖拽把手的类名
+  boundaryPadding?: number;  // 边界padding
+}
+
+export const createDraggable = (options: DragOptions = {}) => {
+  return {
+    mounted(el: HTMLElement) {
+      const handle:HTMLElement|null = options.handleClass 
+        ? el.querySelector(`.${options.handleClass}`)
+        : el;
+      
+      if (!handle) return;
+
+      handle.style.cursor = 'move';
+      handle.onmousedown = (e: MouseEvent) => {
+        e.preventDefault();
+        const rect = el.getBoundingClientRect();
+        const disX = e.clientX - rect.left;
+        const disY = e.clientY - rect.top;
+        
+        document.onmousemove = (e: MouseEvent) => {
+          let left = e.clientX - disX;
+          let top = e.clientY - disY;
+          
+          // 防止元素拖出视口
+          const padding = options.boundaryPadding || 0;
+          const maxX = window.innerWidth - el.offsetWidth - padding;
+          const maxY = window.innerHeight - el.offsetHeight - padding;
+          
+          left = Math.min(maxX, Math.max(padding, left));
+          top = Math.min(maxY, Math.max(padding, top));
+          
+          el.style.left = left + 'px';
+          el.style.top = top + 'px';
+        };
+        
+        document.onmouseup = () => {
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      };
+    }
+  };
+};
+
 

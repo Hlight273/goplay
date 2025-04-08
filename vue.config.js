@@ -4,5 +4,16 @@ module.exports = defineConfig({
   lintOnSave:false,
   devServer: {
     webSocketServer:false,
+  },
+  chainWebpack: config => {
+    config.module
+      .rule('glb')
+      .test(/\.(glb|gltf)$/)
+      .use('file-loader')
+      .loader('file-loader')
+      .options({
+        name: '[name].[ext]',
+        outputPath: 'models'
+      })
   }
 })

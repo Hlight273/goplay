@@ -1,15 +1,24 @@
 <template>
 <!-- 我的歌单 -->
 <div class="recommend-container">
-    <h2>我的歌单 <el-button class="super_submit" @click="openDialog_AddPlaylist">新建歌单</el-button></h2>
-    <div class="recommend-list hide_scroll_child">
-        <div v-for="(playlistInfo, index) in commonStore.myPlaylistInfos" :key="index" style="position: relative;">
-          <el-button class="floating_btn" @click="openDialog_UpdatePlaylist(playlistInfo.playlist)">
-            <el-icon><Edit /></el-icon>
-          </el-button>
-          <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="commonStore.myUserinfo"/>
-        </div>
-    </div>
+  <h2 class="title-area">
+      <span class="title">我的歌单</span>
+      <el-button class="super_submit" @click="openDialog_AddPlaylist">
+          <el-icon><Plus /></el-icon>新建歌单
+      </el-button>
+  </h2>
+  <div class="recommend-list hide_scroll_child">
+      <div v-if="commonStore.myPlaylistInfos.length > 0" v-for="(playlistInfo, index) in commonStore.myPlaylistInfos" :key="index" style="position: relative;">
+        <el-button class="floating_btn" @click="openDialog_UpdatePlaylist(playlistInfo.playlist)">
+          <el-icon><Edit /></el-icon>
+        </el-button>
+        <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="commonStore.myUserinfo"/>
+      </div>
+      <div v-else class="empty-tip">
+          <el-icon><Plus /></el-icon>
+          <span>创建你的第一个歌单，开始上传音乐吧！</span>
+      </div>
+  </div>
 </div>
 
 
@@ -48,6 +57,7 @@ import { CanRecommand, userInfo, userPlaylistInfo } from '@/api/user';
 import { Playlist } from '@/interface/playlist';
 import { ResultCode } from '@/util/webConst';
 import { onMounted, reactive, ref } from 'vue';
+import { Plus } from '@element-plus/icons-vue'
 import { addPlaylist, removePlaylist, updatePlaylist } from '@/api/playlist';
 import { getPlaylistCoverURL } from '@/api/static';
 import { uploadPlaylistCover } from '@/api/upload';
@@ -217,11 +227,68 @@ onMounted(() => {
     background-color: #3c393c;
 }
 
+.title-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2vh;
+}
 
+.title-area .title {
+  font-size: 1.9vh;
+    color: #3c3c3c;
+    font-weight: normal;
+    position: relative;
+    padding-left: 1.5vh;
+}
+
+.title-area .title::before {
+  content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.4vh;
+    height: 1.4vh;
+    background: #ff9294;
+    border-radius: 1.2vh;
+    border: 0.2vh solid #ff72c3;
+    animation: decoratorDance 3s ease-in-out infinite;
+}
+@keyframes decoratorDance {
+    0%, 100% {
+        transform: translateY(-50%);
+    }
+    30% {
+        transform: translateY(-80%);
+    }
+    40% {
+        transform: translateY(25%);
+    }
+    50% {
+        transform: translateY(-50%) rotate(0deg);
+    }
+    70% {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}
 </style>
 
 <style>
 .playlist_info_modify .el-dialog{
     min-width: 540px !important;
+    border-radius: 2vh;
+    border: 0.2vh solid #ccccff;
+    box-shadow: 0px -0.2vh 0.2vh 0px rgb(129 82 82 / 47%) inset;
+}
+.playlist_info_modify .el-dialog .el-dialog__title {
+    font-size: 2vh;
+    background: linear-gradient(94deg, #b894f7, #d28be6, #ef90f7, #ff98b9);
+    background-size: 200% auto;
+    color: transparent;
+    background-clip: text;
+    font-weight: bold;
+    position: relative;
+    top: -0.5vh;
 }
 </style>

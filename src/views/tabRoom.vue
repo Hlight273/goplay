@@ -11,6 +11,10 @@
             加入房间<el-icon class="el-icon--right"><ArrowRight /></el-icon>
         </el-button>
     </div>
+    <div class="empty-tip">
+      <el-icon><InfoFilled /></el-icon>
+      <span>创建或加入房间，开启你的共享音乐之旅吧！</span>
+    </div>
   </div>
 
   <!-- 房间内页 -->
@@ -150,7 +154,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted} from 'vue'
-import { ArrowLeft, Promotion, FolderAdd} from '@element-plus/icons-vue'
+import { ArrowLeft, Promotion, FolderAdd, InfoFilled} from '@element-plus/icons-vue'
 import { ElMessageBox, type DropdownInstance, ElMessage } from 'element-plus'
 
 import { IMessage } from '@stomp/stompjs';
@@ -886,4 +890,6 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   padding: .7vh 1.5vh;
   height: 3vh;
 }
+
+
 </style>

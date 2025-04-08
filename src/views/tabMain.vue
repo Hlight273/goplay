@@ -29,9 +29,7 @@
       </div>
 
        <!-- 欢迎卡片 -->
-      <WelcomeCard 
-        :user-info="myUserinfo" 
-      />
+      <WelcomeCard />
 
       <div class="home-container white_backpanel">
         <div v-show="!showSearchResults" class="hide_scroll_child">

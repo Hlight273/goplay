@@ -1,9 +1,9 @@
 <template>
   <Goheader></Goheader>
   <main>
-    <el-tabs :tab-position="tabPosition" type="border-card" class="demo-tabs">
+    <el-tabs v-model="activeTab" :tab-position="tabPosition" type="border-card" class="demo-tabs">
 
-      <el-tab-pane>
+      <el-tab-pane name="recommend">
         <template #label>
           <el-tooltip content="推荐音乐" placement="right" :show-after="300">
             <div class="nav-item">
@@ -15,7 +15,7 @@
         <TabMain></TabMain>
       </el-tab-pane>
 
-      <el-tab-pane>
+      <el-tab-pane name="room">
         <template #label>
           <el-tooltip content="音乐房间" placement="right" :show-after="300">
             <div class="nav-item">
@@ -27,58 +27,59 @@
         <TabRoom></TabRoom>
       </el-tab-pane>
 
-     <el-tab-pane>
-    <template #label>
-      <el-tooltip content="音乐社区" placement="right" :show-after="300">
-        <div class="nav-item">
-          <el-icon><HelpFilled /></el-icon>
-          <span class="nav-text">社区</span>
-        </div>
-      </el-tooltip>
-    </template>
-    <MusicVillage></MusicVillage>
-  </el-tab-pane>
+    <el-tab-pane name="community">
+      <template #label>
+        <el-tooltip content="音乐社区" placement="right" :show-after="300">
+          <div class="nav-item">
+            <el-icon><HelpFilled /></el-icon>
+            <span class="nav-text">社区</span>
+          </div>
+        </el-tooltip>
+      </template>
+      <MusicVillage></MusicVillage>
+    </el-tab-pane>
 
-  <el-tab-pane>
-    <template #label>
-      <el-tooltip content="我的歌单" placement="right" :show-after="300">
-        <div class="nav-item">
-          <el-icon><Menu /></el-icon>
-          <span class="nav-text">歌单</span>
-        </div>
-      </el-tooltip>
-    </template>
-    <TabMyPlaylist></TabMyPlaylist>
-  </el-tab-pane>
+    <el-tab-pane name="playlist">
+      <template #label>
+        <el-tooltip content="我的歌单" placement="right" :show-after="300">
+          <div class="nav-item">
+            <el-icon><Menu /></el-icon>
+            <span class="nav-text">歌单</span>
+          </div>
+        </el-tooltip>
+      </template>
+      <TabMyPlaylist></TabMyPlaylist>
+    </el-tab-pane>
 
-  <el-tab-pane v-if="isAdmin(myUserinfo)">
-    <template #label>
-      <el-tooltip content="管理面板" placement="right" :show-after="300">
-        <div class="nav-item">
-          <el-icon><Histogram /></el-icon>
-          <span class="nav-text">管理</span>
-        </div>
-      </el-tooltip>
-    </template>
-    <TabAdmin></TabAdmin>
-  </el-tab-pane>
+    <el-tab-pane name="admin" v-if="isAdmin(myUserinfo)">
+      <template #label>
+        <el-tooltip content="管理面板" placement="right" :show-after="300">
+          <div class="nav-item">
+            <el-icon><Histogram /></el-icon>
+            <span class="nav-text">管理</span>
+          </div>
+        </el-tooltip>
+      </template>
+      <TabAdmin></TabAdmin>
+    </el-tab-pane>
 
-  <el-tab-pane>
-    <template #label>
-      <el-tooltip content="设置" placement="right" :show-after="300">
-        <div class="nav-item">
-          <el-icon><Tools /></el-icon>
-          <span class="nav-text">设置</span>
-        </div>
-      </el-tooltip>
-    </template>
-    <TabSetting></TabSetting>
-  </el-tab-pane>
+    <el-tab-pane name="setting">
+      <template #label>
+        <el-tooltip content="设置" placement="right" :show-after="300">
+          <div class="nav-item">
+            <el-icon><Tools /></el-icon>
+            <span class="nav-text">设置</span>
+          </div>
+        </el-tooltip>
+      </template>
+      <TabSetting></TabSetting>
+    </el-tab-pane>
 
-    </el-tabs>
-    <AudioConsole></AudioConsole>
-    <AudioPanel></AudioPanel>
-    <UserPage></UserPage>
+  </el-tabs>
+  <AudioConsole></AudioConsole>
+  <AudioPanel></AudioPanel>
+  <UserPage></UserPage>
+  <CharacterModel :current-tab="activeTab"/>
     
   </main>
   <DissolveTransition 
@@ -94,7 +95,6 @@ import {isAdmin} from '@/api/user'
 
 import type { TabsInstance } from 'element-plus'
 const tabPosition = ref<TabsInstance['tabPosition']>('left') //tab栏暂时设在左边
-  isAdmin
 import TabMain from './tabMain.vue';
 import TabRoom from './tabRoom.vue';
 import AudioConsole from '@/components/audioConsole.vue';
@@ -106,12 +106,15 @@ import AudioPanel from '@/views/audioPanel.vue';
 import UserPage from './userPage.vue';
 import TabAdmin from './tabAdmin.vue'
 import MusicVillage from './musicVillage.vue'
+import CharacterModel from '@/components/characterModel.vue'
 
 import { useCommonStore } from "@/store/commonStore";
 import { storeToRefs } from "pinia";
 
 const commonStore = useCommonStore();
 const { dissolveOn, myUserinfo } = storeToRefs(commonStore);
+
+const activeTab = ref('recommend');
 
 
 onMounted(()=>{
@@ -164,7 +167,7 @@ main {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 12px;
+  padding: 12px 7px;
   transition: all 0.3s ease;
 }
 
@@ -226,7 +229,7 @@ main {
 }
 
 :deep(.el-tabs--border-card > .el-tabs__header .el-tabs__nav){
-  width: 120px;
+  width: 100px;
 }
 
 .demo-tabs .custom-tabs-label .el-icon {

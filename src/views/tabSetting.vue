@@ -135,10 +135,11 @@ watch(
 }
 
 .content .line_top .title{
-    position: absolute;
-    display: flex;
+  position: absolute;
+    display: flex
+;
     align-items: center;
-    top: -3.4vh;
+    top: -2.4vh;
     left: 1vh;
     color: #ffffff;
     font-size: 1.3vh;
@@ -150,10 +151,10 @@ watch(
     border-bottom-left-radius: 1.6vh;
     font-family: 'NSimSun', 'Microsoft YaHei', sans-serif;
     width: 10vh;
-    height: 2.8vh;
+    height: 2.6vh;
     border: 0.2vh solid #6475ff;
     justify-content: space-evenly;
-    padding: 0.2vh 0.1vh;
+    padding: 0vh 0.4vh;
 }
 
 .content .line_top .input_box {

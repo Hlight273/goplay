@@ -39,12 +39,12 @@ header {
     box-sizing: border-box;
     padding: .5vh;
     justify-content: space-between;
-    box-shadow: 0px -2.4vh 1.4vh 0px rgb(40 24 36 / 71%) inset;
+    box-shadow: 0px -3.4vh 0.4vh 0px rgb(24 9 20 / 71%) inset;
     padding-bottom: .8vh;
     background: linear-gradient(45deg, var(--start-color, #3e3e3e), var(--mid-color, #4a3e46), var(--end-color, #3e3e3e));
     border: .1vh solid var(--border-color, #652f2f);
     border-top: none;
-    animation: headerAnimation 8s infinite ease-in-out;
+    animation: headerAnimation 6s infinite ease-in-out;
 }
 header .logo {
   margin-left: 1.2vh;
@@ -62,6 +62,7 @@ header .logo {
   -webkit-background-clip: text;
   background-clip: text;
   animation: textFlow 8s linear infinite;
+  text-shadow: 0vh 0vh .33vh #ff6079;
 }
 
 @keyframes textFlow {
