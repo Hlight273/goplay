@@ -214,7 +214,7 @@ onMounted(() => {
 }
 
 .floating_btn {
-  z-index: 1000;
+  z-index: 599;
     position: absolute;
     top: 0.7vh;
     right: 0.7vh;
