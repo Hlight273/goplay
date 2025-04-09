@@ -33,12 +33,15 @@ export const useCommonStore = defineStore("common", () => {
     }
 
     const updateMyPlaylistInfo = () => {
+        myPlaylistInfos.length = 0;
         const userId = Number(localStorage.getItem("userid"));
         userPlaylistInfo(userId).then(
             (res) => {   
                 switch (res.code) {
                     case ResultCode.SUCCESS:
                         Object.assign(myPlaylistInfos, res.oData);
+                        //console.log(myPlaylistInfos);
+                        
                         break;
                     case ResultCode.EMPTY:          
                         break;

@@ -477,7 +477,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   margin-right: 10px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   color: #434343;
   min-height: 88vh;
 }
