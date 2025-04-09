@@ -146,10 +146,10 @@ onMounted(() => {
   animation: pulse 2s infinite;
 }
 .welcome-cards {
-  display: grid;
-  grid-template-columns: 4.3fr 1fr;
-  gap: 20px;
-  margin: 20px 0;
+  display: flex;
+    gap: 20px;
+    margin: 20px 0;
+
 }
 
 .welcome-card {

@@ -313,11 +313,8 @@ h2::after {
 
 .home-container {
   width: calc(100% - 46px);
-  /* 移除固定高度 */
-  /* height: 30vh; */
   padding: 1vh 1.6vh;
-  /* 移除 overflow 限制 */
-  /* overflow: hidden; */
+  overflow: hidden;
   margin-top: 1vh;
   background: #ffffff;
 }

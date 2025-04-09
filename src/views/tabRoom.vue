@@ -142,7 +142,7 @@
     <!--底部通用 聊天输入框-->
     <div class="line send">
       <el-input v-model="textToSend" placeholder="聊天对话..." @keyup.enter="broadcast_sayInRoom()"/>
-      <el-button class="btn_join" type="primary" @click="broadcast_sayInRoom()" 
+      <el-button class="village_btn" type="primary" @click="broadcast_sayInRoom()" 
         color="#7365ff" :icon="Promotion"/>
     </div>
 
@@ -586,6 +586,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   border: 1px solid #f6e6f5;
   border-radius: 10vh;
   box-shadow: 0px -.7vh .2vh 0px rgb(101 95 156 / 30%) inset;
+  z-index: 998; /* 提高z-index值 */
 }
 
 .roomInfo {
@@ -691,43 +692,158 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   border-radius: 1vh;
   border: .1vh solid #e7e7e7;
   box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
+  padding: 1vh 0;
 }
+
 /* 发送的消息 */
 .msgbox {
   margin: 1vh;
   display: flex;
-  align-items: flex-start
+  align-items: flex-start;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease;
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .msgbox.me {
-  flex-direction: row-reverse
+  flex-direction: row-reverse;
 }
-.msgbox>.avator{
+
+.msgbox > .avator {
   margin-top: 0px;
   height: 3.2vh;
   width: 3.2vh;
   border-radius: 2.5vh;
   box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, .3);
+  border: 2px solid #ffffff;
 }
+
 .msgbox .side {
   margin: 0 1vh;
   max-width: 87%;
 }
-.msgbox .side .name{
+
+.msgbox .side .name {
   margin: .2vh -.4vh;
   font-size: 1.2vh;
-  color: gray;
+  color: #666;
+  font-weight: 500;
 }
-.msgbox .side .name.me{
+
+.msgbox .side .name.me {
   display: flex;
   justify-content: flex-end;
 }
-.msgbox .side .msg{
+
+.msgbox .side .msg {
   font-size: 1.4vh;
   background-color: #7365ff;
   color: white;
   padding: .8vh 1.4vh;
   border-radius: .8vh;
   word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-width: 100%;
+}
+
+.msgbox.me .side .msg {
+  background-color: #9c90ff;
+  border-top-right-radius: 0;
+}
+
+.msgbox:not(.me) .side .msg {
+  background-color: #7365ff;
+  border-top-left-radius: 0;
+}
+
+/* 聊天输入框样式优化 */
+.content .line.send {
+  z-index: 600;
+  align-items: center;
+    position: fixed;
+    box-sizing: border-box;
+    padding: 0.8vh 0.5vw;
+    bottom: 67px;
+    width: calc(96vw - 143px);
+    height: 4.5vh;
+    left: 116px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #e0d5ff;
+    border-radius: 3vh;
+    box-shadow: 0 4px 12px rgba(115, 101, 255, 0.15);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.content .line.send:hover {
+  box-shadow: 0 6px 16px rgba(115, 101, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 聊天输入框样式优化 */
+.content .line.send .el-input__wrapper {
+  background-color: transparent;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: none;
+  padding-left: 1.2vh;
+}
+
+.content .line.send .el-input__wrapper:focus-within {
+  background-color: rgba(245, 245, 255, 0.5);
+}
+
+.content .line.send .el-input__inner {
+  color: #333;
+  font-weight: 500;
+  font-size: 1.4vh;
+}
+
+.content .line.send .el-input__inner::placeholder {
+  color: #9c9cb0;
+  font-weight: normal;
+}
+
+.content .line.send .btn_join {
+  margin-left: 8px;
+  height: 3.8vh;
+  width: 3.8vh;
+  min-width: unset;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #8a7dff, #7365ff);
+  border: none;
+  box-shadow: 0 2px 6px rgba(115, 101, 255, 0.3);
+}
+
+.content .line.send .btn_join:hover {
+  transform: scale(1.08) rotate(5deg);
+  background: linear-gradient(135deg, #9c90ff, #8a7dff);
+  box-shadow: 0 4px 8px rgba(115, 101, 255, 0.4);
+}
+
+.content .line.send .btn_join:active {
+  transform: scale(0.95);
+}
+
+.content .line.send .btn_join .el-icon {
+  font-size: 1.8vh;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.content .line.send .btn_join:hover .el-icon {
+  transform: translateX(2px);
 }
 
 /* 音乐面板 */
