@@ -10,6 +10,7 @@ export namespace User {
         username: string
         avatarUrl: string
         room_id?: number
+        isOnline?: number
         privilege?: number
         level: number
         nickname:string

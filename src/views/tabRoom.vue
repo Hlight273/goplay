@@ -3,11 +3,11 @@
   <!-- 加入房间页 -->
   <div class="content" v-show="currentPageState==PageStatus.WAIT_FOR_ROOM">
     <div class="line">
-        <el-button type="primary" @click="createNewRoom()" color="#7365ff">创建房间</el-button>
+        <el-button class="village_btn" type="primary" @click="createNewRoom()" color="#7365ff">创建房间</el-button>
     </div>
     <div class="line">
         <el-input v-model="roomCode_join" placeholder="房间代码"/>
-        <el-button class="btn_join" type="primary" @click="joinNewRoom()" color="#7365ff">
+        <el-button class="btn_join village_btn" type="primary" @click="joinNewRoom()" color="#7365ff">
             加入房间<el-icon class="el-icon--right"><ArrowRight /></el-icon>
         </el-button>
     </div>
@@ -20,15 +20,22 @@
   <!-- 房间内页 -->
   <div class="content"  v-show="currentPageState==PageStatus.IN_ROOM">
     <div class="line top">
-      <el-button class="btn_join" type="primary" @click="exitRoom()" color="#7365ff" :icon="ArrowLeft">
+      <el-button class="btn_join village_btn" type="primary" @click="exitRoom()" color="#7365ff" :icon="ArrowLeft">
         离开房间
       </el-button>
       <div class="roomInfo" v-show="roomData">
         <span>{{ roomData?.roomName }}</span>
-        <span>
+        <!-- 正常显示用户数量 -->
+        <span v-if="!showDisconnectionAlert || !roomStore.myUserHasRoom()">
           <el-icon><Avatar /></el-icon>
           {{ roomData?.currentUsers }}/{{ roomData?.maxUsers }}
-        </span>      
+        </span>
+        <!-- 断开连接提示 -->
+        <span v-else class="disconnection-alert">
+          <el-icon><WarningFilled /></el-icon>
+          已断开连接
+          <el-button class="black_oil_btn" size="small" type="primary" @click="GoPlayer.enterRoomMode();showDisconnectionAlert = false;">重连</el-button>
+        </span>         
       </div>
       <div class="roomCode" v-show="roomData">
         <el-icon @click="copyRoomCode()"><CopyDocument color="#434343"/></el-icon>
@@ -44,6 +51,8 @@
             <el-icon class="permissionIcon" v-show="userinfo.privilege==2"><Avatar color="#3fc271" /></el-icon>
             <img :src="userinfo.avatarUrl" alt="avator" class="avator">
             <span>{{ userinfo.id==userId?'我':userinfo.nickname }}</span>
+              <!-- 在线状态 -->
+              <div class="online-status" :class="{ 'online': userinfo.isOnline === 1, 'offline': userinfo.isOnline === 0 || userinfo.isOnline === undefined }"></div>
           </div>
           <template #dropdown>
             <div class="playerInfoPanel">
@@ -146,15 +155,15 @@
         color="#7365ff" :icon="Promotion"/>
     </div>
 
-    
 
-  </div>
 
+  
+</div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted} from 'vue'
-import { ArrowLeft, Promotion, FolderAdd, InfoFilled} from '@element-plus/icons-vue'
+import { ArrowLeft, Promotion, FolderAdd, InfoFilled, WarningFilled} from '@element-plus/icons-vue'
 import { ElMessageBox, type DropdownInstance, ElMessage } from 'element-plus'
 
 import { IMessage } from '@stomp/stompjs';
@@ -203,6 +212,7 @@ const roomStore = useRoomStore();
 const roomCode_join = ref('');
 const { roomCode, roomData } = storeToRefs(roomStore);
 import { useCommonStore } from "@/store/commonStore";
+import { eventBus, MEventTypes } from '@/util/eventBus';
 const commonStore = useCommonStore();
 
 const userInfoList = ref<User.UserInfo[]>()
@@ -223,6 +233,9 @@ enum RoomStatus {
 }
 const currentPageState = ref(PageStatus.WAIT_FOR_ROOM)
 const currentRoomState = ref(RoomStatus.MUSIC)
+// 添加断开连接提示状态
+const showDisconnectionAlert = ref(false);
+
 //进入页面调用
 //进入页面需要初始化 用户信息、歌单信息、开启ws连接、注册播放器监听
 const setPageState = (pageState:PageStatus, _roomData?:Room.Room)=>{
@@ -252,6 +265,7 @@ const setPageState = (pageState:PageStatus, _roomData?:Room.Room)=>{
 //生命周期
 onMounted(() => {
   //进入页面 检测用户房间信息，有房间就进入房间页面
+  eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, handleModeChanged);
   userRoomInfo(userId).then(
     (res)=>{   
       switch (res.code) {
@@ -270,16 +284,31 @@ onMounted(() => {
     });
 })
 onUnmounted(()=>{
+  eventBus.off(MEventTypes.GOPLAYER_MODE_CHANGED, handleModeChanged);
   if(wsService!==null){ //卸载WebSocket
     wsService.disconnect();
     wsService = null;
   }
   // roomPlayerEventUnreg(); //清除播放器事件监听
 })
+const handleModeChanged = (val: boolean) => {
+  if (val) {
+      if (wsService === null) {
+        subscribeWebsocket();
+      }
+      showDisconnectionAlert.value = false;// 连接时隐藏提示
+    } else {
+      if (wsService !== null) {
+        wsService.disconnect();
+        wsService = null;
+      }
+       showDisconnectionAlert.value = true; // 断开连接时显示提示
+    }
+  }
 
 let wsService:WebSocketService| null = null;
 const subscribeWebsocket = () => {
-  wsService = new WebSocketService(websocketRoot, userId, roomData.value.id);
+  wsService = new WebSocketService(websocketRoot, userId, roomData.value.id, true);
   wsService.subscribe(`/topic/${roomData.value?.id}/receive`,receive_Msg_InRoom)
   wsService.subscribe(`/topic/${roomData.value?.id}/userInfoList`,receive_UserInfoList_InRoom)
   wsService.subscribe(`/topic/${roomData.value?.id}/songContentList`,receive_SongContentList_InRoom)
@@ -358,6 +387,7 @@ const exitRoom = ()=>{
     (res)=>{   
       switch (res.code) {
         case ResultCode.SUCCESS:
+          wsService?.disconnect();
           globalProperties?.$message.success(res.message)
           setPageState(PageStatus.WAIT_FOR_ROOM)
           break;
@@ -1007,5 +1037,89 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   height: 3vh;
 }
 
+.online-status {
+  position: absolute;
+  bottom: 0.5vh;
+  right: 0.5vh;
+  width: 1vh;
+  height: 1vh;
+  border-radius: 50%;
+  border: 0.1vh solid #ffffff;
+  box-shadow: 0 0 0.2vh rgba(0, 0, 0, 0.3);
+}
 
+.online-status.online {
+  background-color: #4CAF50; /* 在线状态为绿色 */
+  animation: pulse 2s infinite;
+}
+
+.online-status.offline {
+  background-color: #9e9e9e; /* 离线状态为灰色 */
+}
+
+/* 在线状态 */
+.userOnline {
+  display: inline-block;
+  padding: 0 0.5vh;
+  border-radius: 0.5vh;
+  font-size: 1.2vh;
+  margin-top: 0.3vh;
+  color: white;
+}
+
+.userOnline.online {
+  background-color: #4CAF50;
+}
+
+.userOnline.offline {
+  background-color: #9e9e9e;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 0.5vh rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+/* 断开连接提示样式 */
+.disconnection-alert {
+  display: flex;
+  align-items: center;
+  color: #ff5722;
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+  gap: 4px;
+  width: 17vw;
+    justify-content: center;
+}
+
+.disconnection-alert .el-icon {
+  color: #ff5722;
+}
+
+.disconnection-alert .el-button {
+  margin-left: 5px;
+  padding: 2px 5px;
+  height: auto;
+  font-size: 1vh;
+  line-height: normal;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 </style>

@@ -1,4 +1,4 @@
-import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
+import { Client, IMessage, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
 export class WebSocketService {
@@ -13,36 +13,43 @@ export class WebSocketService {
   public MAX_RETRY_COUNT =20;
 
   private activeDisconnect = false;
+
+  private needHeart = true;
+  private heartbeatInterval: number | null = null;
   
-  constructor(brokerURL: string, userId:number, roomId:number) {
+  constructor(brokerURL: string, userId:number, roomId:number, _needHeart?:boolean) {
     console.log("<<new WsService>>"+brokerURL);
     this.url = brokerURL;
     this.userId = userId;
     this.roomId = roomId;
-    this.client = this.createClient(this.url, this.userId, this.roomId)
+    this.client = this.createClient(this.url, this.userId, this.roomId, _needHeart??false)
   }
 
-  createClient(brokerURL:string, userId:number, roomId:number):Client{
+  createClient(brokerURL:string, userId:number, roomId:number, _needHeart?:boolean):Client{
+    this.needHeart = _needHeart || false;
     const socket = new SockJS(brokerURL);
-    return new Client({
+    var cl = new Client({
       //如果是原生ws，直接用url brokerURL: brokerURL,这里sockjs改用webSocketFactory包装
       webSocketFactory: () => {
         return socket; 
-      },
-      connectHeaders: {
-        userId:  userId.toString(),// 这里传递用户ID
-        roomId: roomId.toString(),  // 这里传递房间ID
-        //'token':localStorage.getItem("token") || ''
-      },
-      disconnectHeaders: {
-        userId:  userId.toString(),
-        roomId: roomId.toString(),
       },
       // debug: (str) => { console.log(str); },
       onConnect: this.onConnect.bind(this),
       onStompError: this.onError.bind(this),
       onWebSocketClose: this.onDisconnect.bind(this),
     });
+    if(_needHeart){
+      cl.connectHeaders = {
+        userId:  userId.toString(),// 这里传递用户ID
+        roomId: roomId.toString(),  // 这里传递房间ID
+        //'token':localStorage.getItem("token") || ''
+      };
+      cl.disconnectHeaders = {
+        userId:  userId.toString(),
+        roomId: roomId.toString(),
+      }
+    }
+    return cl;
   }
 
   connect(): void {
@@ -52,6 +59,10 @@ export class WebSocketService {
 
   disconnect(): void {
     this.activeDisconnect = true;
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
     this.client.deactivate();
     this.cleanupSubscriptions();
   
@@ -60,6 +71,17 @@ export class WebSocketService {
   public onConnect(frame: any): void {
     console.log('📞📞连接成功📞📞:'/*, frame*/);
     this.retryCount = 0
+    //心跳包
+    if(this.needHeart){
+      this.sendHeartbeat(); //先发送一次心跳包
+      if (this.heartbeatInterval) {
+        clearInterval(this.heartbeatInterval);
+      }
+      this.heartbeatInterval = setInterval(() => {
+        this.sendHeartbeat(); // 发送心跳包
+      }, 30000);
+    }
+   
     // **自动恢复所有已备份的订阅**
     if (this.subscriptionQueue.length == 0 && this.backupSubscriptions.length > 0) {
       //console.log("♻️📌 恢复之前的订阅");
@@ -124,7 +146,14 @@ export class WebSocketService {
     this.activeSubscriptions = []; // 清空活动订阅
   }
 
-  sendMessage(destination: string, body: string): void {
-    this.client.publish({ destination, body });
+  private sendHeartbeat(): void {
+    this.sendMessage("/app/heartbeat", '0',{
+      userId: this.userId.toString(),
+      roomId: this.roomId.toString(),
+    });
+  }
+
+  sendMessage(destination: string, body: string, headers?:StompHeaders): void {
+    this.client.publish({ destination, body, ...(headers ? { headers } : {}) });
   }
 }
