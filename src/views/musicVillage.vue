@@ -49,9 +49,9 @@
         <div class="post-list">
             <el-card v-for="post in posts" :key="post.id" class="post-card white_backpanel">
                 <div class="post-header">
-                    <el-avatar :src="post.addedByAvatar" />
-                    <div class="post-info">
-                        <span class="username">{{ post.addedByName }}</span>
+                    <el-avatar :src="post.addedByAvatar" @click="openUserProfile(post.addedBy)" class="clickable-avatar" />
+                    <div class="post-info clickable-avatar" @click="openUserProfile(post.addedBy)">
+                        <span class="username clickable-username" @click="openUserProfile(post.addedBy)">{{ post.addedByName }}</span>
                         <span class="time">{{ formatDate(post.addedAt) }}</span>
                     </div>
                 </div>
@@ -138,21 +138,27 @@ import CommentList2 from '@/components/commentList2.vue'
 import { Song } from '@/interface/song'
 import { eventBus, MEventTypes } from '@/util/eventBus'
 
-const posts = ref<(Post.PostDetail & { showComments?: boolean })[]>([])
-const currentPage = ref(1)
-const pageSize = ref(10)
-const hasMore = ref(true)
+import { useCommonStore } from "@/store/commonStore"
+const commonStore = useCommonStore();
+const openUserProfile = (userId: number) => {
+    commonStore.openUserPage(userId);
+}
+
+const posts = ref<(Post.PostDetail & { showComments?: boolean })[]>([]);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const hasMore = ref(true);
 
 const newPost = reactive<Post.PostInfo>({
     contentText: '',
     imageUrls: [],
 })
 
-const uploadRef = ref<ImageUploaderExposed  | null>(null)
+const uploadRef = ref<ImageUploaderExposed  | null>(null);
 
 // 获取动态列表
 const loadPosts = async (page: number) => {
-    const res = await getPostList(page, pageSize.value)
+    const res = await getPostList(page, pageSize.value);
     if (res.data) {
         const processedPosts = res.data.posts.map(post => ({
             ...post,
@@ -161,11 +167,11 @@ const loadPosts = async (page: number) => {
         }))
 
         if (page === 1) {
-            posts.value = processedPosts
+            posts.value = processedPosts;
         } else {
-            posts.value.push(...processedPosts)
+            posts.value.push(...processedPosts);
         }
-        hasMore.value = posts.value.length < res.data.total
+        hasMore.value = posts.value.length < res.data.total;
     }
 }
 
@@ -495,5 +501,61 @@ onMounted(() => {
     padding: 1.5vh !important;
 }
 
+/* 添加可点击头像和用户名的样式 */
+.clickable-avatar {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
 
+.clickable-avatar:hover {
+    transform: scale(1.05);
+}
+
+.clickable-username {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.clickable-username:hover {
+    color: var(--el-color-primary);
+    text-decoration: underline;
+}
+
+.village-header {
+    margin-bottom: 1px;
+    display: flex
+;
+    align-items: center;
+    background: linear-gradient(45deg, #ccc8ff, #ecc3ff, #90afff);
+    border: .3vh solid #d4ceff;
+    border-bottom: none;
+    border-radius: 12px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    padding: .5vh 1vh;
+    justify-content: center;
+    margin-top: -20px;
+}
+
+.logo {
+    font-size: 2.2vh;
+    font-family: ui-monospace;
+    font-weight: bold;
+    background: linear-gradient(90deg, #ffe9ec, #ffe0e0, #ffeafc, #ffdae6, #efefff);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: textFlow-97e2073e 4s linear infinite;
+    text-shadow: 0vh 0vh .33vh #dfcdff29;
+}
+
+@keyframes textFlow {
+    0% {
+        background-position: 0% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
 </style>

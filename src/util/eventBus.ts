@@ -6,7 +6,8 @@ export enum MEventTypes {
   PLAYER_READY = "PLAYER_READY",
   PLAY_NEW_SONG_ROOM = "PLAY_NEW_SONG_ROOM",
   PLAY_NEW_SONG_LOCAL = "PLAY_NEW_SONG_LOCAL",
-  GOPLAYER_MODE_CHANGED = "GOPLAYER_MODE_CHANGED"
+  GOPLAYER_MODE_CHANGED = "GOPLAYER_MODE_CHANGED",
+  SONG_LOADING_PROGRESS = "SONG_LOADING_PROGRESS"
 }
 
 // 使用枚举定义事件类型 无参用void，有参用别的
@@ -15,6 +16,10 @@ export type MEvents = {
   [MEventTypes.PLAY_NEW_SONG_ROOM]: Song.SongContent|null;
   [MEventTypes.PLAY_NEW_SONG_LOCAL]: Song.SongContent|null;
   [MEventTypes.GOPLAYER_MODE_CHANGED]: boolean;
+  [MEventTypes.SONG_LOADING_PROGRESS]: {
+    url: string;
+    progress: number;
+  };
 };
 
 

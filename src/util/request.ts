@@ -143,15 +143,24 @@ export const downloadLargeFile = async (url: string, filename: string) => {
     return objectUrl
   };
 
-export const getFileBlobFromServer = (url: string, filename: string):Promise<string|void> => {
+export const getFileBlobFromServer = (url: string, filename: string ,onProgress?: (progress: number) => void):Promise<string|void> => {
     return service({
         url,
         method: "GET",
         responseType: "blob",
         timeout: 120000,
+        onDownloadProgress: (progressEvent) => {
+          if (progressEvent.total && onProgress) {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              onProgress(percentCompleted);
+          }
+      }
     }).then((response) => {
         const blob = new Blob([response.data]);
         const objectUrl:string = URL.createObjectURL(blob);
+        if (onProgress) {
+            onProgress(100);
+        }
         return objectUrl
     }) .catch((error) => {
         console.error("创建Blob失败:", error);

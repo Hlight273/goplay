@@ -15,8 +15,10 @@
             <span>{{ songContent.songInfo.songAlbum }}</span>
             <span>{{ formatDuration(songContent.songInfo.songDuration) }}</span>
             <span>
-            <el-icon @click="downloadSong(songContent.songUrl)"><Download/></el-icon>
-            {{ formatBytes(songContent.songInfo.songSize) }}
+              <el-icon @click="downloadSong(songContent.songUrl)"><Download/></el-icon>
+              {{ formatBytes(songContent.songInfo.songSize) }}
+              <!-- 添加下载完成的绿色点标识 -->
+              <div v-if="downloadedSongs[songContent.songUrl]" class="download-indicator"></div>
             </span>
             <span class="delete" @click="removeSong(songContent.songInfo.id)">
             <el-icon><DeleteFilled /></el-icon>
@@ -87,14 +89,23 @@ const canShowUploader = computed(() => {
 
 
 const selectedIndex = ref<number>(-1)
+const downloadedSongs = ref<Record<string, boolean>>({});//需要记录当前下载歌曲
 
 onMounted(() => {
     eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, handleModeChanged);
+    eventBus.on(MEventTypes.SONG_LOADING_PROGRESS, handleDownloadProgress);
 });
 
 onUnmounted(() => {
     eventBus.off(MEventTypes.GOPLAYER_MODE_CHANGED, handleModeChanged);
+    eventBus.off(MEventTypes.SONG_LOADING_PROGRESS, handleDownloadProgress);
 });
+
+const handleDownloadProgress = ({ url, progress }: { url: string, progress: number }) => {
+  if (progress === 100) {
+    downloadedSongs.value[url] = true;
+  }
+};
 
 const handleModeChanged = (val: boolean) => {
   if (val) { // 房间模式
@@ -356,7 +367,7 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
 }
 .songLi span:nth-child(6) {
   /* margin-left: -3vh; */
-  flex: 1.5 1 0%;
+  flex: 2.2 1 0%;
   padding-right: 2vh;
 }
 .songLi span:nth-child(6)>i {
@@ -385,5 +396,32 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
 .songLi span.delete:hover {
   background-color: #ffffff00;
   color: #474747;
+}
+
+/* 添加下载完成指示器的样式 */
+.download-indicator {
+  display: inline-block;
+  width: 0.8vh;
+  height: 0.8vh;
+  border-radius: 50%;
+  background-color: #4CAF50;
+  margin-left: 0.5vh;
+  vertical-align: middle;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7), 0 0 0 0 rgba(76, 175, 80, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 0.2vh rgba(76, 175, 80, 0.4), 0 0 0 0.4vh rgba(76, 175, 80, 0.2);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 0 0.4vh rgba(76, 175, 80, 0), 0 0 0 0.6vh rgba(76, 175, 80, 0);
+    transform: scale(1);
+  }
 }
 </style>

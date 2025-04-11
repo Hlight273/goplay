@@ -2,7 +2,7 @@
   <div class="animation-control-panel" v-show="visible">
     <div class="panel-header">
       <span>动作控制面板</span>
-      <el-button type="text" @click="$emit('update:visible', false)">
+      <el-button @click="$emit('update:visible', false)">
         <el-icon><Close /></el-icon>
       </el-button>
     </div>

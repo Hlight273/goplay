@@ -1,7 +1,10 @@
 <template>
   <header>
     <span class="logo">GOPLAY</span>
-    <el-button class="logout_btn black_oil_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
+    <div class="header-right">
+      <DownloadQueue />
+      <el-button class="logout_btn black_oil_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
+    </div>
   </header>
 </template>
 
@@ -9,6 +12,7 @@
 import { logout } from '@/api/user';
 import { ResultCode } from '@/util/webConst';
 import useCurrentInstance from "@/hooks/useCurrentInstance";
+import DownloadQueue from './DownloadQueue.vue';
 const { globalProperties } = useCurrentInstance();
 
 const userLogout = ()=>{
@@ -32,20 +36,25 @@ const userLogout = ()=>{
 <style scoped>
 header {
   display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: calc(100% - 0.1vh);
-    height: 4.9vh;
-    box-sizing: border-box;
-    padding: .5vh;
-    justify-content: space-between;
-    box-shadow: 0px -3.4vh 0.4vh 0px rgb(24 9 20 / 71%) inset;
-    padding-bottom: .8vh;
-    background: linear-gradient(45deg, var(--start-color, #3e3e3e), var(--mid-color, #4a3e46), var(--end-color, #3e3e3e));
-    border: .1vh solid var(--border-color, #652f2f);
-    border-top: none;
-    animation: headerAnimation 6s infinite ease-in-out;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100% - 0.1vh);
+  height: 4.9vh;
+  box-sizing: border-box;
+  padding: .5vh;
+  box-shadow: 0px -3.4vh 0.4vh 0px rgb(24 9 20 / 71%) inset;
+  padding-bottom: .8vh;
+  background: linear-gradient(45deg, var(--start-color, #3e3e3e), var(--mid-color, #4a3e46), var(--end-color, #3e3e3e));
+  border: .1vh solid var(--border-color, #652f2f);
+  border-top: none;
+  animation: headerAnimation 6s infinite ease-in-out;
 }
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
 header .logo {
   margin-left: 1.2vh;
   font-size: 2.2vh;
