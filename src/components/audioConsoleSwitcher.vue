@@ -79,8 +79,8 @@ const toggleGoplayerMode = ()=>{
   border-top-right-radius: 100px;
 }
 .toggle-btn:not(.btn-down):hover {
-  transform: translateY(-0.8vh) scale(1.1);
-  bottom: 45px;
+  transform: translateY(-0.8vh) scale(1.2);
+  bottom: 44px;
 }
 
 .toggle-btn:not(.btn-down):active {
@@ -113,7 +113,7 @@ const toggleGoplayerMode = ()=>{
 }
 
 .link_btn {
-  height: 3.4vh;
+  height: 3.2vh;
     position: fixed;
     top: 4.9vh;
     right: calc(3% - 0px);
@@ -129,7 +129,7 @@ const toggleGoplayerMode = ()=>{
 ;
     align-items: center;
     border: none;
-    border-radius: 0 0 1.4vh 1.4vh;
+    border-radius: 0 0 2.4vh 2.4vh;
     justify-content: space-evenly;
     border: 3px solid #6a666c;
     border-top: none;

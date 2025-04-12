@@ -86,7 +86,7 @@
   <DissolveTransition 
     :isVisible="dissolveOn" 
     :backgroundType="'pureColor'" 
-    :noiseTexture="require('@/assets/effect/Super Perlin 14 - 512x512.png')"/>
+    :noiseTexture="require('@/assets/effect/disslove1.png')"/>
 
 </template>
 
