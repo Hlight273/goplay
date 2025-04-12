@@ -1,11 +1,8 @@
 <template>
   <div class="main-container">
-
-   
-
     <!-- 现有的欢迎信息 -->
     <div class="welcome-section">
-      <div>
+     
 
       <!-- 动态面包屑 -->
       <el-breadcrumb separator="/" class="breadcrumb">
@@ -64,9 +61,9 @@
           
         </div>
       
-      </div>
+   
 
-    </div>
+      </div>
     </div>
 
     <!-- 添加推荐区域 -->
@@ -249,17 +246,60 @@ const handleBackHome = (e: MouseEvent) => {
 </script>
 
 <style scoped>
-
-
+/* 主容器样式 */
 .main-container {
   padding: 20px;
-    overflow-y: scroll;
-    height: 83vh;
-  padding: 20px;
+  overflow-y: scroll;
+  height: 83vh;
 }
 
+/* 欢迎区域样式 */
+.home-container {
+  width: calc(100% - 46px);
+  padding: 1vh 1.6vh;
+  overflow: hidden;
+  margin-top: 1vh;
+  background: #ffffff;
+}
+
+.search-bar {
+  margin-top: 1vh;
+}
+
+/* 搜索结果区域 */
+.search-results {
+  height: 73vh;
+  overflow: hidden;
+}
+
+.result-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1vh;
+  height: 73vh;
+  justify-content: center;
+}
+
+.no-result {
+  text-align: center;
+  color: #666;
+  font-size: 1.6vh;
+  padding: 50px 0;
+  width: 100%;
+}
+
+/* 轮播图样式 */
+.carousel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 推荐区域布局 */
 .recommend-section {
   display: flex;
+  flex-direction: row;
   gap: 20px;
   margin-top: 20px;
 }
@@ -272,6 +312,27 @@ const handleBackHome = (e: MouseEvent) => {
   width: 300px;
 }
 
+/* 站长推荐区域 */
+.recommend-container {
+  padding: 3px;
+}
+
+.recommend-list {
+  gap: 20px;
+  height: 23vh;
+  overflow-x: scroll;
+  display: flex;
+}
+
+.recommend-item {
+  animation: slideIn 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  flex: 0 0 auto;
+  width: calc(33.33% - 14px);
+}
+
+/* 歌单网格布局 */
 .playlist-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -281,12 +342,21 @@ const handleBackHome = (e: MouseEvent) => {
   justify-items: stretch;
 }
 
+.playlist-grid > div {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.playlist-grid > div:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 标题样式 */
 h2 {
   position: relative;
   margin-bottom: 25px;
   font-size: 18px;
   font-weight: 600;
-  color: var(--el-text-color-primary);
   color: #655d75;
   padding-left: 15px;
   display: flex;
@@ -309,48 +379,6 @@ h2::after {
   height: 1px;
   background: linear-gradient(to right, var(--el-border-color) 0%, transparent 100%);
   margin-left: 15px;
-}
-
-.home-container {
-  width: calc(100% - 46px);
-  padding: 1vh 1.6vh;
-  overflow: hidden;
-  margin-top: 1vh;
-  background: #ffffff;
-}
-
-.carousel-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-
-
-
-.search-bar {
-  margin-top: 1vh;
-}
-.search-results {
-  height: 73vh;
-  overflow: hidden;
-}
-
-.result-list {
-  display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 1vh;
-    height: 73vh;
-    justify-content: center;
-}
-
-.no-result {
-  text-align: center;
-  color: #666;
-  font-size: 1.6vh;
-  padding: 50px 0;
-  width: 100%;
 }
 
 .section-title {
@@ -384,6 +412,7 @@ h2::after {
   height: 24px;
 }
 
+/* 图标样式 */
 .refresh-icon {
   margin-left: 10px;
   font-size: 16px;
@@ -410,57 +439,7 @@ h2::after {
   font-weight: normal;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.playlist-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-  margin-top: 15px;
-  justify-content: center;
-  justify-items: stretch;
-}
-
-.playlist-grid > div {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.playlist-grid > div:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.recommend-container {
-  padding: 3px;
-}
-
-.recommend-list {
-  gap: 20px;
-    /* padding: 10px; */
-    height: 23vh;
-    overflow-x: scroll;
-    display: flex
-;
-}
-
-.recommend-item {
-  animation: slideIn 0.6s ease-out forwards;
-  opacity: 0;
-  transform: translateY(20px);
-  flex: 0 0 auto;
-  width: calc(33.33% - 14px);
-}
-
+/* 管理员推荐样式 */
 .admin-recommend-title {
   display: flex;
   align-items: center;
@@ -483,5 +462,87 @@ h2::after {
   font-weight: normal;
 }
 
+/* 动画效果 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 
+/* 移动端适配 - 平板 */
+@media screen and (max-width: 768px) {
+  .main-container {
+    padding: 10px;
+    height: 80vh;
+  }
+  
+  .recommend-section {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .right-section {
+    width: 100%;
+  }
+  
+  .playlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  
+  .recommend-list {
+    height: auto;
+    max-height: 40vh;
+    padding-bottom: 10px;
+  }
+  
+  h2, .section-title {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  .update-time {
+    font-size: 10px;
+  }
+  
+  .search-bar {
+    margin-bottom: 10px;
+  }
+  
+  .home-container {
+    width: calc(100% - 20px);
+    padding: 10px;
+  }
+  
+  .result-list {
+    height: auto;
+    max-height: 65vh;
+  }
+}
+
+/* 移动端适配 - 手机 */
+@media screen and (max-width: 480px) {
+  .playlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  
+  .main-container {
+    padding: 8px;
+  }
+  
+  h2::after {
+    display: none; /* 移除小屏幕上的装饰线 */
+  }
+  
+  .section-title:hover {
+    transform: none; /* 移除小屏幕上的悬停效果 */
+  }
+}
 </style>

@@ -41,7 +41,6 @@ const dialogVisible = ref(false);
 
 <style scoped>
 .boxCd {
-  position: relative;
     margin: 1vh;
     height: 95%;
     display: flex;
@@ -106,7 +105,36 @@ const dialogVisible = ref(false);
     height: 4vh;
 }
 
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+    .boxCd .cd {
+        width: 20vh;
+        height: 20vh;
+        margin: 2vh;
+    }
+    
+    .boxCd .songName {
+        font-size: 1.6vh;
+        max-width: 80vw;
+    }
+    
+    .boxCd .songArtist {
+        font-size: 1vh;
+    }
+    
+    .open-playlist-btn {
+        font-size: 1.6vh;
+        height: 3vh;
+    }
+}
 
+/* 更小屏幕的适配 */
+@media screen and (max-width: 480px) {
+    .boxCd .cd {
+        width: 16vh;
+        height: 16vh;
+    }
+}
 </style>
 
 <style>

@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="icon" href="<%= BASE_URL %>icon.png">
     <title><%= htmlWebpackPlugin.options.title %></title>
+     <!-- 添加全局样式以消除点击延迟 -->
+     <style>
+      * {
+        touch-action: manipulation;
+      }
+    </style>
   </head>
   <body>
     <noscript>
@@ -13,6 +19,15 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+     <!-- 添加 FastClick 库来消除300ms延迟 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
+    <script>
+      if ('addEventListener' in document) {
+        document.addEventListener('DOMContentLoaded', function() {
+          FastClick.attach(document.body);
+        }, false);
+      }
+    </script>
   </body>
 </html>
 

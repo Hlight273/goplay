@@ -89,7 +89,7 @@ const updateCurSong = (songContent: Song.SongContent | null)=>{
     top: 0;
     opacity: 1;
     visibility: visible;
-    transition:  opacity 1.2s ease, visibility 0s 0.42s; /* 延迟 visibility */
+    transition: opacity 1.2s ease, visibility 0s 0.42s;
     box-sizing: border-box;
     display: flex;
     background-color: #1c1c1c;
@@ -108,11 +108,9 @@ const updateCurSong = (songContent: Song.SongContent | null)=>{
     width: 80vw;
     box-sizing: border-box;
     display: flex;
-    /* justify-content: center; */
     flex-direction: column;
     align-items: center;
     height: 82vh;
-    /* margin-top: 5vh; */
     min-width: 50vh;
 }
 .content {
@@ -139,6 +137,7 @@ const updateCurSong = (songContent: Song.SongContent | null)=>{
     width: 10vh;
     color: #616463;
     font-size: 1.3vh;
+    padding: 0 !important;
 }
 :deep(.el-tabs__item.is-active){
     color: #b74343;
@@ -149,4 +148,44 @@ const updateCurSong = (songContent: Song.SongContent | null)=>{
     background: #313131;
 
 }
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+    .inner_pannel {
+        width: 95vw;
+        min-width: auto;
+        height: 85vh
+    }
+
+    .content {
+        width: 95%;
+        height: 75vh;
+        margin-top: 2vh;
+        min-width: auto;
+    }
+
+    .tabBox {
+        margin-left: 10px;
+        margin-top: 2vh;
+    }
+
+    :deep(.el-tabs__item) {
+        width: 8vh;
+        font-size: 1.1vh;
+    }
+}
+
+/* 更小屏幕的适配 */
+@media screen and (max-width: 480px) {
+    .inner_pannel {
+        border-radius: 1vh;
+    }
+
+    :deep(.el-tabs__item) {
+        width: 6vh;
+        padding: 0 10px;
+    }
+}
+
+
 </style>

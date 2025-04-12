@@ -1,10 +1,13 @@
 <template>
-  <button v-show="roomStore.myUserHasRoom() && !isDarkCDMode" @click="toggleGoplayerMode" class="toggle-btn">
-    <el-icon v-show="isRoomMode"><HomeFilled /></el-icon>
-    <el-icon v-show="!isRoomMode"><Service /></el-icon>
+  <button class="link_btn" v-show="roomStore.myUserHasRoom() && !isDarkCDMode" 
+         @click="toggleGoplayerMode"
+         :class="{'room-mode': isRoomMode}"
+         :title="isRoomMode ? '点击切换到单人模式' : '点击切换到房间模式'">
+    <el-icon><HomeFilled /></el-icon>
+    <span class="mode-text">{{ isRoomMode ? '房间模式' : '单人模式' }}</span>
   </button>
 
-  <button v-show="!isRoomMode" class="toggle-btn" @click="dissolveOn=!dissolveOn;isDarkCDMode=!isDarkCDMode" :style="roomStore.myUserHasRoom()&&!isDarkCDMode?'bottom: 13vh;':''">
+  <button class="toggle-btn" :class="{'btn-down': isDarkCDMode}" v-show="!isRoomMode" @click="dissolveOn=!dissolveOn;isDarkCDMode=!isDarkCDMode">
     <el-icon v-show="!isDarkCDMode"><CaretTop /></el-icon>
     <el-icon v-show="isDarkCDMode"><CaretBottom /></el-icon>
   </button>
@@ -47,27 +50,46 @@ const toggleGoplayerMode = ()=>{
 
 <style>
 .toggle-btn {
-    position: absolute;
-    bottom: 7vh;
-    right: 1vh;
-  width: 4.4vh;
-  height: 4.4vh;
-  border-radius: 50%;
-  border: none;
-  background-color: #ffffff; /* 绿色，表示开启 */
-  color: rgb(0, 0, 0);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease-in-out, transform 0.2s;
-  box-shadow: 0px .4vh .6vh rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  border: .3vh solid #aca6c7;
-    background-color: #3c393c;
-    color: white;
-    z-index: 0;
-    font-size: 1.4vh;
+  position: absolute;
+  z-index: 0;
+  bottom: 52px;
+  right: calc(50% - 4.5vh);
+  width: 8vh;
+  height: 2.4vh;
+  transition: all 0.3s ease-in-out;
+  background: #302f36;
+  color: white;
+  font-size: 1.4vh;
+  border: .3vh solid #be4242;
+  border-bottom: none;
+  border-top-left-radius: 100px;
+  border-top-right-radius: 100px;
 }
+.toggle-btn:not(.btn-down):hover {
+  transform: translateY(-0.8vh) scale(1.1);
+  bottom: 45px;
+}
+
+.toggle-btn:not(.btn-down):active {
+  transform: translateY(-0.3vh) scale(0.95);
+}
+
+.toggle-btn.btn-down:hover {
+  transform: translateY(0.5vh) scale(1.1);
+}
+
+.toggle-btn.btn-down:active {
+  transform: translateY(0.3vh) scale(0.95);
+}
+
+.toggle-btn[roomCode="true"] {
+  background-color: #000000;
+}
+
 
 .toggle-btn:hover {
   transform: scale(1.1);
@@ -79,5 +101,76 @@ const toggleGoplayerMode = ()=>{
 
 .toggle-btn[roomCode="true"] {
   background-color: #000000; /* 红色，表示退出 */
+}
+
+.link_btn {
+  height: 2.4vh;
+    position: fixed;
+    top: 4.9vh;
+    right: calc(3% - 0px);
+    min-width: 100px;
+    padding: 0 1vh;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px -0.2vh 0.1vh rgb(231 186 217 / 62%) inset;
+    cursor: pointer;
+    background-color: #262626;
+    color: white;
+    line-height: 3.8vh;
+    display: flex
+;
+    align-items: center;
+    border: none;
+    border-radius: 0 0 1.4vh 1.4vh;
+    justify-content: space-evenly;
+    border: 3px solid #6a666c;
+    border-top: none;
+}
+
+/* 添加曲线连接装饰 */
+.link_btn::before {
+  content: '';
+    position: absolute;
+    top: -14px;
+    left: 0;
+    right: 0;
+    height: 15px;
+    background-color: #262626;
+    transition: all 0.3s ease-in-out;
+    clip-path: path('M 0 15 C 35 15, 35 8, 50 8 C 65 8, 65 15, 100 15 L 100 15 L 0 15');
+    
+}
+
+
+
+.link_btn:hover {
+    transform: translateY(-0.2vh);
+    background-color: #4a4a4a;
+    border: 3px solid #525252;
+    border-top: none;
+}
+
+.link_btn.room-mode {
+  background:linear-gradient(131deg, #be4242, #ff5757, #be42af, #8960a4, #c67285, #be4242);
+    background-size: 200% auto;
+    animation: roomModeFlow 3s linear infinite;
+    border: 3px solid #976f6f;
+    border-top: none;
+}
+
+.link_btn.room-mode::before,
+.link_btn.room-mode::after {
+    background:linear-gradient(131deg, #be4242, #ff5757, #be42af, #8960a4, #c67285, #be4242);
+    background-size: 200% auto;
+    animation: roomModeFlow 3s linear infinite;
+    box-shadow: 0px 0.7vh 0.3vh rgb(28 84 66 / 74%) inset;
+}
+
+.link_btn .mode-text {
+    font-size: 1.2vh;
+    white-space: nowrap;
+}
+
+.link_btn .el-icon {
+    font-size: 1.4vh;
 }
 </style>

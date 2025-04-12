@@ -174,11 +174,11 @@ main {
 
 .nav-text {
   font-size: 13px;
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    font-family: serif;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-family: serif;
 }
 
 :deep(.el-tabs--border-card) {
@@ -231,6 +231,31 @@ main {
 
 :deep(.el-tabs--border-card > .el-tabs__header .el-tabs__nav){
   width: 100px;
+}
+
+/* 添加媒体查询，针对移动设备优化侧边栏 */
+@media screen and (max-width: 768px) {
+  :deep(.el-tabs--border-card > .el-tabs__header .el-tabs__nav) {
+    width: 50px; /* 移动端减小宽度 */
+  }
+  
+  .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  
+  .nav-text {
+    display: none; /* 移动端完全隐藏文字 */
+  }
+  
+  :deep(.el-tabs--border-card > .el-tabs__header .el-tabs__item:hover) .nav-text,
+  :deep(.el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active) .nav-text {
+    display: none;
+  }
+  
+  :deep(.el-tabs--left.el-tabs--border-card .el-tabs__item.is-left.is-active) {
+    padding: 12px 16px;
+  }
 }
 
 .demo-tabs .custom-tabs-label .el-icon {

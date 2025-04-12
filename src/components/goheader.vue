@@ -73,40 +73,4 @@ header .logo {
   animation: textFlow 8s linear infinite;
   text-shadow: 0vh 0vh .33vh #ff6079;
 }
-
-@keyframes textFlow {
-  0% {
-    background-position: 0% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-@keyframes headerAnimation {
-  0% {
-    --start-color: #2a2a2a;
-    --mid-color: #332d33;
-    --end-color: #2a2a2a;
-    --border-color: #4a1f1f;
-  }
-  33% {
-    --start-color: #2a2a33;
-    --mid-color: #2d2a33;
-    --end-color: #2d2a33;
-    --border-color: #1f2d4a;
-  }
-  66% {
-    --start-color: #332a2a;
-    --mid-color: #2a3333;
-    --end-color: #2a2a33;
-    --border-color: #4a1f4a;
-  }
-  100% {
-    --start-color: #2a2a2a;
-    --mid-color: #332d33;
-    --end-color: #2a2a2a;
-    --border-color: #4a1f1f;
-  }
-}
 </style>

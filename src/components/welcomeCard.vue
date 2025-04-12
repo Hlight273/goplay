@@ -147,9 +147,8 @@ onMounted(() => {
 }
 .welcome-cards {
   display: flex;
-    gap: 20px;
-    margin: 20px 0;
-
+  gap: 20px;
+  margin: 20px 0;
 }
 
 .welcome-card {
@@ -271,11 +270,29 @@ welcome-card::before {
   cursor: pointer;
   transition: all 0.3s ease;
   background: var(--el-color-primary-light-9);
+  /* 添加最大宽度和最小宽度限制 */
+  max-width: 160px;
+  min-width: 120px;
+  height: 48px;
+  overflow: hidden;
+  margin: 0 auto;
 }
 
 .mood-item svg {
   font-size: 20px;
   color: var(--el-text-color-primary);
+  /* 固定图标大小 */
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.mood-item span {
+  /* 防止文字溢出 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
 }
 
 .mood-item.active svg {
@@ -292,16 +309,77 @@ welcome-card::before {
   color: white;
 }
 
-.mood-item {
+/* 移除重复的样式定义 */
+/* .mood-item {
   transform: scale(1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+} */
 
 .mood-item:hover {
-  transform: scale(1.05) translateY(-2px);
+  /* 修改悬停效果，减小缩放幅度 */
+  transform: scale(1.03) translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* 媒体查询部分调整 */
+@media screen and (max-width: 768px) {
+  /* 其他样式保持不变... */
+  
+  .mood-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    justify-items: center;
+  }
+  
+  .mood-item {
+    max-width: 120px;
+    min-width: 80px;
+    height: 36px;
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .mood-item svg {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+  
+  .mood-item span {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* 其他样式保持不变... */
+  
+  .mood-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  
+  .mood-item {
+    max-width: 100px;
+    min-width: 70px;
+    height: 32px;
+    padding: 6px;
+    gap: 4px;
+  }
+  
+  .mood-item svg {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+  
+  .mood-item span {
+    font-size: 11px;
+  }
+  
+  .mood-item.active {
+    animation: none; /* 移动端禁用动画以提高性能 */
+  }
+}
 .mood-item.active {
   animation: selectedPulse 1s infinite;
 }
@@ -343,6 +421,122 @@ welcome-card::before {
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* 添加移动端响应式样式 */
+@media screen and (max-width: 768px) {
+  .welcome-cards {
+    flex-direction: column;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  
+  .user-welcome {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .welcome-text h2 {
+    font-size: 18px;
+  }
+  
+  .welcome-text p {
+    font-size: 14px;
+  }
+  
+  .quick-stats {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* 添加卡片头部样式调整 */
+  :deep(.el-card__header) {
+    padding: 1px 15px;
+  }
+  :deep(.el-card__body){
+    padding: 8% 4px;
+  }
+  
+  /* 修改这里，改为横向排列 */
+  .mood-content {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  
+  .mood-item {
+    max-width: 70px;
+    min-width: unset;
+    width: 23%;
+    height: 28px;
+    padding: 4px;
+    gap: 4px;
+    flex: 0 0 auto;
+    margin: 0;
+  }
+  
+  .emoji-animation {
+    font-size: 150px;
+  }
+}
+
+/* 针对更小屏幕的优化 */
+@media screen and (max-width: 480px) {
+  .welcome-cards {
+    margin: 10px 0;
+  }
+  
+  .avatar-wrapper .el-avatar {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 50px !important;
+  }
+  
+  .online-status {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .welcome-text h2 {
+    font-size: 16px;
+  }
+  
+  .welcome-text p {
+    font-size: 12px;
+  }
+  
+  .stat-item {
+    font-size: 12px;
+  }
+  
+  /* 更小屏幕上的心情选项更小 */
+  .mood-content {
+    gap: 2px;
+  }
+  
+  .mood-item {
+    width: 18%;
+    height: 24px;
+    padding: 2px 4px;
+    gap: 2px;
+  }
+  
+  .mood-item svg {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+  }
+  
+  .mood-item span {
+    font-size: 10px;
+  }
+  
+  .emoji-animation {
+    font-size: 120px;
   }
 }
 </style>

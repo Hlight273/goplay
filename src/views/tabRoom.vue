@@ -500,6 +500,10 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   /* justify-content: center; */
 }
 
+.content /deep/ .el-tabs--card>.el-tabs__header {
+  height: 3.2vh;
+}
+
 .content .room-tabs /deep/ .el-tabs__item {
   color: #9790d5;
   display: flex;
@@ -582,14 +586,14 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
 }
 .roomInfo>span:nth-child(2){
   margin-top: .2vh;
-  margin-left: -.4vh;
   font-size: 1.2vh;
   color: #9f9f9f;
   display: flex;
   align-items: center;
+  width: 200px;
 }
 .roomInfo .el-button {
-  margin-top: 0.5vh;
+  margin-top: 0.1vh;
   padding: 0.3vh 0.8vh;
   font-size: 1.2vh;
   display: flex;

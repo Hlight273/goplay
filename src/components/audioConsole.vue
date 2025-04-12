@@ -93,17 +93,7 @@ onUnmounted(()=>{
   display: none;
 }
 
-:deep(.mse .xgplayer-progress-played){
-  background: none;
-  /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
-  animation: backgroundDarkAnimation 3s linear infinite; /* 动画效果 */
-}
-:deep(#mse_local .xgplayer-progress-played){
-  background: #ff4343;
-  animation: none;
-  /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
-  
-}
+
 
 :deep(.mse .xgplayer-slider){
   background: #5e5e5e;
@@ -156,17 +146,30 @@ onUnmounted(()=>{
   z-index: 666; /* 确保文本在渐变边框上方 */
 }
 
+/* 进度条颜色 */
+:deep(.mse .xgplayer-progress-played){
+  background: none;
+  /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
+  animation: backgroundDarkAnimation 3s linear infinite;
+  animation-delay: var(--animation-delay);
+}
+:deep(#mse_local .xgplayer-progress-played){
+  background: #ff4343;
+  animation: none;
+  /* background: linear-gradient(-90deg, #7365ff 0%, #6456ff 100%); */
+  
+}
+
 .gradient-border {
     padding: 2px;
-    background-color: #ffffffff; /* 内部背景色，可以根据需要调整 */
+    background-color: #ffffffff;
     border-top-left-radius: 51px;
     border-top-right-radius: 51px;
     position: relative;
-    border: 1px solid transparent; /* 设置 border 为透明以展示渐变效果 */
-    /* background-image: linear-gradient(white, white), linear-gradient(45deg, red, yellow, green, cyan, blue, magenta, red); */
-    background-origin: border-box; /* 确保背景从边框开始 */
-    /*background-clip: content-box, border-box; *//* 确保背景只展示在内容框和边框上 */
-    animation: backgroundDarkAnimation 3s linear infinite; /* 动画效果 */
+    border: 1px solid transparent;
+    background-origin: border-box;
+    animation: backgroundDarkAnimation 3s linear infinite;
+    animation-delay: var(--animation-delay);
 
     width: calc(100% - 10px) !important;
     position: fixed;
@@ -188,107 +191,6 @@ onUnmounted(()=>{
   }
   
 
-  @keyframes gradient-border-animation {
-    0% {
-        background-position: 0% 0%;
-    }
-    100% {
-        background-position: 100% 0%;
-    }
-  }
-  @keyframes backgroundDarkAnimation {
-    0% {
-      background-color: #5900ff;
-    }
-    14% {
-      background-color: #bf00ff;
-    }
-    28% {
-      background-color: #ff2ba0;
-    }
-    42% {
-      background-color: #bf00ff;
-    }
-    57% {
-      background-color: #5900ff;
-    }
-    71% {
-      background-color: #355aff;
-    }
-    85% {
-      background-color: #309bff;
-    }
-    100% {
-      background-color: #5900ff;
-    }
-  }
-  @keyframes backgroundAnimation {
-    0% {
-      background-color: #ce9292;
-    }
-    14% {
-      background-color: #ff27a1;
-    }
-    28% {
-      background-color: #bb87ca;
-    }
-    42% {
-      background-color: #6b92de;
-    }
-    57% {
-      background-color: #4fa1a8;
-    }
-    71% {
-      background-color: #6b92de;
-    }
-    85% {
-      background-color: #ff27a1;
-    }
-    100% {
-      background-color: #ce9292;
-    }
-  }
-  @keyframes borderAnimation {
-    0% {
-        border-color: #ce9292;
-    }
-    14% {
-        border-color: #ff27a1;
-    }
-    28% {
-        border-color: #be99c9;
-    }
-    42% {
-        border-color: #959fce;
-    }
-    57% {
-        border-color: #4fa1a8;
-    }
-    71% {
-        border-color: #959fce;
-    }
-    85% {
-        border-color: #ff27a1;
-    }
-    100% {
-        border-color: #ce9292; /* 重复开始颜色 */
-    }
-  }
-  @keyframes backgroundRedAnimation {
-    0% {
-        border-color: #bc2e24;
-    }
-    14% {
-        border-color: #ff3838;
-    }
-    42% {
-        border-color: #ff476f;
-    }
-    71% {
-        border-color: #ff3838;
-    }
-    100% {
-        border-color: #bc2e24; /* 重复开始颜色 */
-    }
-  }
+  
+  
 </style>

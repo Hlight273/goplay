@@ -163,13 +163,13 @@ const confirmAgreement = () => {
   position: absolute;
   top: 40%;
   left: 50%;
-  margin-left: -250px;
+  margin-left: -150px;
   margin-top: -200px;
 }
 .out .form-box {
   box-sizing: border-box;
-  padding: 100px;
-  width: 500px;
+  padding: 100px 0;
+  min-width: 300px;
   height: 400px;
 }
 .out .form-box .title {

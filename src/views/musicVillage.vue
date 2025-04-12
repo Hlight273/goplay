@@ -343,12 +343,7 @@ onMounted(() => {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-.post-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
-}
+
 
 .post-card {
     margin-bottom: 20px;
@@ -413,15 +408,16 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     margin-top: 16px;
-    padding: 0 2vh;
     flex-wrap: wrap;
+    gap: 12px;
 }
 
 /* 添加新的样式 */
 .left-actions {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
 .selected-song {
@@ -556,6 +552,159 @@ onMounted(() => {
     }
     100% {
         background-position: 200% center;
+    }
+}
+
+/* 添加移动端适配样式 */
+@media screen and (max-width: 768px) {
+    .village-container {
+        padding: 20px 10px;
+        height: 80vh;
+    }
+
+    .post-creator {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .post-card {
+        margin-bottom: 15px;
+    }
+
+    .post-header {
+        padding: 4px 6px 6px 6px;
+        margin-bottom: 12px;
+    }
+
+    .post-info {
+        margin-left: 8px;
+    }
+
+    .username {
+        font-size: 14px;
+    }
+
+    .time {
+        font-size: 11px;
+    }
+
+    .post-content {
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .songLi {
+        padding: 6px;
+    }
+
+    .songLi img {
+        width: 36px;
+        height: 36px;
+        margin-right: 8px;
+    }
+
+    .song-name {
+        font-size: 13px;
+    }
+
+    .song-artist, .song-duration {
+        font-size: 11px;
+    }
+
+    .play-btn {
+        padding: 6px;
+    }
+
+    .post-footer {
+        padding-top: 8px;
+        margin-bottom: 6px;
+    }
+
+    .actions {
+        gap: 8px;
+    }
+
+    .actions .village_btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .post-actions {
+        margin-top: 12px;
+        gap: 8px;
+    }
+
+    .left-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .left-actions .village_btn {
+        flex: 1;
+        min-width: 120px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 480px) {
+    .village-container {
+        padding: 20px 8px;
+    }
+
+    .post-creator {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .image-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .songLi img {
+        width: 32px;
+        height: 32px;
+        margin-right: 6px;
+    }
+
+    .song-name {
+        font-size: 12px;
+    }
+
+    .song-artist, .song-duration {
+        font-size: 10px;
+    }
+
+    .play-btn {
+        padding: 4px;
+    }
+
+    .actions .village_btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .left-actions .village_btn {
+        min-width: 100px;
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+
+    .post-content {
+        font-size: 13px;
+    }
+
+    :deep(.post-creator .el-textarea__inner) {
+        font-size: 13px;
+        min-height: 5vh;
     }
 }
 </style>

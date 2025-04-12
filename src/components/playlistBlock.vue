@@ -175,68 +175,124 @@ onMounted(()=>{
     padding-bottom: 4.6vh;
     width: 90%;
     max-height: 64vh;
-    background-color: #f5f5f6;
+    background-color: #f7f7f7;
     border-radius: 3vh;
-    border: .3vh solid #f6ccff;
+    border: .3vh solid #5d5d5d;
     box-shadow: 0px -.5vh .2vh 0px rgb(94 90 133 / 84%) inset;
     overflow: hidden;
 }
 
 .playlist-content .infobox {
     display: flex;
+    gap: 2vh;
+    padding: 2vh;
+    background: linear-gradient(145deg, #ffffff, #f5f5f5);
+    border-radius: 2vh;
+    margin: 1vh;
+    box-shadow: 0 0.2vh 1vh rgba(0, 0, 0, 0.05);
+    position: relative; /* 添加相对定位 */
 }
+
+.playlist-content .infobox .mini-cover {
+    width: 12vh;
+    height: 12vh;
+    border-radius: 1.5vh;
+    border: 0.2vh solid #e8e8f3;
+    box-shadow: 0 0.4vh 1vh rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+}
+
 .playlist-content .infobox .column {
-    position: relative;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    margin-top: .5vh;
-    width: 60%;
+    gap: 1.5vh;
+    padding: 0.5vh;
 }
+
 .playlist-content .infobox .column h3 {
-    color: #907676;;
-    font-size: 1.8vh;
-    font-weight: lighter;
-    /* background: #9084ff; */
-    display: inline-block;
-    padding: .5vh 2vh;
-    border-radius: 1.6vh;
-    font-family: math;
-    max-width: 90%;
+    color: #333;
+    font-size: 2vh;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+    max-width: 100%;
 }
+
 .playlist-content .infobox .column span {
-    margin-left: 1vh;
-    box-sizing: border-box;
-    color: #ffffff;
+    color: #666;
     font-size: 1.4vh;
-    padding: 0.4vh 1.3vh;
-    padding-bottom: 0.7vh;
-    background: #fcf3fd;
-    border-radius: 1.5vh;
-    border: .1vh solid #d4c3da;
-    background: #ced7ff;
-    border-radius: 1.6vh;
-    border: 0.2vh solid #ccccff;
-    box-shadow: 0px -0.2vh 0.2vh 0px rgb(129 82 82 / 47%) inset;
+    line-height: 1.6;
+    padding: 1vh 1.5vh;
+    background:#ffffff;
+    border-radius: 1vh;
+    border: 0.1vh solid #eef0ff;
+    box-shadow: 0 0.2vh 0.4vh rgba(0, 0, 0, 0.05);
 }
-.playlist-content .infobox .mini-cover {
-    width: 10vh;
-    height: 10vh;
-    border-radius: 2vh;
-    border: .2vh solid #cdc6eb;
-    margin: .4vh;
-}
+
 .playlist-content .infobox .creater {
     position: absolute;
-    font-size: 1.4vh;
-    /* background-color: #dedbed; */
-    border-radius: 2vh;
-    padding: .4vh .8vh;
-    margin: .4vh;
-    /* border: .1vh solid #d4c3da; */
-    right: 1vh;
-    top: 8vh;
-    color: #d1c7c7;
+    bottom: 0.5vh;
+    right: 0vh;
+    display: flex
+;
+    align-items: center;
+    gap: 0.8vh;
+    font-size: 1.3vh;
+    color: #888;
+    background: rgb(255 254 254 / 70%);
+    padding: 0.8vh 1.2vh;
+    border-radius: 1vh;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0.1vh 0.3vh rgba(0, 0, 0, 0.05);
+    height: 16px;
 }
+
+.playlist-content .infobox .creater .username {
+    padding: 0.4vh 1vh;
+    color: #7a7aff;
+    background: #f0f0ff;
+    border-radius: 0.8vh;
+    border: 0.1vh solid #e0e0ff;
+    box-shadow: none;
+    font-size: 1.3vh;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.playlist-content .infobox .creater .username:hover {
+    background: #e6e6ff;
+    transform: translateY(-0.1vh);
+}
+
+/* 添加移动端适配 */
+@media screen and (max-width: 768px) {
+    .playlist-content .infobox {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.5vh;
+        gap: 1.5vh;
+        padding-bottom: 5vh;
+    }
+
+    .playlist-content .infobox .column {
+        width: 100%;
+        align-items: center;
+    }
+
+    .playlist-content .infobox .creater {
+        justify-content: center;
+        flex-wrap: wrap;
+        bottom: 1vh;
+        right: 1.5vh;
+        font-size: 1.2vh;
+        bottom: 0.4vh;
+    }
+}
+
 .playlist-content .infobox .creater .username {
     padding: .1vh .6vh;
     cursor: pointer;
@@ -305,10 +361,11 @@ onMounted(()=>{
 ;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(145deg, #ffcbec, #a384fe);
+    background: #c8c5d8;
     transition: all 0.3s ease;
-    color: #ffe9fe;
-    border: .3vh solid #dedbff;
+    color: #ffffff;
+    border: .3vh solid #eaedf5;
+    z-index: 1;
 }
 
 .playlist-content .close_btn:hover {
@@ -321,5 +378,10 @@ onMounted(()=>{
     transform: scale(1.1);
     color: #ffffff;
     border: .3vh solid  #f1f3ff;
+}
+
+/* 移动端适配时调整创建者信息的位置 */
+@media screen and (max-width: 768px) {
+    
 }
 </style>

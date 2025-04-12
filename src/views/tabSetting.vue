@@ -126,7 +126,7 @@ watch(
     display: flex;
     flex-direction: column;
     /* width: 100%; */
-    width: calc(100vw - 175px);
+    width: calc(100vw - 200px);
     padding: 1vh 2.2vh 2.2vh 2vh;
     border: 1px solid #e9e9e9;
     background: #fcfcfc;
@@ -234,6 +234,152 @@ watch(
 .floating_rightup {
   position: absolute;
   right: 1vh;
+}
+
+/* 添加移动端适配样式 */
+@media screen and (max-width: 768px) {
+    .content {
+        margin-right: 5px;
+        font-size: 1.2vh;
+        min-height: 80vh;
+    }
+
+    .content .line_top {
+      width: calc(100vw - 140px);
+        margin: 0.8vh;
+        margin-top: 4vh;
+        padding: 0.8vh 1.8vh 1.8vh 1.6vh;
+    }
+
+    .content .line_top .title {
+        font-size: 1.2vh;
+        width: 9vh;
+        height: 2.4vh;
+        top: -2vh;
+    }
+
+    .content .line_top .input_box {
+        height: 2.8vh;
+        margin: 0.3vh;
+    }
+
+    .content .line_top .input_box span {
+        min-width: 7vh;
+        font-size: 1.2vh;
+    }
+
+    .content .line_top .input_box span.label {
+        font-size: 1.4vh;
+    }
+
+    .content .line_top .userId {
+        font-size: 1.8vh;
+        right: 1vh;
+        bottom: 0.8vh;
+    }
+
+    .infobox {
+        padding: 40px 0;
+    }
+
+    .infobox .avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .infobox .usertitle {
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    .infobox .usertitle > span {
+        max-width: 80px;
+    }
+
+    .floating_rightup {
+        font-size: 1.2vh;
+        padding: 0.6vh 1.2vh;
+    }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 480px) {
+    .content {
+        margin-right: 3px;
+        font-size: 1.1vh;
+    }
+
+    .content .line_top {
+        width: calc(100vw - 140px);
+        margin: 0.6vh;
+        margin-top: 3.5vh;
+        padding: 0.6vh 1.4vh 1.4vh 1.2vh;
+    }
+
+    .content .line_top .title {
+        font-size: 1.1vh;
+        width: 8vh;
+        height: 2.2vh;
+        top: -1.8vh;
+    }
+
+    .content .line_top .input_box {
+        height: 2.6vh;
+        margin: 0.2vh;
+    }
+
+    .content .line_top .input_box span {
+        min-width: 6vh;
+        font-size: 1.1vh;
+    }
+
+    .content .line_top .input_box span.label {
+        font-size: 1.3vh;
+    }
+
+    .content .line_top .userId {
+        font-size: 1.6vh;
+        right: 0.8vh;
+        bottom: 0.6vh;
+    }
+
+    .infobox {
+        padding: 30px 0;
+    }
+
+    .infobox .avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .infobox .usertitle {
+        font-size: 14px;
+        margin-top: 12px;
+    }
+
+    .infobox .usertitle > span {
+        max-width: 60px;
+    }
+
+    .floating_rightup {
+        font-size: 1.1vh;
+        padding: 0.4vh 1vh;
+    }
+
+    /* VIP信息区域适配 */
+    .line_top div[v-show="myVipinfo.level>0"] {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5vh;
+    }
+
+    .line_top div[v-show="myVipinfo.level>0"] span {
+        font-size: 1.1vh;
+    }
+
+    .white_b_font {
+        font-size: 1.1vh;
+    }
 }
 
 </style>

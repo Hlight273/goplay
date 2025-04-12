@@ -21,7 +21,7 @@
         </div>
       </el-form>
       <div class="link">
-        <router-link :to="{ path: '/register' }">忘记密码?</router-link>
+        <router-link :to="{ path: '/register' }">注册账号</router-link>
       </div>
     </div>
   </div>
@@ -105,13 +105,13 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
   position: absolute;
   top: 45%;
   left: 50%;
-  margin-left: -250px;
+  margin-left: -150px;
   margin-top: -200px;
 }
 .out .form-box {
   box-sizing: border-box;
-  padding: 100px;
-  width: 500px;
+  padding: 100px 0;
+  min-width: 300px;
   height: 400px;
 }
 .out .form-box .title {

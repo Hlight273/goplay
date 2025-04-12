@@ -1,6 +1,12 @@
 <template>
     <div class="download-btn" @click="toggleExpand">
-      <el-badge :value="Object.keys(downloads).length" :max="99" type="primary" :hidden="!hasDownloads">
+      <el-badge 
+        :value="Object.keys(downloads).length" 
+        :max="99" 
+        type="danger" 
+        :hidden="!hasDownloads"
+        class="custom-badge"
+      >
         <el-icon><Download /></el-icon>
       </el-badge>
       
@@ -111,7 +117,7 @@ onUnmounted(() => {
 .download-panel {
   position: absolute;
   top: 40px;
-  right: -10px;
+  right: -70px;
   width: 300px;
   background-color: rgba(30, 30, 30, 0.7);
   border-radius: 8px;
@@ -165,6 +171,8 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   margin: 5px;
+  border: 0.2vh solid #555760;
+  box-shadow: none;
 }
 
 .empty-tip .el-icon {
@@ -247,5 +255,88 @@ onUnmounted(() => {
 
 .download-list::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
+}
+
+/* 添加自定义徽章样式 */
+:deep(.custom-badge .el-badge__content) {
+  font-size: 10px;
+  padding: 2px 4px;
+  line-height: 1px;
+  border: none;
+    padding: 1px 3px;
+    right: calc(-3px + var(--el-badge-size) / 2);
+    top: 18px;
+    height: 10px;
+}
+
+/* 添加移动端适配 */
+@media screen and (max-width: 768px) {
+  .download-panel {
+    position: fixed;
+    top: auto;
+    bottom: 70px;
+    right: 10px;
+    width: calc(100% - 20px);
+    max-width: 350px;
+  }
+
+  .download-header {
+    padding: 8px 12px;
+  }
+
+  .download-list {
+    max-height: 250px;
+    padding: 8px;
+  }
+
+  .download-item {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+  }
+
+  .filename {
+    font-size: 13px;
+  }
+
+  .progress-text {
+    font-size: 13px;
+  }
+
+  .empty-tip {
+    padding: 20px 0;
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .download-panel {
+    bottom: 60px;
+    /* right: 5px;
+    width: calc(100% - 10px); */
+  }
+
+  .download-header {
+    padding: 6px 10px;
+  }
+
+  .download-list {
+    max-height: 200px;
+    padding: 6px;
+  }
+
+  .filename {
+    font-size: 12px;
+  }
+
+  .progress-text {
+    font-size: 12px;
+  }
+
+  .empty-tip {
+    padding: 15px 0;
+    font-size: 12px;
+  }
+
+
 }
 </style>

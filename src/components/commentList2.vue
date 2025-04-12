@@ -318,4 +318,77 @@ initComments()
     font-size: 1.4vh;
     resize: none;
   }
+
+  /* 添加移动端适配样式 */
+@media screen and (max-width: 768px) {
+    .replies-section {
+        margin-left: 12px;
+        padding-left: 8px;
+    }
+
+    .reply-item {
+        margin-bottom: 8px;
+        padding: 6px;
+    }
+
+    .reply-item .comment-header {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .reply-item .comment-author {
+        font-size: 12px;
+    }
+
+    .reply-item .reply-to {
+        font-size: 11px;
+        margin: 0 2px;
+    }
+
+    .reply-item .comment-time {
+        font-size: 10px;
+        width: 100%;
+        margin: 2px 0;
+        text-align: right;
+    }
+
+    .reply-item .comment-content {
+        font-size: 13px;
+        margin: 4px 0;
+    }
+
+    .reply-item .comment-actions {
+        margin-top: 4px;
+    }
+
+    .reply-item .el-button {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .replies-section {
+        margin-left: 8px;
+        padding-left: 6px;
+    }
+
+    .reply-item {
+        margin-bottom: 6px;
+        padding: 4px;
+    }
+
+    .reply-item .comment-header {
+        margin-bottom: 4px;
+    }
+
+    .reply-item .comment-content {
+        font-size: 12px;
+    }
+
+    .reply-item .el-button {
+        padding: 2px 6px;
+        font-size: 11px;
+    }
+}
 </style>

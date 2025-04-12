@@ -424,4 +424,94 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
     transform: scale(1);
   }
 }
+
+/* 添加移动端响应式样式 */
+@media screen and (max-width: 768px) {
+  .songUl {
+    /* width: calc(100% + 1vh); */
+    width: 100%;
+    padding-right: 1vh;
+  }
+
+  .songLi {
+    margin: .4vh .4vh;
+    padding: 0.2vh 0;
+  }
+
+  .songLi img:nth-child(1) {
+    margin: 0px 0.8vh 0 0.8vh;
+    width: 3vh;
+    height: 3vh;
+  }
+
+  /* 调整显示内容 */
+  .songLi span:nth-child(2) {
+    flex: 5 1 0%; /* 歌名占更多空间 */
+  }
+  
+  .songLi span:nth-child(3),  /* 艺术家 */
+  .songLi span:nth-child(4) { /* 专辑名 */
+    display: none;
+  }
+  
+  .songLi span:nth-child(5) { /* 时长 */
+    flex: 1 1 0%;
+  }
+  
+  .songLi span:nth-child(6) { /* 大小和下载按钮 */
+    flex: 0.8 1 0%;
+    padding-right: 1vh;
+  }
+
+  /* 隐藏文件大小，只保留下载图标 */
+  .songLi span:nth-child(6) {
+    font-size: 0; /* 隐藏文字 */
+  }
+
+  .songLi span:nth-child(6)>i {
+    font-size: 1.8vh;
+    padding: .2vh;
+  }
+
+  .songLi span.delete {
+    flex: 0.6 1 0%;
+    margin: 0 0.8vh;
+  }
+
+  .songLi span.delete i {
+    height: 2vh;
+    width: 1.6vh;
+  }
+
+  .download-indicator {
+    width: 0.6vh;
+    height: 0.6vh;
+    margin-left: 0.2vh;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .songLi img:nth-child(1) {
+    width: 2.6vh;
+    height: 2.6vh;
+    margin: 0px 0.6vh 0 0.6vh;
+  }
+
+  .songLi span {
+    font-size: 1.1vh;
+  }
+
+  .songLi span:nth-child(6)>i {
+    font-size: 1.6vh;
+  }
+
+  .songLi span.delete {
+    margin: 0 0.6vh;
+  }
+
+  .songLi span.delete i {
+    height: 1.8vh;
+    width: 1.4vh;
+  }
+}
 </style>

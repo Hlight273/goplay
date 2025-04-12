@@ -1,0 +1,81 @@
+/* 全局颜色变量 */
+:root {
+  --color-dark-1: #5900ff;
+  --color-dark-2: #bf00ff;
+  --color-dark-3: #ff2ba0;
+  --color-dark-4: #355aff;
+  --color-dark-5: #309bff;
+  
+  --color-red-1: #bc2e24;
+  --color-red-2: #ff3838;
+  --color-red-3: #ff476f;
+
+  --animation-delay: -1.5s; 
+}
+
+/* 渐变边框动画 */
+@keyframes gradient-border-animation {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 0%; }
+}
+
+/* 深色主题背景动画 */
+@keyframes backgroundDarkAnimation {
+  0% { background-color: var(--color-dark-1); }
+  14% { background-color: var(--color-dark-2); }
+  28% { background-color: var(--color-dark-3); }
+  42% { background-color: var(--color-dark-2); }
+  57% { background-color: var(--color-dark-1); }
+  71% { background-color: var(--color-dark-4); }
+  85% { background-color: var(--color-dark-5); }
+  100% { background-color: var(--color-dark-1); }
+}
+
+/* 红色主题背景动画 */
+@keyframes backgroundRedAnimation {
+  0% { border-color: var(--color-red-1); }
+  14% { border-color: var(--color-red-2); }
+  42% { border-color: var(--color-red-3); }
+  71% { border-color: var(--color-red-2); }
+  100% { border-color: var(--color-red-1); }
+}
+
+/* Logo文字流动动画 */
+@keyframes textFlow {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+  
+  /* Header渐变动画 */
+  @keyframes headerAnimation {
+    0% {
+      --start-color: #2a2a2a;
+      --mid-color: #332d33;
+      --end-color: #2a2a2a;
+      --border-color: #4a1f1f;
+    }
+    33% {
+      --start-color: #2a2a33;
+      --mid-color: #2d2a33;
+      --end-color: #2d2a33;
+      --border-color: #1f2d4a;
+    }
+    66% {
+      --start-color: #332a2a;
+      --mid-color: #2a3333;
+      --end-color: #2a2a33;
+      --border-color: #4a1f4a;
+    }
+    100% {
+      --start-color: #2a2a2a;
+      --mid-color: #332d33;
+      --end-color: #2a2a2a;
+      --border-color: #4a1f1f;
+    }
+  }
+  
+  /* 房间模式背景流动动画 */
+  @keyframes roomModeFlow {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }

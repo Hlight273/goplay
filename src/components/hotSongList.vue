@@ -129,6 +129,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .title-icon {
@@ -166,14 +167,6 @@
   padding: 2px 8px;
   border-radius: 12px;
   white-space: nowrap;  /* 防止文字换行 */
-}
-
-.title-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;  /* 防止元素换行 */
-  min-width: 0;  /* 允许子元素收缩 */
 }
 
 .more-btn {
