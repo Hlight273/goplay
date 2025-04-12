@@ -589,6 +589,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   font-size: 1.2vh;
   color: #9f9f9f;
   display: flex;
+  justify-content: center;
   align-items: center;
   width: 200px;
 }
@@ -700,7 +701,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   align-items: center;
     position: fixed;
     box-sizing: border-box;
-    padding: 0.8vh 0.5vw;
+    padding: 0.8vh 10px;
     bottom: 67px;
     width: calc(96vw - 143px);
     height: 4.5vh;

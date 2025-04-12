@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header class="black_flowing_panel">
     <span class="logo">GOPLAY</span>
     <div class="header-right">
       <DownloadQueue />
@@ -44,10 +44,8 @@ header {
   padding: .5vh;
   box-shadow: 0px -3.4vh 0.4vh 0px rgb(24 9 20 / 71%) inset;
   padding-bottom: .8vh;
-  background: linear-gradient(45deg, var(--start-color, #3e3e3e), var(--mid-color, #4a3e46), var(--end-color, #3e3e3e));
   border: .1vh solid var(--border-color, #652f2f);
   border-top: none;
-  animation: headerAnimation 6s infinite ease-in-out;
 }
 
 .header-right {

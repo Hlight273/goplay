@@ -49,30 +49,41 @@
   /* Header渐变动画 */
   @keyframes headerAnimation {
     0% {
-      --start-color: #2a2a2a;
-      --mid-color: #332d33;
-      --end-color: #2a2a2a;
-      --border-color: #4a1f1f;
+        background-position: 0% 50%;
+        --start-color: #2a2a2a;
+        --mid-color: #332d33;
+        --end-color: #2a2a2a;
+        --border-color: #4a1f1f;
     }
-    33% {
-      --start-color: #2a2a33;
-      --mid-color: #2d2a33;
-      --end-color: #2d2a33;
-      --border-color: #1f2d4a;
+    25% {
+        background-position: 100% 50%;
+        --start-color: #2a2a33;
+        --mid-color: #2d2a33;
+        --end-color: #2d2a33;
+        --border-color: #1f2d4a;
     }
-    66% {
-      --start-color: #332a2a;
-      --mid-color: #2a3333;
-      --end-color: #2a2a33;
-      --border-color: #4a1f4a;
+    50% {
+        background-position: 100% 50%;
+        --start-color: #332a2a;
+        --mid-color: #2a3333;
+        --end-color: #2a2a33;
+        --border-color: #4a1f4a;
+    }
+    75% {
+        background-position: 0% 50%;
+        --start-color: #2d2a33;
+        --mid-color: #332d33;
+        --end-color: #2a2a33;
+        --border-color: #2d1f4a;
     }
     100% {
-      --start-color: #2a2a2a;
-      --mid-color: #332d33;
-      --end-color: #2a2a2a;
-      --border-color: #4a1f1f;
+        background-position: 0% 50%;
+        --start-color: #2a2a2a;
+        --mid-color: #332d33;
+        --end-color: #2a2a2a;
+        --border-color: #4a1f1f;
     }
-  }
+}
   
   /* 房间模式背景流动动画 */
   @keyframes roomModeFlow {

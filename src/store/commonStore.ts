@@ -9,6 +9,7 @@ export const useCommonStore = defineStore("common", () => {
 
     const dissolveOn = ref<boolean>(false);
     const userPageOn = ref<boolean>(false);
+    const curPlaylistOn = ref<boolean>(false);
     
     const myUserinfo = reactive<User.UserInfo>({...User.UserInfo_InitData});
     const myVipinfo = reactive<User.VipInfo>({...User.VipInfo_InitData});
@@ -85,7 +86,8 @@ export const useCommonStore = defineStore("common", () => {
     
    
 
-    return { dissolveOn, userPageOn, targetUserInfo, targetUserVipInfo, openUserPage, closeUserPage, openUserPage_byUserInfo,
+    return { dissolveOn, userPageOn, curPlaylistOn, 
+        targetUserInfo, targetUserVipInfo, openUserPage, closeUserPage, openUserPage_byUserInfo,
         myUserinfo, myVipinfo, updateMyUserInfo, updateMyVipInfo, 
         myPlaylistInfos, updateMyPlaylistInfo
      };

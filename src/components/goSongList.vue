@@ -1,5 +1,5 @@
 <template>
-    <ul class="songUl">
+    <ul class="songUl" v-if="playlistInfo.songContentList && playlistInfo.songContentList.length > 0">
         <li :class="[
             'songLi', 
             selectedIndex == i ? 'select' : '', 
@@ -25,6 +25,11 @@
             </span>
         </li>
     </ul>
+     <!-- 空歌单时显示提示 -->
+     <div v-else class="empty-playlist">
+        <el-icon class="empty-icon"><VideoPlay /></el-icon>
+        <span class="empty-text">当前歌单为空</span>
+    </div>
     <li v-if="canShowUploader" class="songLi uploadSong">
         <AudioUploader :user-id="myUserInfo.id"
           :playlist-id="playlistInfo.playlist.id"
@@ -369,12 +374,14 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
   /* margin-left: -3vh; */
   flex: 2.2 1 0%;
   padding-right: 2vh;
+  min-width: 12vw;
 }
 .songLi span:nth-child(6)>i {
   cursor: pointer;
   padding: .3vh;
   font-size: 2vh;
   color: #ab9bbb;
+  
 }
 .songLi span.delete {
   flex: 0 1 0%;
@@ -408,6 +415,26 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
   margin-left: 0.5vh;
   vertical-align: middle;
   animation: pulse 2s infinite;
+}
+
+/* 添加空歌单提示样式 */
+.empty-playlist {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5vh 0;
+    color: #666;
+}
+
+.empty-icon {
+    font-size: 5vh;
+    margin-bottom: 2vh;
+}
+
+.empty-text {
+    font-size: 1.6vh;
+    margin-bottom: 2vh;
 }
 
 @keyframes pulse {

@@ -4,7 +4,7 @@ import "xgplayer-music/dist/index.min.css";
 import 'xgplayer/dist/index.min.css';
 import MusicPreset, * as Music from 'xgplayer-music';
 import { PlayerData } from '@/interface/playerData';
-import { App } from 'vue';
+import { App, reactive } from 'vue';
 import { Song } from '@/interface/song';
 import { getSongBlob } from '@/api/song';
 import { eventBus,MEventTypes } from "@/util/eventBus";
@@ -21,7 +21,7 @@ export class GoPlayer {
     private static inRoomMode = false;
 
     private roomPlaylist: Song.SongContent[] = [];
-    private personalPlaylist: Song.SongContent[] = [];
+    public personalPlaylist: Song.SongContent[] = reactive<Song.SongContent[]>([]);;
     private preloadedIndex: number = -1;
     
     public static broadcast_lock:boolean = false;
@@ -206,7 +206,7 @@ export class GoPlayer {
     }
 
     addSong_to_LocalPlaylist(song:Song.SongContent){
-        const curIndex = this.player4local?.plugins.music.index;
+        const curIndex = this.getLocalPlaylistIndex();
         this.player4local?.plugins.music.add({
             vid: `song_${curIndex+1}`,
             title: song.songInfo.songName,
@@ -226,7 +226,7 @@ export class GoPlayer {
         if (!this.player4room || this.player4room.plugins.music.list==null) 
             return
 
-        let dataIsSetIndex = _data.curTime==0 && _data.index!=this.player4room.plugins.music.index;
+        let dataIsSetIndex = _data.curTime==0 && _data.index!=this.getRoomPlaylistIndex();
 
         //状态为播放 才允许调时间(time为0走setindex而不是调时间)
         if(!_data.paused){
@@ -278,7 +278,7 @@ export class GoPlayer {
         // 预加载下一首
         this.player4local.on(Events.TIME_UPDATE, async ({ currentTime }) => {  
             const len = this.player4local?.plugins.music.list.length; 
-            const cIndex:number = this.player4local?.plugins.music.index;
+            const cIndex:number = this.getLocalPlaylistIndex();
             const nextIndex:number = cIndex+1 > len-1 ? 0 : cIndex + 1;
             if(!this.player4local?.duration)
                 return;
@@ -339,19 +339,20 @@ export class GoPlayer {
         eventBus.emit(MEventTypes.PLAY_NEW_SONG_LOCAL, songContent)
     }
 
-    private getCurRoomSongContent():Song.SongContent|null{
+    private getCurRoomSongContent(): Song.SongContent|null {
         if(!this.roomPlaylist)
             return null;
-        let index = this.player4room?.plugins.music.index;
+        let index = this.getRoomPlaylistIndex();
         let target = this.roomPlaylist[index];
         if(target==null||target==undefined)
             return null;
         return target;
     }
-    public getCurLocalSongContent():Song.SongContent|null{
+
+    public getCurLocalSongContent(): Song.SongContent|null {
         if(!this.personalPlaylist)
             return null;
-        let index = this.player4local?.plugins.music.index;
+        let index = this.getLocalPlaylistIndex();
         let target = this.personalPlaylist[index];
         if(target==null||target==undefined)
             return null;
@@ -367,7 +368,17 @@ export class GoPlayer {
         eventBus.emit(MEventTypes.GOPLAYER_MODE_CHANGED, false);
     }
     static isRoomMode = ():boolean => this.inRoomMode==true
+
+    public getRoomPlaylistIndex(): number {
+        return this.player4room?.plugins.music.index ?? -1;
+    }
+
+    public getLocalPlaylistIndex(): number {
+        return this.player4local?.plugins.music.index ?? -1;
+    }
 }
+
+
 
 const GoPlayerPlugin = {
     install(app: App) {

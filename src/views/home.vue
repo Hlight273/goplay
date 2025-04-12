@@ -79,13 +79,15 @@
   <AudioConsole></AudioConsole>
   <AudioPanel></AudioPanel>
   <UserPage></UserPage>
+  <CurrentPlaylist />
   <CharacterModel :current-tab="activeTab"/>
     
   </main>
   <DissolveTransition 
-        :isVisible="dissolveOn" 
-        :backgroundType="'pureColor'" 
-        :noiseTexture="require('@/assets/effect/Super Perlin 14 - 512x512.png')"/>
+    :isVisible="dissolveOn" 
+    :backgroundType="'pureColor'" 
+    :noiseTexture="require('@/assets/effect/Super Perlin 14 - 512x512.png')"/>
+
 </template>
 
 <script lang="ts" setup>
@@ -107,13 +109,14 @@ import UserPage from './userPage.vue';
 import TabAdmin from './tabAdmin.vue'
 import MusicVillage from './musicVillage.vue'
 import CharacterModel from '@/components/characterModel.vue'
+import CurrentPlaylist from '@/components/currentPlaylist.vue'
 
 
 import { useCommonStore } from "@/store/commonStore";
 import { storeToRefs } from "pinia";
 
 const commonStore = useCommonStore();
-const { dissolveOn, myUserinfo } = storeToRefs(commonStore);
+const { dissolveOn, curPlaylistOn, myUserinfo } = storeToRefs(commonStore);
 
 const activeTab = ref('recommend');
 

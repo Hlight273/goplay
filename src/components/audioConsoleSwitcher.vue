@@ -7,6 +7,11 @@
     <span class="mode-text">{{ isRoomMode ? '房间模式' : '单人模式' }}</span>
   </button>
 
+  <button class="playlist_btn" v-show="!isRoomMode && !isDarkCDMode" @click="showPlaylist">
+    <el-icon><List /></el-icon>
+    <span class="mode-text">当前歌单</span>
+  </button>
+
   <button class="toggle-btn" :class="{'btn-down': isDarkCDMode}" v-show="!isRoomMode" @click="dissolveOn=!dissolveOn;isDarkCDMode=!isDarkCDMode">
     <el-icon v-show="!isDarkCDMode"><CaretTop /></el-icon>
     <el-icon v-show="isDarkCDMode"><CaretBottom /></el-icon>
@@ -25,10 +30,14 @@ import { useCommonStore } from "@/store/commonStore";
 import { ref } from 'vue';
 
 const commonStore = useCommonStore();
-const { dissolveOn } = storeToRefs(commonStore);
+const { dissolveOn, curPlaylistOn } = storeToRefs(commonStore);
 
 const isDarkCDMode = ref(false);
 
+
+const showPlaylist = () => {
+  curPlaylistOn.value = true;
+}
 
 const toggleGoplayerMode = ()=>{
     console.log("isroommode",isRoomMode.value,"roomcode",roomCode.value);
@@ -104,7 +113,7 @@ const toggleGoplayerMode = ()=>{
 }
 
 .link_btn {
-  height: 2.4vh;
+  height: 3.4vh;
     position: fixed;
     top: 4.9vh;
     right: calc(3% - 0px);
@@ -150,7 +159,7 @@ const toggleGoplayerMode = ()=>{
 }
 
 .link_btn.room-mode {
-  background:linear-gradient(131deg, #be4242, #ff5757, #be42af, #8960a4, #c67285, #be4242);
+  background:linear-gradient(90deg, #be4242, #ff5757, #be42af, #8960a4, #c67285, #be4242);
     background-size: 200% auto;
     animation: roomModeFlow 3s linear infinite;
     border: 3px solid #976f6f;
@@ -159,7 +168,7 @@ const toggleGoplayerMode = ()=>{
 
 .link_btn.room-mode::before,
 .link_btn.room-mode::after {
-    background:linear-gradient(131deg, #be4242, #ff5757, #be42af, #8960a4, #c67285, #be4242);
+    background:linear-gradient(90deg, #be4242, #ff5757, #be42af, #8960a4, #c67285, #be4242);
     background-size: 200% auto;
     animation: roomModeFlow 3s linear infinite;
     box-shadow: 0px 0.7vh 0.3vh rgb(28 84 66 / 74%) inset;
@@ -171,6 +180,45 @@ const toggleGoplayerMode = ()=>{
 }
 
 .link_btn .el-icon {
+    font-size: 1.4vh;
+}
+
+.playlist_btn {
+    height: 2.4vh;
+    position: fixed;
+    bottom: 49px;
+    right: 80px;
+    min-width: 100px;
+    padding: 0 1vh;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    background: #302f36;
+    color: white;
+    line-height: 2.8vh;
+    display: flex;
+    align-items: center;
+    border: none;
+    justify-content: space-evenly;
+    border: .3vh solid #be4242;
+    border-bottom: none;
+    border-top-left-radius: 100px;
+    border-top-right-radius: 100px;
+    z-index: 1001;
+}
+
+.playlist_btn:hover {
+    transform: scale(1.01);
+    background-color: #4a4a4a;
+    border: 3px solid rgb(255, 55, 55);
+    border-bottom: none;
+}
+
+.playlist_btn .mode-text {
+    font-size: 1.2vh;
+    white-space: nowrap;
+}
+
+.playlist_btn .el-icon {
     font-size: 1.4vh;
 }
 </style>

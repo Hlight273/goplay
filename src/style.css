@@ -147,6 +147,15 @@ body {
     border: .1vh solid #f0f1ff;
     box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
 }
+.black_flowing_panel {
+    background: linear-gradient(45deg, 
+        var(--start-color, #3e3e3e) 0%, 
+        var(--mid-color, #4a3e46) 50%, 
+        var(--end-color, #3e3e3e) 100%);
+    background-size: 400% 400%;
+    animation: headerAnimation 16s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 /* 空提示 */
 .empty-tip {
