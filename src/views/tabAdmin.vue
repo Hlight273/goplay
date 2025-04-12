@@ -158,17 +158,16 @@
     width="30%"
   >
     <el-form :model="userLevelForm" label-width="100px">
-        <el-form-item label="当前权限">
-          <span>{{ Level.Enum[userLevelForm.currentLevel] }}</span>
+      <el-form-item label="当前权限">
+        <span>{{ Level.Enum[userLevelForm.currentLevel] }}</span>
         </el-form-item>
         <el-form-item label="新权限">
           <el-select v-model="userLevelForm.newLevel">
             <el-option
-              v-for="(label, value) in Level.Enum"
-              :key="Number(value)"
-              :label="label"
-              :value="Number(value)"
-              v-if="typeof value === 'number'"
+              v-for="level in levelOptions"
+              :key="level.value"
+              :label="level.label"
+              :value="level.value"
             />
           </el-select>
         </el-form-item>
@@ -282,6 +281,13 @@ import {
   activateUser,
   deactivateUser
 } from '@/api/admin'
+const levelOptions = computed(() => {
+  return [
+    { value: Level.Enum.普通, label: '普通用户' },
+    { value: Level.Enum.负责人, label: '负责人' },
+    { value: Level.Enum.管理员, label: '管理员' }
+  ];
+});
 type SearchType = 'playlist' | 'song' | 'user'
 const searchType = ref<SearchType>('playlist')
 const searchKeyword = ref('')
@@ -702,5 +708,152 @@ const submitUpdateUserLevel = () => {
   right: 20px;
   top: 20px;
   color: #d1c7c7;
+}
+
+:deep(.el-dialog) {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.el-dialog__header) {
+  margin: 0;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:deep(.el-dialog__body) {
+  padding: 20px;
+  color: var(--el-text-color-primary);
+}
+
+:deep(.el-dialog__footer) {
+  padding: 10px 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:deep(.el-form-item__label) {
+  color: var(--el-text-color-primary);
+}
+
+:deep(.el-input__inner) {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:deep(.el-select) {
+  width: 100%;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .admin-container {
+    padding: 10px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-type,
+  .id-input {
+    width: 100%;
+  }
+
+  .result-area {
+    max-height: calc(100vh - 200px);
+  }
+
+  /* 表格滚动适配 */
+  .list-container {
+    overflow-x: auto;
+  }
+
+  :deep(.el-table) {
+    width: 100%;
+    min-width: 800px; /* 确保表格内容完整显示 */
+  }
+
+  /* 弹窗适配 */
+  :deep(.el-dialog) {
+    width: 90% !important;
+    margin: 10vh auto !important;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  /* 歌单详情弹窗适配 */
+  .playlist-detail-dialog {
+    :deep(.el-dialog) {
+      width: 95% !important;
+      margin: 5vh auto !important;
+    }
+
+    .infobox {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .column {
+      width: 100%;
+      margin-left: 0;
+      margin-top: 15px;
+    }
+
+    .creater {
+      position: static;
+      margin-top: 10px;
+    }
+  }
+
+  /* 表单项适配 */
+  :deep(.el-form-item) {
+    margin-bottom: 15px;
+  }
+
+  :deep(.el-form-item__label) {
+    float: none;
+    display: block;
+    text-align: left;
+    padding: 0 0 8px;
+  }
+
+  :deep(.el-form-item__content) {
+    margin-left: 0 !important;
+  }
+
+  /* 按钮组适配 */
+  :deep(.el-dialog__footer) {
+    text-align: center;
+    padding: 15px;
+
+    .el-button {
+      margin: 5px;
+    }
+  }
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  :deep(.el-dialog) {
+    background: rgba(30, 30, 30, 0.9) !important;
+  }
+
+  :deep(.el-dialog__header),
+  :deep(.el-dialog__footer) {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  :deep(.el-input__inner) {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
 }
 </style>

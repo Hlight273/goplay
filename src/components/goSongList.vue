@@ -1,5 +1,28 @@
 <template>
-    <ul class="songUl" v-if="playlistInfo.songContentList && playlistInfo.songContentList.length > 0">
+   <!-- 操作记录 -->
+   <div class="queue-control" v-if="isRoomPlaylist" @click="toggleQueue">
+        <el-icon :class="{ active: showQueue }">
+            <Operation />
+        </el-icon>
+    </div>
+    <div class="operation-queue" v-if="isRoomPlaylist && operationQueue.length > 0 && showQueue">
+      <div class="queue-header">
+        <span>操作记录</span>
+        <el-icon class="clear-icon" @click="clearQueue"><Delete /></el-icon>
+      </div>
+      <transition-group name="fade">
+        <div v-for="(op, index) in operationQueue" :key="op.timestamp" class="operation-item">
+          <span class="username">{{ op.username }}</span>
+          <span class="operation">
+            {{ op.type === 'play' ? '播放' : '暂停' }}了
+            {{ playlistInfo.songContentList[op.songIndex]?.songInfo.songName }}
+            {{ op.currentTime ? `(${formatTime(op.currentTime)})` : '' }}
+          </span>
+        </div>
+      </transition-group>
+    </div>
+
+    <ul class="songUl hide_scroll_child" v-if="playlistInfo.songContentList && playlistInfo.songContentList.length > 0">
         <li :class="[
             'songLi', 
             selectedIndex == i ? 'select' : '', 
@@ -23,6 +46,8 @@
             <span class="delete" @click="removeSong(songContent.songInfo.id)">
             <el-icon><DeleteFilled /></el-icon>
             </span>
+            <!-- 添加加载指示器 -->
+            <el-icon v-if="isRoomPlaylist && !$GoPlayer.isSongLoaded(i)" class="loading-icon"><Loading /></el-icon>
         </li>
     </ul>
      <!-- 空歌单时显示提示 -->
@@ -40,7 +65,8 @@
 </template>
 
 <script setup lang="ts"> 
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { Operation } from '@element-plus/icons-vue'
 import { Song } from '@/interface/song';
 import { formatDuration, formatBytes, isNothing } from '@/util/commonUtil'
 
@@ -159,6 +185,27 @@ const receive_PlayerData_InRoom = (msg:IMessage)=>{
   //排除自己发的
   if(_playerData.srcUserId == userId)
     return
+
+  // 添加操作记录
+  const newOperation: OperationItem = {
+    username: _playerData.srcUserId.toString(),
+    type: _playerData.paused ? 'pause' : 'play',
+    songIndex: _playerData.index,
+    currentTime: _playerData.curTime,
+    timestamp: Date.now()
+  };
+  operationQueue.value.unshift(newOperation);
+  if (operationQueue.value.length > MAX_QUEUE_LENGTH) {
+    operationQueue.value.pop();
+  }
+
+  // 检查是否与当前状态相同，如果相同则不需要同步
+  if (_playerData.paused === globalProperties?.$GoPlayer.player4room?.paused 
+      && _playerData.index === globalProperties?.$GoPlayer.player4room?.plugins.music.index
+      && Math.abs(_playerData.curTime - (globalProperties?.$GoPlayer.player4room?.currentTime || 0)) < 0.5) {
+    return;
+  }
+
   globalProperties?.$GoPlayer.b_lock();//上锁。
   console.log("🎵播放器状态更新👉");
   selectedIndex.value = _playerData.index;
@@ -235,6 +282,12 @@ const roomPlayerEventUnreg = () => {
   globalProperties?.$GoPlayer.player4room?.off(Events.SEEKED, broadcast_playerStatusChangeInRoom)
 }
 
+watch(() => props.playlistInfo.songContentList, () => {
+    if(props.isRoomPlaylist) {
+       // selectedIndex.value = globalProperties?.$GoPlayer.player4room?.plugins.music.index ?? -1;
+       //  // 同步选中状态与播放器当前索引，如果这么写，和xgplayer的6. 恢复播放索引（如果有效）加载完自动选中第一首
+    }
+}, { deep: true });
 //播放列表点击事件
 const selectSong = (event: MouseEvent, i:number):void=>{
   event.stopPropagation();//防止事件向下传递
@@ -252,11 +305,17 @@ const selectSong = (event: MouseEvent, i:number):void=>{
 
   if(i==selectedIndex.value) return;//前端先检查 该歌曲是否已选中 && (房间歌单)用户是否有管理员房间权限
   if(props.isRoomPlaylist && !HasRoomAdminPower(props.myUserInfo)) return;
-
+  if (props.isRoomPlaylist && !globalProperties?.$GoPlayer.isSongLoaded(i)) {
+        globalProperties?.$message.warning('歌曲正在加载中，请稍候...');
+        return;
+  }
   selectedIndex.value = i;
   
   if(props.isRoomPlaylist){
-    globalProperties?.$GoPlayer.setPlayer4RoomIndex(i);
+    if(i >= 0 && i < props.playlistInfo.songContentList.length) {
+            selectedIndex.value = i;
+            globalProperties?.$GoPlayer.setPlayer4RoomIndex(i);
+        }
   }else{
     globalProperties?.$GoPlayer.setPlayer4localIndex(i);
   }
@@ -308,11 +367,34 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
   {
     props.playlistInfo.songContentList.push(songContent);
     let l = GoPlayer.getInstance().addSong_to_LocalPlaylist(songContent);
-    console.log("list ",l);
-    
+    //console.log("list ",l);
+  }else {
+    const newIndex = props.playlistInfo.songContentList.length; // 房间歌单：设置新上传歌曲的加载状态为 true
+    globalProperties?.$GoPlayer.roomSongLoadingStatus.set(newIndex, true);
   }
-   
 }
+
+
+
+//播放数据队列
+interface OperationItem {
+  username: string;
+  type: 'play' | 'pause';
+  songIndex: number;
+  currentTime?: number;
+  timestamp: number;
+}
+const showQueue = ref(false);
+const operationQueue = ref<OperationItem[]>([]);
+const MAX_QUEUE_LENGTH = 5; // 最多显示5条记录
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+const clearQueue = () => operationQueue.value = [];
+const toggleQueue = () => showQueue.value = !showQueue.value;
+
 </script>
 
 <style scoped>
@@ -332,6 +414,19 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
   border-radius: .6vh;
   box-shadow: 0px 0px 0.2vh .1vh rgb(91 98 116 / 20%);
   transition: all 0.5s ease-out;
+}
+.songLi.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.loading-icon {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 .songLi .uploadSong {
   position: sticky;
@@ -540,5 +635,127 @@ const handleUploadSuccess = (songContent:Song.SongContent)=>{
     height: 1.8vh;
     width: 1.4vh;
   }
+}
+
+
+
+
+/* 添加新的样式 */
+.operation-queue {
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
+  z-index: 1000;
+}
+.queue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+.clear-icon {
+  cursor: pointer;
+  color: #909399;
+}
+.clear-icon:hover {
+  color: #409EFF;
+}
+.operation-item {
+  padding: 5px 0;
+  font-size: 14px;
+  color: #606266;
+  display: flex;
+  flex-direction: column;
+}
+.username {
+  color: #409EFF;
+  font-weight: bold;
+  margin-right: 5px;
+}
+.operation {
+  color: #606266;
+}
+/* 添加过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .operation-queue {
+    left: 10px;
+    max-width: 200px;
+    font-size: 12px;
+  }
+}
+.queue-control {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+
+.queue-control:hover {
+    background: #409EFF;
+    color: white;
+}
+
+.queue-control .el-icon {
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.queue-control .el-icon.active {
+    color: #409EFF;
+}
+
+.queue-control:hover .el-icon.active {
+    color: white;
+}
+
+/* 修改操作队列面板的位置，避免与按钮重叠 */
+.operation-queue {
+    left: 70px;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+    .queue-control {
+        left: 10px;
+        width: 28px;
+        height: 28px;
+    }
+
+    .queue-control .el-icon {
+        font-size: 16px;
+    }
+
+    .operation-queue {
+        left: 50px;
+    }
 }
 </style>

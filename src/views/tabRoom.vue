@@ -72,7 +72,7 @@
           class="save-playlist-btn"
         >
           <el-icon><FolderAdd /></el-icon>
-          保存为歌单
+          <span>保存为歌单</span>  
         </el-button>
     </div>
    
@@ -400,13 +400,6 @@ const updateSongContentList = (_songContentList:Song.SongContent[]) => {
   songContentList.length = 0
   for (const key in _songContentList) {
     songContentList[key] = _songContentList[key];
-    // getSongBlob(songContentList[key].songUrl).then(
-    // (res)=>{
-    //   if(res)
-      
-    // },(err)=>{
-
-    // });
   }
   globalProperties?.$GoPlayer.syncPlayList(_songContentList)
 }
@@ -451,6 +444,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
 </script>
 
 <style scoped>
+/* 通用样式 */
 .content {
   margin-right: 10px;
   display: flex;
@@ -459,28 +453,13 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   color: #434343;
   min-height: 88vh;
 }
+
 .content .line {
   display: flex;
   flex-direction: row;
   width: 100%;
   padding: 1vh 0;
   border-bottom: 1px solid #e9e9e9;
-}
-.content .line:nth-child(2) .btn_join {
-  color: #fff;
-  font-weight: 600;
-  border-radius: 0 2vh 2vh 0;
-}
-.content .line:nth-child(2) .btn_join {
-  border-radius: 0 2vh 2vh 0;
-}
-.content .line:nth-child(2) .el-input__wrapper{
-  font-weight: bold;
-  border-radius: 2vh 0 0 2vh;
-}
-.content .line:nth-child(2) .el-input__inner::placeholder{
-  padding-left: 5px;
-  font-weight: bold;
 }
 
 .content .line.top {
@@ -489,7 +468,50 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   height: 3.5vh;
 }
 
-.content .tabBox {
+/* 房间信息 */
+.roomInfo {
+  margin-top: -1vh;
+  margin-left: .5vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.roomInfo>span:nth-child(1) {
+  font-size: 2vh;
+  color: #4e4e4e;
+  font-weight: bold;
+}
+
+.roomInfo>span:nth-child(2) {
+  margin-top: .2vh;
+  font-size: 1.2vh;
+  color: #9f9f9f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+}
+
+.roomCode {
+  margin-right: .4vh;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  font-size: 1.3vh;
+}
+
+.roomCode>i {
+  cursor: pointer;
+  margin-right: .2vh;
+}
+
+/* 面板区域 */
+.tabBox {
   position: relative;
   margin-left: 15px;
   margin-top: 1vh;
@@ -497,7 +519,6 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   width: 100%;
   display: flex;
   align-items: flex-start;
-  /* justify-content: center; */
 }
 
 .content /deep/ .el-tabs--card>.el-tabs__header {
@@ -510,13 +531,13 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   justify-content: space-around;
   font-size: 1.4vh;
   width: 20vw !important;
-  /* width: 180px !important; */
   height: 3vh;
   padding: 0 !important;
   align-items: center;
   border-radius: 2vh 2vh .2vh .2vh;
 }
-.content .room-tabs /deep/ .el-tabs__item.is-active{
+
+.content .room-tabs /deep/ .el-tabs__item.is-active {
   color: #9790d5;
   display: flex;
   border: 0.01vh solid #fbedff;
@@ -524,97 +545,20 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   align-items: flex-start;
   padding-top: .4vh !important;
   background-color: #f5f5f6;
-} 
-.content .room-tabs /deep/ .el-tabs__item:hover{
+}
+
+.content .room-tabs /deep/ .el-tabs__item:hover {
   color: #9790d5;
   font-weight: bold;
   transition: var(--el-transition-duration) var(--el-transition-function-ease-in-out-bezier), padding var(--el-transition-duration) var(--el-transition-function-ease-in-out-bezier);
 }
-.content .room-tabs > .el-tabs__content {
-  padding: 3.2vh 3.2vw;
-  font-size: 3.2vh;
-  font-weight: 600;
-}
-.content .line.chatPanel {
-  /* flex: 1; */
-  height: 60vh;
-  padding: 0;
-}
-.content .line.musicPanel {
-  /* flex: 1; */
-  height: 60vh;
-  padding: 0;
-}
-.content .line.listPanel {
-  /* flex: 1; */
-  height: 60vh;
-  padding: 0;
-}
-.content .line.send {
-  align-items: center;
-  position: fixed;
-  box-sizing: border-box;
-  padding: 1vh 2vw;
-  padding-bottom: 1.7vh;
-  bottom: 60px;
-  width: calc(100vw - 91px);
-  height: 6vh;
-  bottom: 60px;
-  left: 46px;
-  background-color: white;
-  border: 1px solid #f6e6f5;
-  border-radius: 10vh;
-  box-shadow: 0px -.7vh .2vh 0px rgb(101 95 156 / 30%) inset;
-  z-index: 998; /* 提高z-index值 */
-}
 
-.roomInfo {
-  margin-top: -1vh;
-  margin-left: .5vh;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  user-select: none;
-}
-.roomInfo>span:nth-child(1){
-  font-size: 2vh;
-  color: #4e4e4e;
-  font-weight: bold;
-}
-.roomInfo>span:nth-child(2){
-  margin-top: .2vh;
-  font-size: 1.2vh;
-  color: #9f9f9f;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 200px;
-}
-.roomInfo .el-button {
-  margin-top: 0.1vh;
-  padding: 0.3vh 0.8vh;
-  font-size: 1.2vh;
-  display: flex;
-  align-items: center;
-  gap: 0.3vh;
-}
-.roomInfo .el-button .el-icon {
-  margin-right: 0.2vh;
-}
-
-.roomCode {
-  margin-right: .4vh;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  font-size: 1.3vh;
-}
-.roomCode>i{
-  cursor: pointer;
-  margin-right: .2vh;
+/* 面板内容 */
+.line.chatPanel,
+.line.musicPanel,
+.line.listPanel {
+  height: 60vh;
+  padding: 0;
 }
 
 /* 聊天面板 */
@@ -629,18 +573,13 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   padding: 1vh 0;
 }
 
-/* 发送的消息 */
+/* 消息样式 */
 .msgbox {
   margin: 1vh;
   display: flex;
   align-items: flex-start;
   transition: all 0.3s ease;
   animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .msgbox.me {
@@ -695,91 +634,6 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   border-top-left-radius: 0;
 }
 
-/* 聊天输入框样式优化 */
-.content .line.send {
-  z-index: 600;
-  align-items: center;
-    position: fixed;
-    box-sizing: border-box;
-    padding: 0.8vh 10px;
-    bottom: 67px;
-    width: calc(96vw - 143px);
-    height: 4.5vh;
-    left: 116px;
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 1px solid #e0d5ff;
-    border-radius: 3vh;
-    box-shadow: 0 4px 12px rgba(115, 101, 255, 0.15);
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-}
-
-.content .line.send:hover {
-  box-shadow: 0 6px 16px rgba(115, 101, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-/* 聊天输入框样式优化 */
-.content .line.send .el-input__wrapper {
-  background-color: transparent;
-  border: none;
-  transition: all 0.3s ease;
-  box-shadow: none;
-  padding-left: 1.2vh;
-}
-
-.content .line.send .el-input__wrapper:focus-within {
-  background-color: rgba(245, 245, 255, 0.5);
-}
-
-.content .line.send .el-input__inner {
-  color: #333;
-  font-weight: 500;
-  font-size: 1.4vh;
-}
-
-.content .line.send .el-input__inner::placeholder {
-  color: #9c9cb0;
-  font-weight: normal;
-}
-
-.content .line.send .btn_join {
-  margin-left: 8px;
-  height: 3.8vh;
-  width: 3.8vh;
-  min-width: unset;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, #8a7dff, #7365ff);
-  border: none;
-  box-shadow: 0 2px 6px rgba(115, 101, 255, 0.3);
-}
-
-.content .line.send .btn_join:hover {
-  transform: scale(1.08) rotate(5deg);
-  background: linear-gradient(135deg, #9c90ff, #8a7dff);
-  box-shadow: 0 4px 8px rgba(115, 101, 255, 0.4);
-}
-
-.content .line.send .btn_join:active {
-  transform: scale(0.95);
-}
-
-.content .line.send .btn_join .el-icon {
-  font-size: 1.8vh;
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.content .line.send .btn_join:hover .el-icon {
-  transform: translateX(2px);
-}
-
 /* 音乐面板 */
 .musicZone {
   width: 100%;
@@ -790,7 +644,6 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   border: .1vh solid #e7e7e7;
   box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
 }
-
 
 /* 歌单面板 */
 .listZone {
@@ -804,35 +657,32 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
   overflow: hidden;
 }
-.listZone .listOutRange::-webkit-scrollbar{
+
+.listZone .listOutRange::-webkit-scrollbar {
   display: none;
 }
 
-
-
-
+/* 保存歌单按钮 */
 .save-playlist-btn {
   right: .1vh;
-    height: 2.4vh;
-    width: 10vh;
-    position: absolute;
-    margin-right: 15px;
-    padding: 0 1vh;
-    font-size: 1.2vh;
-    background-color: #7365ff;
-    border-color: #7365ff;
-    display: flex;
-    align-items: center;
-    gap: 0.3vh;
-    display: flex
-;
-    border: 0.3vh solid #bbb1ff;
-    box-shadow: 0px -1.7vh 0.2vh 0px rgb(136 73 112 / 44%) inset;
-    align-items: flex-start;
-    padding-top: 0.45vh !important;
-    background-color: #b4b9ff;
-    color: #ffffff;
-    height: 2.6vh;
+  height: 2.4vh;
+  width: 10vh;
+  position: absolute;
+  margin-right: 15px;
+  padding: 0 1vh;
+  font-size: 1.2vh;
+  background-color: #7365ff;
+  border-color: #7365ff;
+  display: flex;
+  align-items: center;
+  gap: 0.3vh;
+  border: 0.3vh solid #bbb1ff;
+  box-shadow: 0px -1.7vh 0.2vh 0px rgb(136 73 112 / 44%) inset;
+  align-items: flex-start;
+  padding-top: 0.45vh !important;
+  background-color: #b4b9ff;
+  color: #ffffff;
+  height: 2.6vh;
 }
 
 .save-playlist-btn:hover {
@@ -844,9 +694,30 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   background-color: #c0c4cc;
   border-color: #c0c4cc;
 }
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .save-playlist-btn {
+    width: auto;
+    padding: 0 0.8vh;
+  }
+  .save-playlist-btn span {
+    display: none;
+  }
+  .save-playlist-btn .el-icon {
+    margin-right: 0;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 </style>
 
 <style>
+/* 全局样式 */
 .el-button, .el-input__wrapper {
   box-sizing: border-box;
   color: #fff;
@@ -857,7 +728,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   height: 3vh;
 }
 
-/* 断开连接提示样式 */
+/* 断开连接提示 */
 .disconnection-alert {
   display: flex;
   align-items: center;
@@ -866,7 +737,7 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   animation: pulse 1.5s infinite;
   gap: 4px;
   width: 17vw;
-    justify-content: center;
+  justify-content: center;
 }
 
 .disconnection-alert .el-icon {
@@ -880,15 +751,10 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   font-size: 1vh;
   line-height: normal;
 }
+
 @keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 1;
-  }
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 </style>

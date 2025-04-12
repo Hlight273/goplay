@@ -12,10 +12,12 @@
       
       <transition name="fade">
         <div class="download-panel" v-if="isExpanded">
+
           <div class="download-header">
-            <span>下载队列</span>
+            <span>传输队列</span>
             <el-icon class="close-icon" @click.stop="isExpanded = false"><Close /></el-icon>
           </div>
+
           <div class="download-list">
             <div v-if="!hasDownloads" class="empty-tip">
               <el-icon><InfoFilled /></el-icon>
@@ -33,6 +35,27 @@
               />
             </div>
           </div>
+
+          <hr class="divider" />
+
+          <div class="download-list" v-if="hasUploads || !hasDownloads">
+            <div v-if="!hasUploads" class="empty-tip">
+              <el-icon><InfoFilled /></el-icon>
+              <span>当前无上传任务</span>
+            </div>
+            <div v-else v-for="(item, filename) in uploads" :key="filename" class="download-item">
+              <div class="download-info">
+                <span class="filename">{{ filename }}</span>
+                <span class="progress-text">{{ item.progress }}%</span>
+              </div>
+              <el-progress 
+                :percentage="item.progress" 
+                :status="item.progress === 100 ? 'success' : ''"
+                :stroke-width="6"
+              />
+            </div>
+          </div>
+          
         </div>
       </transition>
     </div>
@@ -89,13 +112,35 @@ const handleDownloadProgress = ({ url, progress }: { url: string, progress: numb
   }
 };
 
+//上传
+const uploads = ref<Record<string, DownloadItem>>({});
+const hasUploads = computed(() => Object.keys(uploads.value).length > 0);
+const handleUploadProgress = ({ filename, progress }: { filename: string, progress: number }) => {
+  if (!uploads.value[filename]) {
+    uploads.value[filename] = {
+      progress: 0,
+      timestamp: Date.now()
+    };
+  }
+  uploads.value[filename].progress = progress;
+  if (progress === 100) {
+    setTimeout(() => {
+      const currentUploads = { ...uploads.value };
+      delete currentUploads[filename];
+      uploads.value = currentUploads;
+    }, AUTO_REMOVE_DELAY);
+  }
+};
+
 // 生命周期钩子
 onMounted(() => {
   eventBus.on(MEventTypes.SONG_LOADING_PROGRESS, handleDownloadProgress);
+  eventBus.on(MEventTypes.FILE_UPLOAD_PROGRESS, handleUploadProgress);
 });
 
 onUnmounted(() => {
   eventBus.off(MEventTypes.SONG_LOADING_PROGRESS, handleDownloadProgress);
+  eventBus.off(MEventTypes.FILE_UPLOAD_PROGRESS, handleUploadProgress);
 });
 </script>
 
@@ -118,13 +163,13 @@ onUnmounted(() => {
   position: absolute;
   top: 40px;
   right: -70px;
-  width: 300px;
+  width: 400px;
   background-color: rgba(30, 30, 30, 0.7);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   z-index: 9999;
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -155,12 +200,14 @@ onUnmounted(() => {
   overflow-y: auto;
   padding: 10px;
   color: #fff;
-  display: flex
-;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .empty-tip {
+  width: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,16 +307,22 @@ onUnmounted(() => {
 /* 添加自定义徽章样式 */
 :deep(.custom-badge .el-badge__content) {
   font-size: 10px;
-  padding: 2px 4px;
+  padding: 1px 3px;
   line-height: 1px;
   border: none;
-    padding: 1px 3px;
-    right: calc(-3px + var(--el-badge-size) / 2);
-    top: 18px;
-    height: 10px;
+  right: calc(-3px + var(--el-badge-size) / 2);
+  top: 18px;
+  height: 10px;
 }
 
-/* 添加移动端适配 */
+/* 分隔线样式 */
+.divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  margin: 10px 0;
+}
+
+/* 移动端适配 */
 @media screen and (max-width: 768px) {
   .download-panel {
     position: fixed;
@@ -311,8 +364,6 @@ onUnmounted(() => {
 @media screen and (max-width: 480px) {
   .download-panel {
     bottom: 60px;
-    /* right: 5px;
-    width: calc(100% - 10px); */
   }
 
   .download-header {
@@ -336,7 +387,46 @@ onUnmounted(() => {
     padding: 15px 0;
     font-size: 12px;
   }
+}
 
+/* 上传列表样式 */
+.upload-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
 
+.section-title {
+  width: 100%;
+  padding: 5px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* 移动端适配中添加 */
+@media screen and (max-width: 768px) {
+  .upload-list {
+    max-height: 250px;
+    padding: 8px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .upload-list {
+    max-height: 200px;
+    padding: 6px;
+  }
+
+  .section-title {
+    font-size: 12px;
+    padding: 4px 0;
+  }
 }
 </style>

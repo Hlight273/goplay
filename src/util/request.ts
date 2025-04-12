@@ -81,6 +81,25 @@ export const http = {
   
     delete<T=any>(url: string, config?: AxiosRequestConfig) : Promise<T> {
       return service.delete(url, config)
+    },
+
+    uploadWithProgress<T=any>(
+        url: string, 
+        formData: FormData,
+        onProgress?: (progress: number) => void
+    ): Promise<T> {
+        return service.post(url, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.total && onProgress) {
+                    const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    onProgress(progress);
+                }
+            },
+            timeout: 600000 // 上传文件设置更长的超时时间
+        });
     }
 }
 
@@ -166,6 +185,7 @@ export const getFileBlobFromServer = (url: string, filename: string ,onProgress?
         console.error("创建Blob失败:", error);
 
     });
-    
 };
+
+
  

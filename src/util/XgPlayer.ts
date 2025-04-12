@@ -21,6 +21,10 @@ export class GoPlayer {
     private static inRoomMode = false;
 
     private roomPlaylist: Song.SongContent[] = [];
+    private roomSongLoadingStatus: Map<number, boolean> = new Map();
+    private isPassiveChange: boolean = false;
+
+
     public personalPlaylist: Song.SongContent[] = reactive<Song.SongContent[]>([]);;
     private preloadedIndex: number = -1;
     
@@ -156,36 +160,66 @@ export class GoPlayer {
         }
     }
 
-    private roomlist(){
-        if (this.player4room==null)
-            return null
-        return this.player4room.plugins.music.list
-    }
+    //房间内歌单增量加载
     async syncPlayList(_list:Array<Song.SongContent>):Promise<void>{
-        this.roomlist().length = 0;
-        // 创建所有 getSongBlob 的 Promise
-        const promises = _list.map((song, i) =>
-            getSongBlob(song.songUrl).then(res => ({ res, song, index: i }))
-        );
-        // 等待所有 Blob 加载完成
+        if(!this.player4room) return;
+    
+        // 1. 保存当前播放索引
+        const currentIndex = this.player4room.plugins.music.index;
+        
+        // 2. 清空当前播放列表和加载状态
+        this.player4room.plugins.music.list.splice(0);
+        this.roomSongLoadingStatus.clear();
+        
+        // 3. 创建新的加载状态映射
+        const oldList = [...this.roomPlaylist];
+        const promises = _list.map(async (song, i) => {
+            const cacheKey = `${song.songInfo.id}_${song.songUrl}`;
+            const cachedBlob = await BlobCacheManager.getInstance().getBlob(song.songUrl)
+                .catch(() => null);
+    
+            if (cachedBlob) {
+                return { 
+                    res: URL.createObjectURL(cachedBlob), 
+                    song, 
+                    index: i 
+                };
+            }
+    
+            return getSongBlob(song.songUrl)
+                .then(blobUrl => BlobCacheManager.getInstance().getBlob(song.songUrl))
+                .then(blob => ({
+                    res: URL.createObjectURL(blob),
+                    song,
+                    index: i
+                }));
+        });
+    
+        // 4. 处理结果并更新播放列表
         const results = await Promise.all(promises);
-
-         // 按索引排序，保证顺序
         results.sort((a, b) => a.index - b.index);
-
-        // 按顺序添加到播放列表
+    
         for (const { res, song, index } of results) {
             if (res) {
-                this.player4room?.plugins.music.add({
+                this.player4room.plugins.music.add({
                     src: res,
                     title: song.songInfo.songName,
                     vid: '00000' + index,
                     poster: song.coverBase64
                 });
-                console.log(`>>>> 歌曲 ${index} 已同步: ${song.songInfo.songName} >>>>`);
+                this.roomSongLoadingStatus.set(index, true);
             }
         }
-        this.roomPlaylist = _list;     
+        
+        // 5. 更新房间播放列表引用
+        this.roomPlaylist = _list;
+        
+        // // 6. 恢复播放索引（如果有效）
+        // if(currentIndex >= 0 && currentIndex < _list.length) {
+        //     this.player4room.plugins.music.setIndex(currentIndex);
+        // } else {
+        //     this.player4room.plugins.music.setIndex(0);
+        // }
     }
     loadPlaylist4local(_list:Array<Song.SongContent>){
         this.player4local?.plugins.music.list.splice(0); //清空
@@ -376,6 +410,10 @@ export class GoPlayer {
     public getLocalPlaylistIndex(): number {
         return this.player4local?.plugins.music.index ?? -1;
     }
+
+    isSongLoaded(index: number): boolean {
+        return this.roomSongLoadingStatus.get(index) ?? false;
+    }
 }
 
 
@@ -395,6 +433,24 @@ export default GoPlayerPlugin;
 class BlobCacheManager {
     private static instance: BlobCacheManager;
     private cache: Map<string, Blob> = new Map(); // 使用歌曲URL作为key
+    private db: IDBDatabase | null = null;
+
+    async initialize() {
+        if (!window.indexedDB) return;
+        
+        const request = indexedDB.open('AudioBlobCache', 1);
+        request.onupgradeneeded = (event) => {
+            const db = (event.target as IDBOpenDBRequest).result;
+            if (!db.objectStoreNames.contains('blobs')) {
+                db.createObjectStore('blobs', { keyPath: 'key' });
+            }
+        };
+        this.db = await new Promise(resolve => {
+            request.onsuccess = (event) => {
+                resolve((event.target as IDBOpenDBRequest).result);
+            };
+        });
+    }
 
     static getInstance() {
         if (!BlobCacheManager.instance) {
@@ -403,14 +459,35 @@ class BlobCacheManager {
         return BlobCacheManager.instance;
     }
 
-    async getBlob(url: string): Promise<Blob> {
-        if (this.cache.has(url)) {
-            return this.cache.get(url)!;
+    async getBlob(key: string): Promise<Blob> {
+        // 1. 检查内存缓存
+        if (this.cache.has(key)) return this.cache.get(key)!;
+        
+        // 2. 检查IndexedDB
+        if (this.db) {
+            const blob = await new Promise<Blob|undefined>(resolve => {
+                const tx = this.db!.transaction('blobs', 'readonly');
+                const store = tx.objectStore('blobs');
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result?.blob);
+            });
+            if (blob) {
+                this.cache.set(key, blob);
+                return blob;
+            }
         }
         
-        const blobURL = await getSongBlob(url) as string;
-        const blob = await this.createBlobFromBlobUrl(blobURL);
-        this.cache.set(url, blob);
+        // 3. 网络请求
+        const blob = await this._fetchBlob(key);
+        
+        // 更新缓存
+        this.cache.set(key, blob);
+        if (this.db) {
+            const tx = this.db.transaction('blobs', 'readwrite');
+            tx.objectStore('blobs').put({ key, blob });
+            await new Promise(resolve => tx.oncomplete = resolve);
+        }
+        
         return blob;
     }
 
@@ -420,6 +497,23 @@ class BlobCacheManager {
 
     deleteCache(url: string) {
         this.cache.delete(url);
+    }
+
+    private async _fetchBlob(key: string): Promise<Blob> {
+        try {
+            // 调用现有的getSongBlob API
+            const blobUrl = await getSongBlob(key);
+            
+            // 将Blob URL转换为实际的Blob对象
+            const response = await fetch(blobUrl as string);
+            if (!response.ok) throw new Error('Failed to fetch blob');
+            
+            return await response.blob();
+        } catch (e) {
+            // 清理无效缓存
+            this.cache.delete(key);
+            throw new Error(`Failed to fetch blob: ${e}`);
+        }
     }
 
     private async createBlobFromBlobUrl(blobUrl: string): Promise<Blob> {

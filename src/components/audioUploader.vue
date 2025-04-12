@@ -58,6 +58,8 @@ const uploadFile = (options:any)=>{
             ElMessage.success('上传成功！')
             loading.value = false;
             fileList.value = []
+        }).catch((err)=>{
+            loading.value = false;
         })
     }else{//上传到普通歌单
         uploadAudio4Playlist(props.userId, props.playlistId, rawFile).then((res)=>{
@@ -70,6 +72,8 @@ const uploadFile = (options:any)=>{
             ElMessage.success('上传成功！')
             loading.value = false;
             fileList.value = []
+        }).catch((err)=>{
+            loading.value = false;
         })
     }
    
