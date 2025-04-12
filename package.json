@@ -21,6 +21,7 @@
     "gsap": "^3.12.7",
     "html2canvas": "^1.4.1",
     "mitt": "^3.0.1",
+    "particles.js": "^2.0.0",
     "pinia": "^3.0.1",
     "sockjs-client": "^1.6.1",
     "three": "^0.174.0",

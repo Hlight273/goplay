@@ -206,7 +206,7 @@ onUnmounted(()=>{
     }
     :deep(.xg-center-grid){
       padding: 0 0px !important;
-      margin-left: -30px;
+      margin-left: -6px;
     }
     :deep(.xg-center-grid .xgplayer-time){
       min-width: 30px;

@@ -715,7 +715,7 @@ const toggleQueue = () => showQueue.value = !showQueue.value;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1001;
+    z-index: 666;
     transition: all 0.3s ease;
 }
 

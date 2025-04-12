@@ -7,6 +7,9 @@ import { webRoot } from "./webConst";
 const service = axios.create({
     baseURL: webRoot,
     timeout: 30000,
+    headers: {
+      'Cache-Control': 'max-age=3600'
+    }
 })
  
 // request 拦截器

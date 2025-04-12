@@ -39,6 +39,18 @@
       <MusicVillage></MusicVillage>
     </el-tab-pane>
 
+    <el-tab-pane name="mbti">
+      <template #label>
+        <el-tooltip content="交友圈" placement="right" :show-after="300">
+          <div class="nav-item">
+            <el-icon><GobletSquareFull /></el-icon>
+            <span class="nav-text">交友</span>
+          </div>
+        </el-tooltip>
+      </template>
+      <MusicMBTI />
+    </el-tab-pane>
+
     <el-tab-pane name="playlist">
       <template #label>
         <el-tooltip content="我的歌单" placement="right" :show-after="300">
@@ -110,6 +122,7 @@ import TabAdmin from './tabAdmin.vue'
 import MusicVillage from './musicVillage.vue'
 import CharacterModel from '@/components/characterModel.vue'
 import CurrentPlaylist from '@/components/currentPlaylist.vue'
+import MusicMBTI from '@/components/MusicMBTI.vue'
 
 
 import { useCommonStore } from "@/store/commonStore";
