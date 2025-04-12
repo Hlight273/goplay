@@ -97,11 +97,13 @@
     <!-- 聊天面板 -->
     <div class="line chatPanel" v-show="currentRoomState==RoomStatus.CHAT">
       <div class="chatZone">
-        <div :class="msg.userInfo.id==userId?'msgbox me':'msgbox'" v-for="msg in msgList">
-          <img :src="msg.userInfo.avatarUrl" alt="avator" class="avator">
-          <div class="side">
-            <div :class="msg.userInfo.id==userId?'name me':'name'"> {{ msg.userInfo.nickname }}</div>
-            <div class="msg">{{ msg.msg }}</div>
+        <div class="chatZoneChild hide_scroll_child">
+          <div :class="msg.userInfo.id==userId?'msgbox me':'msgbox'" v-for="msg in msgList">
+            <img :src="msg.userInfo.avatarUrl" alt="avator" class="avator">
+            <div class="side">
+              <div :class="msg.userInfo.id==userId?'name me':'name'"> {{ msg.userInfo.nickname }}</div>
+              <div class="msg">{{ msg.msg }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -571,6 +573,11 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   border: .1vh solid #e7e7e7;
   box-shadow: 0px -.7vh .2vh 0px rgb(128 125 155 / 20%) inset;
   padding: 1vh 0;
+}
+.chatZone .chatZoneChild {
+  height: 56vh;
+  padding: 0 1vh;
+  box-sizing: border-box;
 }
 
 /* 消息样式 */

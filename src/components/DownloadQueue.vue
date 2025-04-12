@@ -153,6 +153,7 @@ onUnmounted(() => {
   cursor: pointer;
   margin-right: 15px;
   color: #fff;
+  top: .2vh;
 }
 
 .download-btn .el-icon {

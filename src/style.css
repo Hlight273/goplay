@@ -135,9 +135,14 @@ body {
 
 /*父级需要overflow hidden*/
 .hide_scroll_child {
-    overflow-y: scroll !important;
-    padding-right: 3vh !important;
-    width: calc(100% + 1.6vh) !important;
+     overflow-y: scroll !important;
+    /*padding-right: 3vh !important;*/
+    width: calc(100% + 0vh) !important; 
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+.hide_scroll_child::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
 }
 
 /* 背景 */
@@ -161,11 +166,12 @@ body {
 .empty-tip {
     margin-top: 15vh;
     width: 30vw;
+    min-width: 200px;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
     color: #ffffff;
-    font-size: 1.6vh;
+    font-size: 1.3vh;
     padding: 2vh;
     text-align: center;
     background: linear-gradient(145deg, #9aadef, #ffabf7);

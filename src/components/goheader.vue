@@ -38,7 +38,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: calc(100% - 0.1vh);
+  width: calc(100%);
   height: 4.9vh;
   box-sizing: border-box;
   padding: .5vh;

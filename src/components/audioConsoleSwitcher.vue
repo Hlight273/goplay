@@ -66,8 +66,8 @@ const toggleGoplayerMode = ()=>{
   position: absolute;
   z-index: 0;
   bottom: 52px;
-  right: calc(50% - 4.5vh);
-  width: 8vh;
+  right: calc(50% - 8.5vh);
+  width: 16vh;
   height: 2.4vh;
   transition: all 0.3s ease-in-out;
   background: #302f36;
@@ -75,8 +75,8 @@ const toggleGoplayerMode = ()=>{
   font-size: 1.4vh;
   border: .3vh solid #be4242;
   border-bottom: none;
-  border-top-left-radius: 100px;
-  border-top-right-radius: 100px;
+  border-top-left-radius: 150px 100px;
+  border-top-right-radius: 150px 100px;
 }
 .toggle-btn:not(.btn-down):hover {
   transform: translateY(-0.8vh) scale(1.2);
@@ -120,7 +120,7 @@ const toggleGoplayerMode = ()=>{
     min-width: 100px;
     padding: 0 1vh;
     transition: all 0.3s ease-in-out;
-    box-shadow: 0px -0.2vh 0.1vh rgb(231 186 217 / 62%) inset;
+    box-shadow: 0px -0.2vh 0.1vh rgb(69 76 221 / 62%) inset;
     cursor: pointer;
     background-color: #262626;
     color: white;
@@ -135,7 +135,7 @@ const toggleGoplayerMode = ()=>{
     border-top: none;
 }
 
-/* 添加曲线连接装饰 */
+/* 曲线 */
 .link_btn::before {
   content: '';
     position: absolute;
@@ -146,10 +146,7 @@ const toggleGoplayerMode = ()=>{
     background-color: #262626;
     transition: all 0.3s ease-in-out;
     clip-path: path('M 0 15 C 35 15, 35 8, 50 8 C 65 8, 65 15, 100 15 L 100 15 L 0 15');
-    
 }
-
-
 
 .link_btn:hover {
     transform: translateY(-0.2vh);
@@ -162,8 +159,9 @@ const toggleGoplayerMode = ()=>{
   background:linear-gradient(90deg, #be4242, #ff5757, #be42af, #8960a4, #c67285, #be4242);
     background-size: 200% auto;
     animation: roomModeFlow 3s linear infinite;
-    border: 3px solid #976f6f;
+    border: 3px solid #ffbaba;
     border-top: none;
+    box-shadow: 0px -0.2vh 0.1vh rgb(231 186 217 / 62%) inset;
 }
 
 .link_btn.room-mode::before,
@@ -220,5 +218,15 @@ const toggleGoplayerMode = ()=>{
 
 .playlist_btn .el-icon {
     font-size: 1.4vh;
+}
+
+@media  screen and (max-width: 480px) {
+  .playlist_btn {
+    right: 27px;
+    min-width: 45px;
+  }
+  .playlist_btn .mode-text{
+    display: none;
+  }
 }
 </style>

@@ -3,6 +3,7 @@
         <div class="analysis-header">
             <h3>高级音乐特征分析</h3>
             <el-button 
+                class="black_oil_btn"
                 :loading="analyzing" 
                 type="primary" 
                 @click="startAnalysis"
@@ -41,11 +42,11 @@
                         </el-tag>
                     </div>
                     <!-- 一句话提示 -->
-                    <div v-if="analysisResult.keywords[analysisResult.keywords.length - 1]?.startsWith('🎯')" class="prompt-line">
+                    <!-- <div v-if="analysisResult.keywords[analysisResult.keywords.length - 1]?.startsWith('🎯')" class="prompt-line">
                         <p style="margin-top: 1vh; color: #ccc;">
                             AI提示语：{{ analysisResult.keywords[analysisResult.keywords.length - 1].slice(2) }}
                         </p>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- 详细分析结果 -->

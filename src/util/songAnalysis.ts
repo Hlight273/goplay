@@ -335,6 +335,19 @@ function generateKeywords(tempo: number, features: { rms: number; centroid: numb
     if (features.fluctuation > 0.6) keywords.push('多变');
     if (features.centroid > 0.6) keywords.push('明亮');
     if (features.centroid < 0.4) keywords.push('温暖');
+     // 生成AI提示语
+     let aiTip = '🎯建议: ';
+     if (tempo > 120 && features.rms > 0.15) {
+         aiTip += '这是一首充满活力的曲目，适合创作热情洋溢的画面';
+     } else if (tempo < 90 && features.centroid < 0.4) {
+         aiTip += '这是一首温暖舒缓的曲目，适合创作柔和静谧的场景';
+     } else if (features.fluctuation > 0.6) {
+         aiTip += '这是一首富有变化的曲目，适合创作丰富多样的画面层次';
+     } else {
+         aiTip += '这是一首平衡的曲目，适合创作自然流畅的画面';
+     }
+     
+     keywords.push(aiTip);
     return [...new Set(keywords)];
 }
 

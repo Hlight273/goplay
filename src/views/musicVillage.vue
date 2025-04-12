@@ -52,7 +52,7 @@
                     <el-avatar :src="post.addedByAvatar" @click="openUserProfile(post.addedBy)" class="clickable-avatar" />
                     <div class="post-info clickable-avatar" @click="openUserProfile(post.addedBy)">
                         <span class="username clickable-username" @click="openUserProfile(post.addedBy)">{{ post.addedByName }}</span>
-                        <span class="time">{{ formatDate(post.addedAt) }}</span>
+                        <span class="time">{{ formatDate(post.addedAt) }} 发帖</span>
                     </div>
                 </div>
                 

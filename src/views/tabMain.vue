@@ -302,6 +302,7 @@ const handleBackHome = (e: MouseEvent) => {
   flex-direction: row;
   gap: 20px;
   margin-top: 20px;
+  overflow: hidden;
 }
 
 .left-section {

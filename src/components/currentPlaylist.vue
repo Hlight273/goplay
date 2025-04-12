@@ -116,7 +116,7 @@
     color: #000000;
     font-size: 1.4vh;
     transition: all 0.3s;
-    background: #8c1212;
+    background: #ff8181;
     border-radius: 2vh;
     box-shadow: 0.0vh -0.4vh 0.4vh 0px rgb(124 49 106 / 91%) inset;
     border: 0.4vh solid #333333;
@@ -125,6 +125,20 @@
 .close-btn:hover {
   color: #fff;
   transform: scale(1.1);
+  border: 0.4vh solid #633846;
+}
+.close-btn::after {
+    content: '';
+    /* flex: 0; */
+    width: 0.5vh;
+    height: 0.4vh;
+    border-radius: 2vh;
+    background: #ffb2d2;
+    position: relative;
+    top: -.2vh;
+    left: -.01vh;
+    border: .1vh solid #ffb6e5;
+    box-shadow: 0.0vh 0.3vh 0.3vh 0px rgb(62 105 255 / 33%);
 }
 
 .panel-header {

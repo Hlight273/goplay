@@ -190,7 +190,41 @@ onUnmounted(()=>{
     display: none;
   }
   
+  @media screen and (max-width: 768px)  {
+    :deep(.xg-left-grid) {
+      flex-wrap: nowrap;
+      margin-left: -40px;
+      scale: 0.8;
+    }
+    :deep(.xg-right-grid) {
+      margin-right: -8px;
+      scale: .8;
+    }
+    :deep(xg-icon) {
+      width: 20px;
+      scale: 0.8;
+    }
+    :deep(.xg-center-grid){
+      padding: 0 0px !important;
+      margin-left: -30px;
+    }
+    :deep(.xg-center-grid .xgplayer-time){
+      min-width: 30px;
+      font-size: 10px;
+    }
+    :deep(.toggle-btn){
+      right: calc(50% - 4.5vh);
+      width: 8vh;
+    }
 
+    :deep(.xgplayer-playing .xg-left-grid){
+      margin-left: -33px;
+    }
+    :deep(.xgplayer-playing .xg-center-grid){
+      margin-left: 3px;
+    }
+   
+  }
   
   
 </style>
