@@ -51,10 +51,11 @@ import {defineProps, onMounted, reactive} from 'vue'
 import GoSongList from '@/components/goSongList.vue'
 import { userInfo } from '@/api/user';
 import { ResultCode } from '@/util/webConst';
+import { checkIsLogin } from '@/util/pageUtil';
+import { formatDate } from '@/util/commonUtil'
 
-import { useCommonStore } from "@/store/commonStore";
-import { formatDate } from '@/util/commonUtil';
-const commonStore = useCommonStore();
+import { useCommonStore } from '@/store/commonStore'
+const commonStore = useCommonStore()
 
 const props = defineProps<{
     playlistInfo: Playlist.PlaylistInfo;
@@ -62,6 +63,7 @@ const props = defineProps<{
 }>();
 const selectedPlaylistInfo = reactive<Playlist.PlaylistInfo>({...Playlist.playlistInfo_InitData});
 const selectPlaylist = (playlistInfo:Playlist.PlaylistInfo) => {
+  if(!checkIsLogin())return;
   Object.assign(selectedPlaylistInfo, playlistInfo);
   GoPlayer.getInstance().loadPlaylist4local(playlistInfo.songContentList)
 };

@@ -3,7 +3,8 @@
     <span class="logo">GOPLAY</span>
     <div class="header-right">
       <DownloadQueue />
-      <el-button class="logout_btn black_oil_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
+      <el-button v-if="ls.getItem('token')!=null" class="logout_btn black_oil_btn" type="primary" @click="userLogout()" color="#333333">退出登录</el-button>
+      <el-button v-else class="logout_btn black_oil_btn" type="primary" @click="goLog()" color="#333333">注册&登录</el-button>
     </div>
   </header>
 </template>
@@ -14,7 +15,7 @@ import { ResultCode } from '@/util/webConst';
 import useCurrentInstance from "@/hooks/useCurrentInstance";
 import DownloadQueue from './DownloadQueue.vue';
 const { globalProperties } = useCurrentInstance();
-
+const ls = localStorage;
 const userLogout = ()=>{
   logout().then(
     (res)=>{   
@@ -30,6 +31,10 @@ const userLogout = ()=>{
     },(err)=>{
 
     });
+}
+
+const goLog = ()=>{
+  globalProperties?.$router.replace("/login")
 }
 </script>
 

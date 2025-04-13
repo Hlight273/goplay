@@ -40,6 +40,7 @@
   import { GoPlayer } from '@/util/XgPlayer'
   import useCurrentInstance from "@/hooks/useCurrentInstance"
   import { eventBus, MEventTypes } from '@/util/eventBus'
+import { checkIsLogin } from '@/util/pageUtil'
   
   const { globalProperties } = useCurrentInstance()
   
@@ -73,6 +74,7 @@
   }
   
   const selectSong = (event: MouseEvent, i: number): void => {
+    if(!checkIsLogin())return;
     event.stopPropagation()
     GoPlayer.getInstance().loadPlaylist4local(props.songs);
     if(GoPlayer.isRoomMode()) {

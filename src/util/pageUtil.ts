@@ -1,4 +1,7 @@
     // 注意：路由地址的 path 必须配置成以下这样，有几个参数就配置几个参数
+
+import { ElMessage } from "element-plus"
+
     // path : '/testPage/:title/:id/:type/:date'
 export const openNewWindow = ()=>{
     // 打开新窗口
@@ -19,4 +22,13 @@ export const openNewTab = (globalProperties:any) => {
      }
     }))
     window.open(routeData.href,'_blank')
+ }
+
+ export const checkIsLogin = ():boolean => {
+    let token = localStorage.getItem("token");
+    if(token==null){
+        ElMessage.closeAll();
+        ElMessage.warning("请先登录");
+    } 
+    return token!=null;
  }

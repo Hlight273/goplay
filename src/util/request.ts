@@ -49,9 +49,10 @@ service.interceptors.response.use(
 
         //ResultCode不是20000 需要统一处理的写下面
         if (res.code === ResultCode.EXPIRED) {//token过期
-            msgErr("错误："+res.message);
-            router.replace("/login")
-            return Promise.reject(new Error(res.message))
+           // msgErr("错误："+res.message);
+            //router.replace("/login")
+            return Promise.reject()
+            //return Promise.reject(new Error(res.message))
         }
         else if (res.code === ResultCode.ERROR){ //业务错误，默认的业务错误全都是发这个消息
             msgErr("错误："+res.message);

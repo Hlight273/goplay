@@ -7,7 +7,7 @@
           <div class="online-status"></div>
         </div>
         <div class="welcome-text">
-          <h2>欢迎回来, {{ commonStore.myUserinfo.nickname }}</h2>
+          <h2>{{ls.getItem('token')!=null?'欢迎回来, '+ commonStore.myUserinfo.nickname :'游客，请登录'}}</h2>
           <p>{{ greetingText }}</p>
         </div>
       </div>
@@ -16,7 +16,7 @@
           <el-icon><Calendar /></el-icon>
           <span>{{ formatDate(new Date()) }}</span>
         </div>
-        <div class="stat-item animate-in" style="animation-delay: 0.2s">
+        <div v-if="ls.getItem('token')!=null" class="stat-item animate-in" style="animation-delay: 0.2s">
           <el-icon><Star /></el-icon>
           <span>我的歌单 {{ myPlaylistCount }}</span>
         </div>
@@ -61,7 +61,7 @@ import { userPlaylistInfo } from '@/api/user';
 import { ResultCode } from '@/util/webConst'
 import { formatDate } from '@/util/commonUtil'
 import { useCommonStore } from '@/store/commonStore'
-
+const ls = localStorage;
 
 const commonStore = useCommonStore()
 const myPlaylistCount = computed(() => commonStore.myPlaylistInfos.length)

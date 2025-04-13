@@ -39,6 +39,7 @@
       </el-form>
       <div class="link">
         <router-link :to="{ path: '/login' }">已有账号</router-link>
+        <router-link :to="{ path: '/home' }">游客进入</router-link>
       </div>
     </div>
   </div>

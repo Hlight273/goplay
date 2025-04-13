@@ -12,7 +12,7 @@
       </el-breadcrumb>
 
       <!-- 搜索框 -->
-      <div class="search-bar">
+      <div class="search-bar" v-if="token!=null">
         <el-input 
           v-model="searchKeyword"
           placeholder="搜索歌单"
@@ -124,7 +124,7 @@ const banners = ref([
    require("@/assets/imgs/banner/banner3.png"), // 热门歌曲
 ]);
 
-
+const token = localStorage.getItem("token");
 
 const router = useRouter()
 const state = reactive({

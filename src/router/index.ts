@@ -45,7 +45,7 @@ const router = createRouter({
 
 // 检查是否存在于免登陆白名单
 function inWhiteList(toPath:string) {
-  const whiteList = ['/login', '/register', '/404']
+  const whiteList = ['/login', '/register', '/404', '/home']
   const path = whiteList.find((value) => {
       // 使用正则匹配
       const reg = new RegExp('^' + value)

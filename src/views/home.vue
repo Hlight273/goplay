@@ -15,7 +15,7 @@
         <TabMain></TabMain>
       </el-tab-pane>
 
-      <el-tab-pane name="room">
+      <el-tab-pane name="room" v-if="token!=null">
         <template #label>
           <el-tooltip content="音乐房间" placement="right" :show-after="300">
             <div class="nav-item">
@@ -27,7 +27,7 @@
         <TabRoom></TabRoom>
       </el-tab-pane>
 
-    <el-tab-pane name="community">
+    <el-tab-pane name="community" v-if="token!=null">
       <template #label>
         <el-tooltip content="音乐社区" placement="right" :show-after="300">
           <div class="nav-item">
@@ -51,7 +51,7 @@
       <MusicMBTI />
     </el-tab-pane>
 
-    <el-tab-pane name="playlist">
+    <el-tab-pane name="playlist" v-if="token!=null">
       <template #label>
         <el-tooltip content="我的歌单" placement="right" :show-after="300">
           <div class="nav-item">
@@ -63,7 +63,7 @@
       <TabMyPlaylist></TabMyPlaylist>
     </el-tab-pane>
 
-    <el-tab-pane name="admin" v-if="isAdmin(myUserinfo)">
+    <el-tab-pane name="admin" v-if="token!=null&&isAdmin(myUserinfo)">
       <template #label>
         <el-tooltip content="管理面板" placement="right" :show-after="300">
           <div class="nav-item">
@@ -75,7 +75,7 @@
       <TabAdmin></TabAdmin>
     </el-tab-pane>
 
-    <el-tab-pane name="setting">
+    <el-tab-pane name="setting" v-if="token!=null">
       <template #label>
         <el-tooltip content="设置" placement="right" :show-after="300">
           <div class="nav-item">
@@ -90,9 +90,9 @@
   </el-tabs>
   <AudioConsole></AudioConsole>
   <AudioPanel></AudioPanel>
-  <UserPage></UserPage>
+  <UserPage v-if="token!=null"></UserPage>
   <CurrentPlaylist />
-  <CharacterModel :current-tab="activeTab"/>
+  <CharacterModel :current-tab="activeTab" v-if="token!=null"/>
     
   </main>
   <DissolveTransition 
@@ -133,11 +133,12 @@ const { dissolveOn, curPlaylistOn, myUserinfo } = storeToRefs(commonStore);
 
 const activeTab = ref('recommend');
 
+const token = localStorage.getItem("token");
 
 onMounted(()=>{
   commonStore.updateMyUserInfo();
   if(needDebugOutpot)
-    console.log(localStorage.getItem("token"));
+    console.log(token);
 })
 
 </script>
