@@ -60,7 +60,7 @@
             {{ genre }}
           </el-tag>
         </div>
-        <el-button class="black_oil_btn" type="primary" @click="shareResult">分享结果</el-button>
+        <el-button class="black_oil_btn" type="primary" @click="submitResult">提交结果</el-button>
       </div>
     </div>
   </div>
@@ -70,8 +70,11 @@
 import { ref, onMounted, onUnmounted, Ref, watch ,nextTick} from 'vue'
 import { MagicStick } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { MBTIService } from '@/util/mbtiUtil'
+import { MBTICodec, MBTIService } from '@/util/mbtiUtil'
+import { updateMBTI } from '@/api/user'
+import {ResultCode} from '@/util/webConst'
 import 'particles.js'
+
 
 const hasResult = ref(false)
 const isTestStarted = ref(false)
@@ -100,12 +103,11 @@ const selectAnswer = (dimension: string) => {
   }
 }
 
-const shareResult = () => {
-  const shareText = MBTIService.generateShareText(mbtiResult.value)
-  // 复制到剪贴板
-  navigator.clipboard.writeText(shareText)
-    .then(() => ElMessage.success('结果已复制到剪贴板'))
-    .catch(() => ElMessage.error('复制失败'))
+const submitResult = async () => {
+  const mbtiCode = MBTICodec.encode(mbtiResult.value.type)
+  const res = await updateMBTI(mbtiCode)
+  if (res.code === ResultCode.SUCCESS) 
+    ElMessage.success(res.message)
 }
 
 

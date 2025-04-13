@@ -15,6 +15,7 @@ export namespace User {
         level: number
         nickname:string
         hPoints?:number
+        mbtiType?:number
         isActive?:number
     }
     

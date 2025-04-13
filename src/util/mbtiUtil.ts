@@ -271,6 +271,32 @@ function generateShareText(result: MBTIResult): string {
     return `我的音乐性格是${result.type}-${result.name}！\n${result.description}\n推荐音乐类型：${result.genres.join('、')}`;
 }
 
+// MBTI编码工具
+export const MBTICodec = {
+    // 将MBTI字符串编码为数字 (0-31)
+    encode(mbtiType: string): number {
+        const bits = [
+            mbtiType[0] === 'E' ? 0 : 1,  // E/I
+            mbtiType[1] === 'N' ? 0 : 1,  // N/S
+            mbtiType[2] === 'F' ? 0 : 1,  // F/T
+            mbtiType[3] === 'P' ? 0 : 1,  // P/J
+            0  // 预留扩展位
+        ];
+        return bits.reduce((acc, bit, index) => acc | (bit << (4 - index)), 0);
+    },
+
+    // 将数字解码为MBTI字符串
+    decode(code: number): string {
+        return [
+            (code & 16) ? 'I' : 'E',  // 第5位
+            (code & 8) ? 'S' : 'N',   // 第4位
+            (code & 4) ? 'T' : 'F',   // 第3位
+            (code & 2) ? 'J' : 'P',   // 第2位
+            // 第1位预留扩展
+        ].join('');
+    }
+};
+
 export const MBTIService = {
     getQuestions: () => MBTI_QUESTIONS,
     calculateResult: (answers: Record<number, string>): MBTIResult => {

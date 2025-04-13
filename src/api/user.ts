@@ -40,6 +40,12 @@ export const updateNickname = (newNickname:string) => {
     return http.put<Result<boolean>>(`/user/nickname`, formData);
 }
 
+export const updateMBTI = (mbtiType: number) => {
+    let formData = new FormData();
+    formData.append('MBTIType', mbtiType.toString());
+    return http.put<Result<boolean>>(`/user/mbti`, formData);
+}
+
 export const updatePwd = (oldPwd:string, newPwd:string) => {
     let formData = new FormData();
     formData.append('oldPwd', oldPwd);
