@@ -46,8 +46,8 @@
             <span class="delete" @click="removeSong(songContent.songInfo.id)">
             <el-icon><DeleteFilled /></el-icon>
             </span>
-            <!-- 添加加载指示器 -->
-            <el-icon v-if="isRoomPlaylist && !$GoPlayer.isSongLoaded(i)" class="loading-icon"><Loading /></el-icon>
+            <!-- 添加加载指示器
+            <el-icon v-if="isRoomPlaylist && !$GoPlayer.isSongLoaded(i)" class="loading-icon"><Loading /></el-icon> -->
         </li>
     </ul>
      <!-- 空歌单时显示提示 -->
@@ -283,9 +283,9 @@ const roomPlayerEventUnreg = () => {
 }
 
 watch(() => props.playlistInfo.songContentList, () => {
-    if(props.isRoomPlaylist) {
-       // selectedIndex.value = globalProperties?.$GoPlayer.player4room?.plugins.music.index ?? -1;
-       //  // 同步选中状态与播放器当前索引，如果这么写，和xgplayer的6. 恢复播放索引（如果有效）加载完自动选中第一首
+  if(props.isRoomPlaylist && selectedIndex.value >= 0) {
+        // 只保持已选中的歌曲状态，不自动选择新歌
+        selectedIndex.value = Math.min(selectedIndex.value, props.playlistInfo.songContentList.length - 1);
     }
 }, { deep: true });
 //播放列表点击事件
@@ -520,6 +520,7 @@ const toggleQueue = () => showQueue.value = !showQueue.value;
     justify-content: center;
     padding: 5vh 0;
     color: #666;
+    height: 42vh;
 }
 
 .empty-icon {
@@ -715,7 +716,7 @@ const toggleQueue = () => showQueue.value = !showQueue.value;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    z-index: 666;
+    z-index: 1001;
     transition: all 0.3s ease;
 }
 

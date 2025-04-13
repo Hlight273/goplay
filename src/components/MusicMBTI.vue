@@ -390,6 +390,7 @@ h4 {
 }
 
 .question-card::before {
+  scale: 2;
   content: '';
   position: absolute;
   top: -50%;

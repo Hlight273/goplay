@@ -9,6 +9,7 @@ import { Song } from '@/interface/song';
 import { getSongBlob } from '@/api/song';
 import { eventBus,MEventTypes } from "@/util/eventBus";
 import { HlsPlugin } from 'xgplayer-hls/es/plugin';
+import { useVocalRemover } from '@/plugins/vocalRemoverPlugin';
 
 
 export class GoPlayer {
@@ -79,24 +80,8 @@ export class GoPlayer {
                     return dom;
                 },
               },
-            //   plugins: [HlsPlugin], // 添加 HLS 插件
-            //     // HLS 配置
-            //     hlsConfig: {
-            //         maxBufferLength: 30, // 缓冲区长度
-            //         maxMaxBufferLength: 60,
-            //         enableWorker: true
-            //     },
-            //     hls: {
-            //         retryCount: 3, // 重试 3 次，默认值
-            //         retryDelay: 1000, // 每次重试间隔 1 秒，默认值
-            //         loadTimeout: 10000, // 请求超时时间为 10 秒，默认值
-            //         fetchOptions: {
-            //             // 该参数会透传给 fetch，默认值为 undefined
-            //             token: localStorage.getItem("token") || '',
-            //             mode: 'cors'
-            //         }
-            //     }
         })
+        useVocalRemover(this.player4room);
         this.player4room.on(Events.PLAY, this.sendNewSongEv)
         eventBus.on(MEventTypes.GOPLAYER_MODE_CHANGED, ()=>{this.player4local?.pause(); });
         console.log("🎵Goplayer4ROOM初始化完成🎵...");
@@ -160,66 +145,121 @@ export class GoPlayer {
         }
     }
 
-    //房间内歌单增量加载
-    async syncPlayList(_list:Array<Song.SongContent>):Promise<void>{
-        if(!this.player4room) return;
-    
-        // 1. 保存当前播放索引
+
+    async syncPlayList(_list: Array<Song.SongContent>): Promise<void> {
+        if (!this.player4room) return;
+        
+        // 保存当前播放索引
         const currentIndex = this.player4room.plugins.music.index;
         
-        // 2. 清空当前播放列表和加载状态
-        this.player4room.plugins.music.list.splice(0);
-        this.roomSongLoadingStatus.clear();
+        // 1. 找出新增的歌曲
+        const newSongs: { song: Song.SongContent, index: number }[] = [];
         
-        // 3. 创建新的加载状态映射
-        const oldList = [...this.roomPlaylist];
-        const promises = _list.map(async (song, i) => {
-            const cacheKey = `${song.songInfo.id}_${song.songUrl}`;
-            const cachedBlob = await BlobCacheManager.getInstance().getBlob(song.songUrl)
-                .catch(() => null);
-    
-            if (cachedBlob) {
-                return { 
-                    res: URL.createObjectURL(cachedBlob), 
-                    song, 
-                    index: i 
-                };
+        _list.forEach((song, index) => {
+            // 检查是否是新歌曲
+            const existingSong = this.roomPlaylist.find(s => 
+                s.songInfo.id === song.songInfo.id && 
+                s.songUrl === song.songUrl
+            );
+            
+            if (!existingSong || !this.roomSongLoadingStatus.get(index)) {
+                newSongs.push({ song, index });
+                // 标记为未加载状态
+                this.roomSongLoadingStatus.set(index, false);
             }
-    
-            return getSongBlob(song.songUrl)
-                .then(blobUrl => BlobCacheManager.getInstance().getBlob(song.songUrl))
-                .then(blob => ({
-                    res: URL.createObjectURL(blob),
-                    song,
-                    index: i
-                }));
         });
-    
-        // 4. 处理结果并更新播放列表
-        const results = await Promise.all(promises);
-        results.sort((a, b) => a.index - b.index);
-    
-        for (const { res, song, index } of results) {
-            if (res) {
-                this.player4room.plugins.music.add({
-                    src: res,
-                    title: song.songInfo.songName,
-                    vid: '00000' + index,
-                    poster: song.coverBase64
+        
+        console.log(`发现 ${newSongs.length} 首新歌曲需要加载`);
+        
+        // 2. 处理已删除的歌曲
+        if (this.roomPlaylist.length > 0) {
+            const songsToRemove = this.roomPlaylist.filter(oldSong => 
+                !_list.some(newSong => 
+                    newSong.songInfo.id === oldSong.songInfo.id && 
+                    newSong.songUrl === oldSong.songUrl
+                )
+            );
+            
+            // 从播放列表中移除歌曲
+            if (songsToRemove.length > 0) {
+                console.log(`移除 ${songsToRemove.length} 首歌曲`);
+                
+                // 由于 xgplayer 不支持直接按 ID 删除，我们需要重建播放列表
+                const currentList = [...this.player4room.plugins.music.list];
+                this.player4room.plugins.music.list.splice(0);
+                
+                // 重新添加未被删除的歌曲
+                _list.forEach((song, index) => {
+                    const existingIndex = this.roomPlaylist.findIndex(s => 
+                        s.songInfo.id === song.songInfo.id && 
+                        s.songUrl === song.songUrl
+                    );
+                    
+                    if (existingIndex !== -1 && existingIndex < currentList.length) {
+                        // 复用现有的歌曲项
+                        this.player4room?.plugins.music.add(currentList[existingIndex]);
+                        this.roomSongLoadingStatus.set(index, true);
+                    }
                 });
-                this.roomSongLoadingStatus.set(index, true);
             }
         }
         
-        // 5. 更新房间播放列表引用
-        this.roomPlaylist = _list;
+        // 3. 只加载新歌曲
+        if (newSongs.length > 0) {
+            // 创建新歌曲的加载 Promise
+            const promises = newSongs.map(({ song, index }) => 
+                getSongBlob(song.songUrl)
+                    .then(res => ({ res, song, index }))
+                    .catch(err => {
+                        console.error(`加载歌曲失败: ${song.songInfo.songName}`, err);
+                        return { res: null, song, index };
+                    })
+            );
+            
+            // 使用 Promise.all 并行加载所有新歌曲
+            const results = await Promise.all(promises);
+            
+            // 按索引排序，保证顺序
+            results.sort((a, b) => a.index - b.index);
+            
+            // 添加新歌曲到播放列表
+            for (const { res, song, index } of results) {
+                if (res) {
+                    // 检查该索引位置是否已有歌曲
+                    if (index < this.player4room.plugins.music.list.length) {
+                        // 替换现有位置的歌曲
+                        this.player4room.plugins.music.list[index] = {
+                            src: res,
+                            title: song.songInfo.songName,
+                            vid: '00000' + index,
+                            poster: song.coverBase64
+                        };
+                    } else {
+                        // 添加新歌曲
+                        this.player4room.plugins.music.add({
+                            src: res,
+                            title: song.songInfo.songName,
+                            vid: '00000' + index,
+                            poster: song.coverBase64
+                        });
+                    }
+                    
+                    this.roomSongLoadingStatus.set(index, true);
+                    console.log(`>>>> 新歌曲 ${index} 已加载: ${song.songInfo.songName} >>>>`);
+                }
+            }
+        }
         
-        // // 6. 恢复播放索引（如果有效）
-        // if(currentIndex >= 0 && currentIndex < _list.length) {
-        //     this.player4room.plugins.music.setIndex(currentIndex);
-        // } else {
-        //     this.player4room.plugins.music.setIndex(0);
-        // }
+        // 4. 更新房间播放列表引用
+        this.roomPlaylist = [..._list];
+        
+         // 5. 不自动恢复播放索引，除非已经在播放中
+        if (currentIndex >= 0 && currentIndex < this.player4room.plugins.music.list.length && !this.player4room.paused) {
+            this.player4room.plugins.music.setIndex(currentIndex);
+        } else {
+            // 确保不自动播放
+            this.player4room.pause();
+        }
     }
     loadPlaylist4local(_list:Array<Song.SongContent>){
         this.player4local?.plugins.music.list.splice(0); //清空
@@ -433,24 +473,6 @@ export default GoPlayerPlugin;
 class BlobCacheManager {
     private static instance: BlobCacheManager;
     private cache: Map<string, Blob> = new Map(); // 使用歌曲URL作为key
-    private db: IDBDatabase | null = null;
-
-    async initialize() {
-        if (!window.indexedDB) return;
-        
-        const request = indexedDB.open('AudioBlobCache', 1);
-        request.onupgradeneeded = (event) => {
-            const db = (event.target as IDBOpenDBRequest).result;
-            if (!db.objectStoreNames.contains('blobs')) {
-                db.createObjectStore('blobs', { keyPath: 'key' });
-            }
-        };
-        this.db = await new Promise(resolve => {
-            request.onsuccess = (event) => {
-                resolve((event.target as IDBOpenDBRequest).result);
-            };
-        });
-    }
 
     static getInstance() {
         if (!BlobCacheManager.instance) {
@@ -459,35 +481,14 @@ class BlobCacheManager {
         return BlobCacheManager.instance;
     }
 
-    async getBlob(key: string): Promise<Blob> {
-        // 1. 检查内存缓存
-        if (this.cache.has(key)) return this.cache.get(key)!;
-        
-        // 2. 检查IndexedDB
-        if (this.db) {
-            const blob = await new Promise<Blob|undefined>(resolve => {
-                const tx = this.db!.transaction('blobs', 'readonly');
-                const store = tx.objectStore('blobs');
-                const request = store.get(key);
-                request.onsuccess = () => resolve(request.result?.blob);
-            });
-            if (blob) {
-                this.cache.set(key, blob);
-                return blob;
-            }
+    async getBlob(url: string): Promise<Blob> {
+        if (this.cache.has(url)) {
+            return this.cache.get(url)!;
         }
         
-        // 3. 网络请求
-        const blob = await this._fetchBlob(key);
-        
-        // 更新缓存
-        this.cache.set(key, blob);
-        if (this.db) {
-            const tx = this.db.transaction('blobs', 'readwrite');
-            tx.objectStore('blobs').put({ key, blob });
-            await new Promise(resolve => tx.oncomplete = resolve);
-        }
-        
+        const blobURL = await getSongBlob(url) as string;
+        const blob = await this.createBlobFromBlobUrl(blobURL);
+        this.cache.set(url, blob);
         return blob;
     }
 
@@ -497,23 +498,6 @@ class BlobCacheManager {
 
     deleteCache(url: string) {
         this.cache.delete(url);
-    }
-
-    private async _fetchBlob(key: string): Promise<Blob> {
-        try {
-            // 调用现有的getSongBlob API
-            const blobUrl = await getSongBlob(key);
-            
-            // 将Blob URL转换为实际的Blob对象
-            const response = await fetch(blobUrl as string);
-            if (!response.ok) throw new Error('Failed to fetch blob');
-            
-            return await response.blob();
-        } catch (e) {
-            // 清理无效缓存
-            this.cache.delete(key);
-            throw new Error(`Failed to fetch blob: ${e}`);
-        }
     }
 
     private async createBlobFromBlobUrl(blobUrl: string): Promise<Blob> {
