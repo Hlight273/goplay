@@ -47,7 +47,18 @@ service.interceptors.response.use(
             res = res ? JSON.parse(res) : res
         }
 
-        //ResultCode不是20000 需要统一处理的写下面
+        if (response.headers['daily-points-added']?.toLowerCase() === 'true') {//每日积分的返回提示
+          const points = response.headers['points-amount']
+          console.log("每日积分的返回提示");
+          
+          ElMessage({
+            message: `💴恭喜获得每日登录奖励：${points}积分！`,
+            type: 'success',
+            duration: 3000
+          })
+        }
+
+        //ResultCode不是20000 需要统一处理的写下面，由于需要兼容游客，不直接跳转了
         if (res.code === ResultCode.EXPIRED) {//token过期
            // msgErr("错误："+res.message);
             //router.replace("/login")
@@ -58,12 +69,12 @@ service.interceptors.response.use(
             msgErr("错误："+res.message);
             return Promise.reject(new Error(res.message))
         }else if(res.code === ResultCode.UPLOAD_ERROR){ //上传文件错误
-            msgErr("错误："+res.message);
+            msgErr("传输错误："+res.message);
             return Promise.reject(new Error(res.message))
         }
         return res;
     },
-    (error:AxiosError) => {//网络错误
+    (error:AxiosError) => {//非后端业务逻辑，网络错误
         msgErr("网络错误"+error);
         return Promise.reject(error)
     }

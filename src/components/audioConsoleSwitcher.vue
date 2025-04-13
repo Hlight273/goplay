@@ -7,7 +7,7 @@
     <span class="mode-text">{{ isRoomMode ? '房间模式' : '单人模式' }}</span>
   </button>
 
-  <button class="playlist_btn" v-show="!isRoomMode && !isDarkCDMode" @click="showPlaylist">
+  <button class="playlist_btn" v-show="!isRoomMode" @click="togglePlaylist">
     <el-icon><List /></el-icon>
     <span class="mode-text">当前歌单</span>
   </button>
@@ -35,8 +35,8 @@ const { dissolveOn, curPlaylistOn } = storeToRefs(commonStore);
 const isDarkCDMode = ref(false);
 
 
-const showPlaylist = () => {
-  curPlaylistOn.value = true;
+const togglePlaylist = () => {
+  curPlaylistOn.value = !curPlaylistOn.value;
 }
 
 const toggleGoplayerMode = ()=>{
