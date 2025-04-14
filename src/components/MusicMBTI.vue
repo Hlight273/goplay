@@ -65,7 +65,7 @@
             {{ genre }}
           </el-tag>
         </div>
-        <el-button class="black_oil_btn" type="primary" @click="submitResult">提交结果</el-button>
+        <el-button v-if="ls.getItem('token')!=null" class="black_oil_btn" type="primary" @click="submitResult">提交结果</el-button>
       </div>
     </div>
 
@@ -123,7 +123,7 @@ import { useCommonStore } from "@/store/commonStore";
 import { storeToRefs } from "pinia";
 import { User } from '@/interface/user'
 import 'particles.js'
-
+const ls = localStorage;
 const commonStore = useCommonStore();
 const { myUserinfo } = storeToRefs(commonStore);
 

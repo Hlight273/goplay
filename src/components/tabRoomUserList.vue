@@ -22,18 +22,18 @@
             </div>
             <div class="btns">
               <el-button class="super_submit" v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo)"
-                @click="handleOwnerTransfer(userinfo.id)"
-                color="#7365ff">移交房主</el-button>
+                @click="handleOwnerTransfer(userinfo.id)">移交房主</el-button>
               
               <el-button class="super_submit" v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo) && !HasRoomAdminPower(userinfo)"
-                @click="handleSetAdmin(userinfo.id)"
-                color="#7365ff">设为管理员</el-button>
+                @click="handleSetAdmin(userinfo.id)">设为管理员</el-button>
 
               <el-button class="super_submit" v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo) && HasRoomAdminPower(userinfo)"
-                @click="handleRemoveAdmin(userinfo.id)"
-                color="#7365ff">移除权限</el-button>
+                @click="handleRemoveAdmin(userinfo.id)">移除权限</el-button>
 
-              <el-button class="super_submit" color="#7365ff" @click="handleViewProfile(userinfo)">查看主页</el-button>
+              <el-button class="super_submit" @click="handleViewProfile(userinfo)">查看主页</el-button>
+
+              <el-button  class="super_submit danger" v-show="CanKickUser(myUserInfo, userinfo)"
+                @click="handleKickUser(userinfo.id)">踢出房间</el-button>
             </div>
           </div>
         </template>
@@ -43,15 +43,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
 import { Avatar } from '@element-plus/icons-vue';
 import { type DropdownInstance } from 'element-plus';
 import { User } from '@/interface/user';
 import { Privilege } from '@/interface/user';
-import { getPrivilegeName, HasOwnerPower, HasRoomAdminPower } from '@/api/user';
+import { getPrivilegeName, HasOwnerPower, HasRoomAdminPower, CanKickUser } from '@/api/user';
 import { useCommonStore } from "@/store/commonStore";
-import { roomOwnerTransPrivilege, roomMemberPrivilege } from '@/api/room';
-import { ElMessage } from 'element-plus';
+import { roomOwnerTransPrivilege, roomMemberPrivilege, roomExit } from '@/api/room';
+import { ElMessage,ElMessageBox } from 'element-plus';
 
 const commonStore = useCommonStore();
 
@@ -110,6 +110,25 @@ const handleRemoveAdmin = (targetUserId: number) => {
     .catch(err => {
       ElMessage.error('操作失败：' + (err.message || '未知错误'));
     });
+};
+
+// 踢出用户
+const handleKickUser = (targetUserId: number) => {
+  ElMessageBox.confirm(
+    '确定要将该用户踢出房间吗？',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      roomExit(props.roomCode, targetUserId)
+        .then(res => {
+          ElMessage.success('已将用户踢出房间');
+        })
+    })
 };
 
 const handleViewProfile = (userinfo: User.UserInfo) => {
@@ -244,6 +263,13 @@ const handleViewProfile = (userinfo: User.UserInfo) => {
   height: 8vh;
   width: 22vh;
   flex-wrap: wrap;
+}
+.playerInfoPanel .btns>button {
+  width: 9vh;
+  height: 2.6vh;
+  font-size: 1.3vh;
+  line-height: 1.3vh;
+  margin: 0vh .95vh;
 }
 
 .online-status {

@@ -91,6 +91,14 @@ body {
     color: #fff;
     background-color: #938493;
 }
+.super_submit.danger {
+    background-color: #ff4757;
+    color: white;
+}
+
+.super_submit.danger:hover {
+    background-color: #ff6b81;
+}
 
 
 .noback_btn {

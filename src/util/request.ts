@@ -24,7 +24,6 @@ service.interceptors.request.use(config => {
     if (token) {
         config.headers['token'] = token;  // 设置请求头
     }
- 
     return config
 }, 
 (error:AxiosError) => {
@@ -60,6 +59,19 @@ service.interceptors.response.use(
 
         //ResultCode不是20000 需要统一处理的写下面，由于需要兼容游客，不直接跳转了
         if (res.code === ResultCode.EXPIRED) {//token过期
+            // 使用try-catch包裹localStorage操作，避免在Firefox中可能出现的问题
+            try {
+              // 延迟执行localStorage操作，避免Firefox中的同步问题
+              setTimeout(() => {
+                if(localStorage.getItem("token")) {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("userid");
+                  console.log("已清除过期的token");
+                }
+              }, 0);
+            } catch (e) {
+              console.error("清除token时出错:", e);
+            }
            // msgErr("错误："+res.message);
             //router.replace("/login")
             return Promise.reject()

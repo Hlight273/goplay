@@ -109,10 +109,10 @@
       </div>
     </div>
 
-    <!--底部通用 播放器-->
+    <!-- 底部通用 播放器
     <div class="musicPlayer">
-      
-    </div>
+    </div> -->
+
     <!--底部通用 聊天输入框-->
     <div class="line send">
       <el-input v-model="textToSend" placeholder="聊天对话..." @keyup.enter="broadcast_sayInRoom()"/>
@@ -120,25 +120,21 @@
         color="#7365ff" :icon="Promotion"/>
     </div>
 
-
-
-  
 </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted} from 'vue'
 import { ArrowLeft, Promotion, FolderAdd, InfoFilled, WarningFilled} from '@element-plus/icons-vue'
-import { ElMessageBox, type DropdownInstance, ElMessage } from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 import { IMessage } from '@stomp/stompjs';
 
-import { roomCreate,roomJoin,roomExit,roomMember,roomSongContentList, roomSongRemove, saveRoomSongsAsPlaylist} from '@/api/room'
-import { userRoomInfo, getPrivilegeName, HasOwnerPower, HasRoomAdminPower} from '@/api/user'
+import { roomCreate,roomJoin,roomExit,roomMember,roomSongContentList, saveRoomSongsAsPlaylist} from '@/api/room'
+import { userRoomInfo, HasOwnerPower} from '@/api/user'
 import { Room } from '@/interface/room'
 import { User } from '@/interface/user'
 import { Song } from '@/interface/song';
-import { PlayerData } from '@/interface/playerData'
 import { WebSocketService } from '@/util/webSocketService';
 import { ResultCode, websocketRoot } from '@/util/webConst';
 import {  copyToClipboard } from '@/util/commonUtil'
@@ -287,6 +283,15 @@ const receive_Msg_InRoom = (msg:IMessage)=>{
 //订阅 用户列表更新 /topic/房间id/userInfoList
 const receive_UserInfoList_InRoom = (msg:IMessage)=>{
   let _userInfoList = JSON.parse(msg.body) as User.UserInfo[]
+
+  const stillInRoom = _userInfoList.some(user => user.id === userId);
+  
+  if (!stillInRoom && currentPageState.value === PageStatus.IN_ROOM) {//检查我是否还在该列表
+    ElMessage.warning('你已被踢出房间');
+    setPageState(PageStatus.WAIT_FOR_ROOM);
+    return;
+  }
+
   updateUserInfoList(_userInfoList)
 }
 //订阅 歌曲列表更新 /topic/房间id/songContentList
@@ -431,16 +436,24 @@ const saveAsPlaylist = () => {
   }).catch(() => {})
 }
 
+//用户列表子组件回调
+// const handleUserKicked = (kickedUserId: number) => {
+//   if (kickedUserId === userId) {// 如果被踢出的是当前用户，则自动离开房间
+//     ElMessage.warning('你已被踢出房间');
+//     setPageState(PageStatus.WAIT_FOR_ROOM);
+//   }
+// };
+
 
 //播放器相关 
 //播放列表点击事件
 
 //浏览器更新播放器状态
-const updateMyPlayerData = (playerData:PlayerData):void=>{
-  console.log(`浏览器加载第${playerData.index}首歌曲`);
-  selectedIndex.value = playerData.index;
-  globalProperties?.$GoPlayer.syncPlayerData(playerData);
-}
+// const updateMyPlayerData = (playerData:PlayerData):void=>{
+//   console.log(`浏览器加载第${playerData.index}首歌曲`);
+//   selectedIndex.value = playerData.index;
+//   globalProperties?.$GoPlayer.syncPlayerData(playerData);
+// }
 
 
 </script>

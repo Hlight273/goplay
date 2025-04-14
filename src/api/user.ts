@@ -88,6 +88,19 @@ export const HasRoomAdminPower = (userinfo:User.UserInfo):boolean=>{
     return false
 }
 
+// 判断是否有权限踢出用户
+export const CanKickUser = (myUserInfo: User.UserInfo, targetUserInfo: User.UserInfo): boolean => {
+    if (!myUserInfo || !targetUserInfo) return false;
+    // 不能踢自己
+    if (myUserInfo.id === targetUserInfo.id) return false;
+    // 房主可以踢任何人
+    if (myUserInfo.privilege === Privilege.Enum.房主) return true;
+    // 管理员只能踢普通成员
+    if (myUserInfo.privilege === Privilege.Enum.管理员 && 
+        targetUserInfo.privilege === Privilege.Enum.成员) return true;
+    return false;
+  }
+
 export const HasPlaylistPermission = (playlist:Playlist.Playlist, userinfo:User.UserInfo):boolean=>{
     if(userInfo==undefined||userInfo==null)return false
     const userId = userinfo.id;
