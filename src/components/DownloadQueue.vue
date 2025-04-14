@@ -151,13 +151,13 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-right: 15px;
+  margin-right: 1.5vh;
   color: #fff;
   top: .2vh;
 }
 
 .download-btn .el-icon {
-  font-size: 20px;
+  font-size: 2vh;
 }
 
 .download-panel {

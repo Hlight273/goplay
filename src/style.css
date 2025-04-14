@@ -193,3 +193,19 @@ body {
     color: #ffffff;
 }
 
+
+
+/* el全局样式 */
+.el-button, .el-input__wrapper {
+    box-sizing: border-box;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 4vh;
+    font-size: 1.3vh;
+    padding: .7vh 1.5vh;
+    height: 3vh;
+  }
+  [class="el-button"]{
+    color: #7a68ff;
+  }
+

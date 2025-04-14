@@ -21,19 +21,19 @@
               </div>
             </div>
             <div class="btns">
-              <el-button v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo)"
+              <el-button class="super_submit" v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo)"
                 @click="handleOwnerTransfer(userinfo.id)"
                 color="#7365ff">移交房主</el-button>
               
-              <el-button v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo) && !HasRoomAdminPower(userinfo)"
+              <el-button class="super_submit" v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo) && !HasRoomAdminPower(userinfo)"
                 @click="handleSetAdmin(userinfo.id)"
                 color="#7365ff">设为管理员</el-button>
 
-              <el-button v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo) && HasRoomAdminPower(userinfo)"
+              <el-button class="super_submit" v-show="userinfo.id!=userId && HasOwnerPower(myUserInfo) && HasRoomAdminPower(userinfo)"
                 @click="handleRemoveAdmin(userinfo.id)"
                 color="#7365ff">移除权限</el-button>
 
-              <el-button color="#7365ff" @click="handleViewProfile(userinfo)">查看主页</el-button>
+              <el-button class="super_submit" color="#7365ff" @click="handleViewProfile(userinfo)">查看主页</el-button>
             </div>
           </div>
         </template>
@@ -244,17 +244,6 @@ const handleViewProfile = (userinfo: User.UserInfo) => {
   height: 8vh;
   width: 22vh;
   flex-wrap: wrap;
-}
-.playerInfoPanel .btns>button {
-  width: 9vh;
-  height: 2.6vh;
-  font-size: 1.3vh;
-  line-height: 1.3vh;
-  margin: 0vh .95vh;
-  border: .2vh solid #aca6c7;
-  background-color: #3c393c;
-  font-family: 'NSimSun','Microsoft YaHei', sans-serif;
-  font-weight: bold;
 }
 
 .online-status {

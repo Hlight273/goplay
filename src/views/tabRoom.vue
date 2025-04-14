@@ -470,6 +470,21 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
   height: 3.5vh;
 }
 
+.content .line.send {
+  width: calc(100% - 172px);
+    border: 1px solid #e9e9e9;
+    padding: 1vh 1vh;
+    margin-top: 1vh;
+    margin-left: -1px;
+    border-radius: 3vh;
+    background: white;
+    position: fixed;
+    bottom: 7vh;
+}
+:deep(.content.line.send .el-input .el-input__inner) {
+  height: 100%;
+}
+
 /* 房间信息 */
 .roomInfo {
   margin-top: -1vh;
@@ -724,16 +739,6 @@ const updateMyPlayerData = (playerData:PlayerData):void=>{
 </style>
 
 <style>
-/* 全局样式 */
-.el-button, .el-input__wrapper {
-  box-sizing: border-box;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 4vh;
-  font-size: 1.3vh;
-  padding: .7vh 1.5vh;
-  height: 3vh;
-}
 
 /* 断开连接提示 */
 .disconnection-alert {

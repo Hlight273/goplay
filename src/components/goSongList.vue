@@ -38,10 +38,11 @@
             <span>{{ songContent.songInfo.songAlbum }}</span>
             <span>{{ formatDuration(songContent.songInfo.songDuration) }}</span>
             <span>
-              <el-icon @click="downloadSong(songContent.songUrl)"><Download/></el-icon>
-              {{ formatBytes(songContent.songInfo.songSize) }}
               <!-- 添加下载完成的绿色点标识 -->
               <div v-if="downloadedSongs[songContent.songUrl]" class="download-indicator"></div>
+              <el-icon @click="downloadSong(songContent.songUrl)"><Download/></el-icon>
+              {{ formatBytes(songContent.songInfo.songSize) }}
+              
             </span>
             <span class="delete" @click="removeSong(songContent.songInfo.id)">
             <el-icon><DeleteFilled /></el-icon>
@@ -716,7 +717,7 @@ const toggleQueue = () => showQueue.value = !showQueue.value;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1001;
+    z-index: 599;
     transition: all 0.3s ease;
 }
 
