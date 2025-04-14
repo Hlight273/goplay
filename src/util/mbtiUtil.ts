@@ -247,6 +247,7 @@ const MBTI_QUESTIONS: MBTIQuestion[] = [
 
 // 计算MBTI结果
 function calculateMBTIType(answers: Record<number, string>): string {
+    // 初始化维度得分
     const scores = {
         E: 0, I: 0,
         N: 0, S: 0,
@@ -254,15 +255,48 @@ function calculateMBTIType(answers: Record<number, string>): string {
         J: 0, P: 0
     };
 
-    Object.entries(answers).forEach(([questionId, dimension]) => {
-        scores[dimension as keyof typeof scores] += 2;
+    // 每个维度的问题数量统计
+    const questionCounts = {
+        EI: 0, // E/I维度的总问题数
+        NS: 0, // N/S维度的总问题数
+        TF: 0, // T/F维度的总问题数
+        JP: 0  // J/P维度的总问题数
+    };
+
+    // 遍历所有问题，统计每个维度的问题数量
+    MBTI_QUESTIONS.forEach(question => {
+        const dim1 = question.options[0].dimension;
+        const dim2 = question.options[1].dimension;
+        
+        // 确定这个问题属于哪个维度对
+        if (dim1 === 'E' || dim1 === 'I') questionCounts.EI++;
+        if (dim1 === 'N' || dim1 === 'S') questionCounts.NS++;
+        if (dim1 === 'T' || dim1 === 'F') questionCounts.TF++;
+        if (dim1 === 'P' || dim1 === 'J') questionCounts.JP++;
     });
 
+    // 计算每个选项的权重（基于问题位置）
+    Object.entries(answers).forEach(([questionId, dimension]) => {
+        const qIndex = parseInt(questionId) - 1;
+        const questionWeight = 1 + (qIndex / MBTI_QUESTIONS.length) * 0.5; // 后面的问题权重略高
+        scores[dimension as keyof typeof scores] += questionWeight;
+    });
+
+    // 计算每个维度的得分比例，考虑问题数量
+    const getPreference = (score1: number, score2: number, total: number): boolean => {
+        const threshold = 0.5; // 基准阈值
+        const ratio = score1 / (score1 + score2);
+        // 考虑答题数量对结果的影响
+        const confidence = (score1 + score2) / total;
+        return ratio > (threshold * confidence);
+    };
+
+    // 确定最终类型
     return [
-        scores.E > scores.I ? 'E' : 'I',
-        scores.N > scores.S ? 'N' : 'S',
-        scores.F > scores.T ? 'F' : 'T',
-        scores.P > scores.J ? 'P' : 'J'
+        getPreference(scores.E, scores.I, questionCounts.EI) ? 'E' : 'I',
+        getPreference(scores.N, scores.S, questionCounts.NS) ? 'N' : 'S',
+        getPreference(scores.F, scores.T, questionCounts.TF) ? 'F' : 'T',
+        getPreference(scores.P, scores.J, questionCounts.JP) ? 'P' : 'J'
     ].join('');
 }
 

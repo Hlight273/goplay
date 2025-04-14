@@ -144,6 +144,14 @@ body {
 .hide_scroll_child::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
 }
+.hide_scroll_child2 {
+    overflow-y: scroll !important;
+   scrollbar-width: none; /* Firefox */
+   -ms-overflow-style: none; /* IE and Edge */
+}
+.hide_scroll_child2::-webkit-scrollbar {
+   display: none; /* Chrome, Safari and Opera */
+}
 
 /* 背景 */
 .white_backpanel {
