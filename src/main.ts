@@ -6,13 +6,13 @@ import ElementPlus from 'element-plus'
 import { createPinia } from "pinia";
 //import webSocketPlugin from '@/util/webSocketPlugin';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
 import 'element-plus/dist/index.css'
 import '@/style.css' 
 import "@/assets/font/font.css";
 import '@/assets/styles/animations.css'
-
-
 import './assets/global.css'
+
 
 const app = createApp(App);
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

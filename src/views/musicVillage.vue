@@ -3,6 +3,13 @@
         <!-- Logo -->
         <div class="village-header">
             <span class="logo">GOPLAY·音乐村</span>
+            <el-switch
+                v-model="showPersonalPosts"
+                class="post-filter"
+                active-text="我的动态"
+                inactive-text="全部动态"
+                @change="handleFilterChange"
+            />
         </div>
         
         <!-- 发布动态区域 -->
@@ -52,7 +59,7 @@
                     <el-avatar :src="post.addedByAvatar" @click="openUserProfile(post.addedBy)" class="clickable-avatar" />
                     <div class="post-info clickable-avatar" @click="openUserProfile(post.addedBy)">
                         <span class="username clickable-username" @click="openUserProfile(post.addedBy)">{{ post.addedByName }}</span>
-                        <span class="time">{{ formatDate(post.addedAt) }} 发帖</span>
+                        <span class="time">{{ formatDate(post.addedAt, true) }} 发帖</span>
                     </div>
                 </div>
                 
@@ -114,8 +121,24 @@
         </div>
 
         <!-- 加载更多 -->
-        <div class="load-more" v-if="hasMore">
+        <!-- <div class="load-more" v-if="hasMore">
             <el-button @click="loadMore">加载更多</el-button>
+        </div> -->
+
+        <!-- 分页 -->
+        <div class="pagination-container">
+            <div v-show="total>=11" class="total-count">共 {{ total }} 条</div>
+            <el-pagination
+                v-model:current-page="currentPage"
+                v-model:page-size="pageSize"
+                :pager-count="11"
+                :total="total"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                layout="prev, pager, next"
+                :hide-on-single-page="true"
+                background
+            />
         </div>
     </div>
 
@@ -126,7 +149,7 @@ import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import {  CaretTop, ChatDotRound, Service } from '@element-plus/icons-vue'
 import { Post } from '@/interface/post'
-import { getPostList, createPost, togglePostLike, getPostComments, addPostComment, getCommentReplies } from '@/api/post'
+import { getPostList, createPost, togglePostLike, getPostComments, getPostListByUserId } from '@/api/post'
 import { formatDate, formatDuration } from "@/util/commonUtil"
 import { GoPlayer } from '@/util/XgPlayer'
 import { ResultCode } from "@/util/webConst"
@@ -158,11 +181,18 @@ const openUserProfile = (userId: number) => {
     commonStore.openUserPage(userId);
 }
 
-
+const showPersonalPosts = ref(false)
+const cachedPosts = reactive({
+    all: new Map<number, Post.PostDetail[]>(),
+    personal: new Map<number, Post.PostDetail[]>(),
+    allTotal: 0,
+    personalTotal: 0
+})
 const posts = ref<(Post.PostDetail & { showComments?: boolean })[]>([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
-const hasMore = ref(true);
+const total = ref(0)
+// const hasMore = ref(true);
 
 const newPost = reactive<Post.PostInfo>({
     contentText: '',
@@ -173,29 +203,54 @@ const uploadRef = ref<ImageUploaderExposed  | null>(null);
 
 // 获取动态列表
 const loadPosts = async (page: number) => {
-    console.log("%c初始化动态列表成功",'color: blue');
+    const cacheMap = showPersonalPosts.value ? cachedPosts.personal : cachedPosts.all;
     
-    const res = await getPostList(page, pageSize.value);
+    // 检查是否有缓存
+    if (cacheMap.has(page)) {
+        posts.value = cacheMap.get(page)!
+        total.value = showPersonalPosts.value ? cachedPosts.personalTotal : cachedPosts.allTotal
+        return
+    }
+
+    // 没有缓存则请求数据
+    const res = showPersonalPosts.value ? 
+        await getPostListByUserId(commonStore.myUserinfo.id, page, pageSize.value) :
+        await getPostList(page, pageSize.value)
+    
     if (res.data) {
         const processedPosts = res.data.posts.map(post => ({
             ...post,
             showComments: false,
             imageUrls: post.imageUrls.map(url => getPostImageURL(url))
         }))
-
-        if (page === 1) {
-            posts.value = processedPosts;
+        posts.value = processedPosts
+        total.value = res.data.total
+        
+        // 缓存当前页的数据和总数
+        cacheMap.set(page, processedPosts)
+        if (showPersonalPosts.value) {
+            cachedPosts.personalTotal = res.data.total
         } else {
-            posts.value.push(...processedPosts);
+            cachedPosts.allTotal = res.data.total
         }
-        hasMore.value = posts.value.length < res.data.total;
     }
 }
 
 // 加载更多
-const loadMore = () => {
-    currentPage.value++
-    loadPosts(currentPage.value)
+// const loadMore = () => {
+//     currentPage.value++
+//     loadPosts(currentPage.value)
+// }
+// 添加分页处理函数
+const handleSizeChange = (val: number) => {
+    pageSize.value = val
+    currentPage.value = 1
+    loadPosts(1)
+}
+
+const handleCurrentChange = (val: number) => {
+    currentPage.value = val
+    loadPosts(val)
 }
 
 const onImageUpload = (file: File): Promise<string> => {
@@ -277,7 +332,11 @@ const submitPost = () => {
                 newPost.imageUrls = []
                 newPost.songId = undefined
                 selectedSong.value = null
-                uploadRef.value?.clearImages();
+                uploadRef.value?.clearImages()
+                // 清空所有缓存
+                cachedPosts.all.clear()
+                cachedPosts.personal.clear()
+                currentPage.value = 1
                 loadPosts(1)
                 break
             default:
@@ -294,7 +353,7 @@ const handleLike = (post: Post.PostDetail) => {
             case ResultCode.SUCCESS:
                 post.likedByCurrentUser = !post.likedByCurrentUser
                 post.likeCount += post.likedByCurrentUser ? 1 : -1
-                ElMessage.success(res.message)
+                //ElMessage.success(res.message)
                 break
             default:
                 ElMessage.error('操作失败，请稍后再试')
@@ -337,7 +396,11 @@ const toggleComments = async (post: Post.PostDetail & { showComments?: boolean }
     }
 }
 
-
+// 切换是全部还是仅用户
+const handleFilterChange = () => {
+    currentPage.value = 1
+    loadPosts(1)
+}
 // onMounted(() => {
     
 //     loadPosts(1)
@@ -396,6 +459,10 @@ const toggleComments = async (post: Post.PostDetail & { showComments?: boolean }
 
 .post-content {
     margin-bottom: 16px;
+    padding: 10px 16px;
+    border: 1px solid #ebebeb;
+    border-radius: 14px;
+    background: #ffffff;
 }
 
 .image-grid {
@@ -536,6 +603,7 @@ const toggleComments = async (post: Post.PostDetail & { showComments?: boolean }
 }
 
 .village-header {
+    position: relative;
     margin-bottom: 1px;
     display: flex
 ;
@@ -724,5 +792,60 @@ const toggleComments = async (post: Post.PostDetail & { showComments?: boolean }
         font-size: 13px;
         min-height: 5vh;
     }
+}
+/* 添加分页器样式 */
+.pagination-container {
+    left: calc(50%);
+    bottom: 4vh;
+    position: fixed;
+    display: flex
+;
+    justify-content: center;
+    margin: 20px 0;
+    
+    align-items: center;
+    margin-left: -110px;
+
+    background-color: #ffffff;
+    border-radius: 2vh;
+    box-sizing: border-box;
+    border: .1vh solid #f0f1ff;
+    box-shadow: 0px -.2vh .2vh 0px rgb(128 125 155 / 20%) inset;
+    padding: 6px 30px;
+    padding-bottom: 8px
+}
+.pagination-container .total-count {
+    font-size: 14px;
+    color: #999;
+    margin-right: 10px;
+
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+    .pagination-container {
+        margin: 15px 0;
+        padding: 8px;
+    }
+    
+    :deep(.el-pagination) {
+        font-size: 12px;
+    }
+}
+
+.post-filter {
+    position: absolute;
+    right: 2vh;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+:deep(.post-filter .el-switch__label) {
+    color: #fff;
+}
+
+:deep(.post-filter .el-switch__label.is-active) {
+    color: #fff;
+    font-weight: bold;
 }
 </style>

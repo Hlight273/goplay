@@ -15,6 +15,14 @@ export const getPostList = (page: number, pageSize: number) => {
     )
 }
 
+/** 获取某用户动态列表（分页） */
+export const getPostListByUserId = (userId:number, page: number, pageSize: number) => {
+    return http.get<Result<{ posts: Post.PostDetail[], total: number }>>(
+        `/village/post/${userId}`,
+        { params: { page, pageSize } }
+    )
+}
+
 /** 获取动态的一级评论（分页） */
 export const getPostComments = (postId: number, page: number, pageSize: number) => {
     return http.get<Result<{ comments: Post.PostComment[], total: number }>>(

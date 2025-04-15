@@ -55,30 +55,42 @@ export const useCommonStore = defineStore("common", () => {
 
     const targetUserInfo = reactive<User.UserInfo>({...User.UserInfo_InitData})
     const targetUserVipInfo = reactive<User.VipInfo>({...User.VipInfo_InitData})
-    const openUserPage = (targetUserId:number)=>{
-        userPageOn.value = true;
-        Object.assign(myUserinfo, {...User.UserInfo_InitData});
-        userInfo(targetUserId).then((res)=>{
-            if(res.code == ResultCode.SUCCESS){
-                Object.assign(targetUserInfo, res.oData);
-            }
-        })
+    const openUserPage = async (targetUserId:number)=>{
+        
+        Object.assign(targetUserInfo, {...User.UserInfo_InitData});
         Object.assign(targetUserVipInfo, {...User.VipInfo_InitData});
-        userVipInfo(targetUserId).then((res)=>{
-            if(res.code == ResultCode.SUCCESS){
-                Object.assign(targetUserVipInfo, res.oData);
+        
+        try {
+            const [userInfoRes, vipInfoRes] = await Promise.all([
+                userInfo(targetUserId),
+                userVipInfo(targetUserId)
+            ]);
+            
+            if (userInfoRes.code === ResultCode.SUCCESS) {
+                Object.assign(targetUserInfo, userInfoRes.oData);
             }
-        })
+            if (vipInfoRes.code === ResultCode.SUCCESS) {
+                Object.assign(targetUserVipInfo, vipInfoRes.oData);
+            }
+            userPageOn.value = true;
+        } catch (error) {
+            //console.error('加载用户信息失败:', error);
+        }
     }
-    const openUserPage_byUserInfo = (_targetUserInfo:User.UserInfo)=>{
-        userPageOn.value = true;
+    const openUserPage_byUserInfo = async (_targetUserInfo:User.UserInfo)=>{
+        
         Object.assign(targetUserInfo, _targetUserInfo);
         Object.assign(targetUserVipInfo, {...User.VipInfo_InitData});
-        userVipInfo(_targetUserInfo.id).then((res)=>{
-            if(res.code == ResultCode.SUCCESS){
-                Object.assign(targetUserVipInfo, res.oData);
+        
+        try {
+            const vipInfoRes = await userVipInfo(_targetUserInfo.id);
+            if (vipInfoRes.code === ResultCode.SUCCESS) {
+                Object.assign(targetUserVipInfo, vipInfoRes.oData);
             }
-        })
+            userPageOn.value = true;
+        } catch (error) {
+            //console.error('加载用户VIP信息失败:', error);
+        }
     }
     const closeUserPage = ()=>{
         userPageOn.value = false;

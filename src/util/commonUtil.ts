@@ -33,7 +33,7 @@ export function formatBytes(bytes: number, decimals = 2): string {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-export const formatDate = (dateString: string): string => {
+export const formatDate = (dateString: string, showTime: boolean = false): string => {
   const date = new Date(dateString);
   
   if (isNaN(date.getTime())) {
@@ -42,8 +42,14 @@ export const formatDate = (dateString: string): string => {
   }
 
   const year = date.getFullYear();
-  const month = date.getMonth() + 1; // getMonth() 返回 0-11
+  const month = date.getMonth() + 1;
   const day = date.getDate();
+  
+  if (showTime) {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${year}年${month}月${day}日 ${hours}:${minutes}`;
+  }
 
   return `${year}年${month}月${day}日`;
 };

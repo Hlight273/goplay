@@ -215,16 +215,36 @@ onMounted(() => {
 
 .floating_btn {
   z-index: 599;
-    position: absolute;
-    top: 0.7vh;
-    right: 0.7vh;
-    color: #ffffff;
-    width: 1vh;
-    height: 3.3vh;
-    /* border-radius: 0.6vh; */
-    font-size: 1.6vh;
-    border: .2vh solid #aca6c7;
-    background-color: #3c393c;
+  position: absolute;
+  top: .3vh;
+  right: .3vh;
+  color: #ffffff;
+  width: 3.2vh;
+  height: 3.2vh;
+  border-radius: 50%;
+  font-size: 1.4vh;
+  border: none;
+  background-color: rgba(60, 57, 60, 0.7);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transform: scale(0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 添加父元素悬停时的按钮显示效果 */
+div[style="position: relative;"]:hover .floating_btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.floating_btn:hover {
+  background-color: var(--el-color-primary);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .title-area {

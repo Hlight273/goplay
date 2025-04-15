@@ -391,4 +391,11 @@ initComments()
         font-size: 11px;
     }
 }
+.no-comments {
+    text-align: center;
+    padding: 32px 16px;
+    color: #a2a2a2;
+    border: 1px solid #ebebeb;
+    border-radius: 14px;
+}
 </style>

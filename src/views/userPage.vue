@@ -32,7 +32,7 @@
             <div class="header-stats">
               <div class="header-stat-item">
                 <el-icon><Folder /></el-icon>
-                <span>{{ myPlaylistInfos.length }}</span>
+                <span>{{ targetPlaylistInfos.length }}</span>
                 <small>歌单</small>
               </div>
               <div class="header-stat-item">
@@ -74,28 +74,52 @@
         </div>
       </div>
       
-      <!-- 歌单列表 -->
-      <div class="recommend-container" :class="{ 'dark-recommend': isDarkTheme }">
-        <div class="recommend-header">
-          <el-icon class="recommend-icon"><Headset /></el-icon>
-          <h2 class="title">歌单列表</h2>
-        </div>
-        <div class="recommend-list hide_scroll_child">
-          <div v-for="(playlistInfo, index) in myPlaylistInfos" :key="index" class="playlist-item">
-            <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="targetUserInfo"/>
-          </div>
-        </div>
+      <!-- 切换动态还是歌单的按钮列表 -->
+      <div class="tabBox">
+        <el-tabs v-model="currentView" type="card" class="user-tabs">
+          <el-tab-pane label="歌单" name="playlists">
+            <template #label>
+              <span class="custom-tabs-label">
+                <el-icon><Headset /></el-icon>
+              </span>
+            </template>
+          </el-tab-pane>
+          <el-tab-pane label="动态" name="posts">
+            <template #label>
+              <span class="custom-tabs-label">
+                <el-icon><ChatDotSquare /></el-icon>
+              </span>
+            </template>
+          </el-tab-pane>
+        </el-tabs>
       </div>
       
-      <!-- 如果没有歌单，显示空状态 -->
-      <div v-if="myPlaylistInfos.length === 0" class="empty-state" :class="{ 'dark-empty': isDarkTheme }">
-        <el-empty description="暂无歌单">
-          <template #image>
-            <el-icon class="empty-icon"><Headset /></el-icon>
-          </template>
-        </el-empty>
-      </div>
-    
+      <!-- 歌单列表 -->
+      <template v-if="currentView === 'playlists'">
+        <div v-if="targetPlaylistInfos.length === 0" class="empty-state" :class="{ 'dark-empty': isDarkTheme }">
+          <el-empty description="暂无歌单">
+            <template #image>
+              <el-icon class="empty-icon"><Headset /></el-icon>
+            </template>
+          </el-empty>
+        </div>
+        <div v-else class="recommend-container subContent" :class="{ 'dark-recommend': isDarkTheme }">
+          <div class="recommend-header">
+            <el-icon class="recommend-icon"><Headset /></el-icon>
+            <h2 class="title">歌单列表</h2>
+          </div>
+          <div class="recommend-list hide_scroll_child">
+            <PlaylistBlock v-for="(playlistInfo, index) in targetPlaylistInfos" :key="index" :playlist-info="playlistInfo" :my-userinfo="targetUserInfo"/>
+          </div>
+        </div>
+      </template>
+      <!-- 或者贴文列表 -->
+      <template v-else>
+        <div class="subContent">
+          <UserPosts :userId="targetUserInfo.id" />
+        </div>
+      </template>
+
     </div>
   </div>
 </template>
@@ -107,14 +131,17 @@ import { useCommonStore } from "@/store/commonStore";
 import { ResultCode } from "@/util/webConst";
 import { storeToRefs } from "pinia";
 import { onMounted, reactive, ref, computed, watch } from "vue";
-import PlaylistBlock from '@/components/playlistBlock.vue'
-import VipTag from '@/components/vipTag.vue';
 import { MBTICodec, MBTIService } from '@/util/mbtiUtil';
-import { CircleCloseFilled, CircleCheckFilled, Clock, Folder, Star, Medal, MagicStick, Headset } from '@element-plus/icons-vue';
+import { CircleCloseFilled, Folder, Star, Medal, ChatDotSquare, Headset } from '@element-plus/icons-vue';
+
+import PlaylistBlock from '@/components/playlistBlock.vue'
+import UserPosts from '@/components/UserPosts.vue'
+import VipTag from '@/components/vipTag.vue';
+const currentView = ref('playlists')
 
 const commonStore = useCommonStore();
 const { userPageOn, targetUserInfo, targetUserVipInfo } = storeToRefs(commonStore);
-const myPlaylistInfos = reactive<Playlist.PlaylistInfo[]>([]);
+const targetPlaylistInfos = reactive<Playlist.PlaylistInfo[]>([]);
 const isDarkTheme = ref(false);
 const tagTypes = ['primary', 'success', 'warning', 'danger'];
 
@@ -128,27 +155,28 @@ const mbtiInfo = computed(() => {
 
 watch(
   () => userPageOn.value,
-  (newVal, oldVal) => {
-    if(oldVal==undefined)return;
-    if (newVal==true) {//每次进入用户主页 都要重新拉一遍用户列表
+  (newVal) => {
+    if (newVal) {  // 只要是打开状态就加载数据
+      targetPlaylistInfos.length = 0;
       userPlaylistInfo(targetUserInfo.value.id).then(
-      (res)=>{   
-        switch (res.code) {
-          case ResultCode.SUCCESS:
-            console.log("拉取歌单",res.oData);
-            myPlaylistInfos.length = 0;
-            Object.assign(myPlaylistInfos,res.oData);
-            console.log("用户主页歌单更新",myPlaylistInfos);
-            break;
-          case ResultCode.EMPTY:          
-            break;
-          default:
-            break;
+        (res) => {   
+          switch (res.code) {
+            case ResultCode.SUCCESS:
+              //console.log("拉取歌单", res.oData);
+              
+              Object.assign(targetPlaylistInfos, res.oData);
+              //console.log("用户主页歌单更新", myPlaylistInfos);
+              break;
+            case ResultCode.EMPTY:          
+              break;
+            default:
+              break;
+          }
         }
-      });
+      );
     }
   },
-  { deep: true, immediate: true }
+  { immediate: true }
 )
 </script>
 
@@ -405,18 +433,7 @@ watch(
 
 /* 歌单列表 */
 .recommend-container {
-  margin-top: 1vh;
-  width: 90%;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  background: #e7e8ed;
-  border-radius: 1.5vh;
-  padding: 2vh;
-  border: .1vh solid #cfbfef;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  transition: all 0.3s ease;
+  
 }
 
 .recommend-header {
@@ -448,13 +465,47 @@ watch(
   justify-content: center;
 }
 
-.playlist-item {
-  position: relative;
+.subContent {
+  max-height: 60vh;
+  margin-top: 1vh;
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+
+  border-radius: 1.5vh;
+  padding: 2vh;
+
+  overflow: hidden;
   transition: all 0.3s ease;
+  background: #e7e8ed;
+  border: .1vh solid #cfbfef;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.playlist-item:hover {
-  transform: translateY(-5px);
+.tabBox {
+  margin-left: 15px;
+  margin-top: 0vh;
+  height: 3vh;
+  display: flex;
+  align-items: flex-start;
+}
+
+:deep(.el-tabs__item) {
+  height: 3.2vh;
+  width: 10vh;
+  color: #616463;
+  font-size: 1.3vh;
+  padding: 0 !important;
+}
+
+:deep(.el-tabs__item.is-active) {
+  color: #846887;
+  border-bottom: .3vh solid #cfbfef !important;
+  box-shadow: 0px -0.23vh 0.5vh 0.2vh rgb(149 166 198 / 41%) inset;
+  border-top-left-radius: 3vh;
+  border-top-right-radius: 3vh;
+  background: #e7e8ed;
 }
 
 /* 空状态样式 */
@@ -464,8 +515,9 @@ watch(
   border-radius: 1.5vh;
   background-color: #e7e8ed;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   text-align: center;
+  width: 80%;
 }
 
 .empty-icon {
@@ -515,7 +567,7 @@ watch(
   color: #999;
 }
 
-.dark-theme .recommend-container.dark-recommend {
+.dark-theme .subContent.dark-recommend {
   background-color: #2a2a2a;
   border: .1vh solid #333;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -536,6 +588,16 @@ watch(
   color: #444;
 }
 
+.dark-theme :deep(.el-tabs__item) {
+  color: #888;
+}
+
+.dark-theme :deep(.el-tabs__item.is-active) {
+  color: #ccc;
+  border-bottom: .3vh solid #444 !important;
+  background: #2a2a2a;
+}
+
 /* 动画效果 */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -548,11 +610,13 @@ watch(
 
 /* 添加页面进入动画 */
 @keyframes slideIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .userPage .content {
-  animation: slideIn 0.4s ease-out;
+  animation: slideIn 0.3s ease-out;
 }
+
+
 </style>
