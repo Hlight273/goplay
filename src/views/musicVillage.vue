@@ -122,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import {  CaretTop, ChatDotRound, Service } from '@element-plus/icons-vue'
 import { Post } from '@/interface/post'
@@ -138,11 +138,26 @@ import CommentList2 from '@/components/commentList2.vue'
 import { Song } from '@/interface/song'
 import { eventBus, MEventTypes } from '@/util/eventBus'
 
+
+// 初始化动态列表
+const { currentTab } = defineProps<{
+    currentTab?: string
+}>()
+const isInitialized = ref(false);
+watch(() => currentTab, (newTab) => {
+    if (newTab === 'community' && !isInitialized.value) {
+        loadPosts(1);
+        isInitialized.value = true;
+    }
+}, { immediate: true })
+
+
 import { useCommonStore } from "@/store/commonStore"
 const commonStore = useCommonStore();
 const openUserProfile = (userId: number) => {
     commonStore.openUserPage(userId);
 }
+
 
 const posts = ref<(Post.PostDetail & { showComments?: boolean })[]>([]);
 const currentPage = ref(1);
@@ -158,6 +173,8 @@ const uploadRef = ref<ImageUploaderExposed  | null>(null);
 
 // 获取动态列表
 const loadPosts = async (page: number) => {
+    console.log("%c初始化动态列表成功",'color: blue');
+    
     const res = await getPostList(page, pageSize.value);
     if (res.data) {
         const processedPosts = res.data.posts.map(post => ({
@@ -321,9 +338,10 @@ const toggleComments = async (post: Post.PostDetail & { showComments?: boolean }
 }
 
 
-onMounted(() => {
-    loadPosts(1)
-})
+// onMounted(() => {
+    
+//     loadPosts(1)
+// })
 </script>
 
 <style scoped>

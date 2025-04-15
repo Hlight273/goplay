@@ -64,6 +64,7 @@ service.interceptors.response.use(
               // 延迟执行localStorage操作，避免Firefox中的同步问题
               setTimeout(() => {
                 if(localStorage.getItem("token")) {
+                  msgErr("登录信息过期！");
                   localStorage.removeItem("token");
                   localStorage.removeItem("userid");
                   console.log("已清除过期的token");
@@ -87,9 +88,30 @@ service.interceptors.response.use(
         return res;
     },
     (error:AxiosError) => {//非后端业务逻辑，网络错误
-        msgErr("网络错误"+error);
-        return Promise.reject(error)
-    }
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+          //请求超时
+          msgErr("请求超时，请检查网络连接或稍后重试");
+      } else if (error.response) {
+          //服务器返回了错误状态码
+          switch (error.response.status) {
+              case 404:
+                  msgErr("请求的资源不存在");
+                  break;
+              case 500:
+                  msgErr("服务器内部错误");
+                  break;
+              default:
+                  msgErr(`网络错误(${error.response.status}): ${error.message}`);
+          }
+      } else if (error.request) {
+          //请求发出但没有收到响应
+          msgErr("无法连接到服务器，请检查网络");
+      } else {
+          //其他错误
+          msgErr("网络错误: " + error.message);
+      }
+      return Promise.reject(error);
+  }
 )
  
 // 导出封装的请求方法

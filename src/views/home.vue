@@ -36,7 +36,7 @@
           </div>
         </el-tooltip>
       </template>
-      <MusicVillage></MusicVillage>
+      <MusicVillage :current-tab="activeTab"></MusicVillage>
     </el-tab-pane>
 
     <el-tab-pane name="mbti">
@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted} from 'vue'
+import { ref, onMounted, defineAsyncComponent} from 'vue'
 import { needDebugOutpot } from '@/util/webConst'
 import {isAdmin} from '@/api/user'
 
@@ -119,7 +119,7 @@ import DissolveTransition from '@/components/dissolveTransition.vue';
 import AudioPanel from '@/views/audioPanel.vue';
 import UserPage from './userPage.vue';
 import TabAdmin from './tabAdmin.vue'
-import MusicVillage from './musicVillage.vue'
+const MusicVillage = defineAsyncComponent(() => import('./musicVillage.vue'))
 import CharacterModel from '@/components/characterModel.vue'
 import CurrentPlaylist from '@/components/currentPlaylist.vue'
 import MusicMBTI from '@/components/MusicMBTI.vue'

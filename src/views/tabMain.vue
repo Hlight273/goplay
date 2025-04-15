@@ -3,7 +3,6 @@
     <!-- 现有的欢迎信息 -->
     <div class="welcome-section">
      
-
       <!-- 动态面包屑 -->
       <el-breadcrumb separator="/" class="breadcrumb">
         <el-breadcrumb-item @click="handleBackHome" :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -30,17 +29,18 @@
 
       <div class="home-container white_backpanel">
         <div v-show="!showSearchResults" class="hide_scroll_child">
-          <!-- 轮播图
-          <el-carousel height="40vh">
-            <el-carousel-item v-for="(item, index) in banners" :key="index">
-              <img :src="item" class="carousel-img" />
-            </el-carousel-item>
-          </el-carousel> -->
-
           <!-- 推荐歌单 -->
           <div class="recommend-container">
             <h2>站长推荐</h2>
-            <div class="recommend-list">
+            <div v-if="adminRecommendLoading" class="loading-container">
+              <el-progress type="circle" :percentage="adminLoadingProgress" :stroke-width="6">
+                <template #default="{ percentage }">
+                  <span class="progress-text">加载中...</span>
+                  <span class="progress-percentage">{{ percentage }}%</span>
+                </template>
+              </el-progress>
+            </div>
+            <div v-else class="recommend-list">
               <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
                 <PlaylistBlock :playlist-info="playlistInfo" :my-userinfo="myUserinfo"/>
               </div>
@@ -58,11 +58,7 @@
               暂无搜索结果
             </div>
           </div>
-          
         </div>
-      
-   
-
       </div>
     </div>
 
@@ -76,7 +72,15 @@
           </el-tooltip>
           <span class="update-time">{{ lastUpdateTime }}</span>
         </h2>
-        <div class="playlist-grid">
+        <div v-if="autoRecommendLoading" class="loading-container">
+          <el-progress type="circle" :percentage="autoLoadingProgress" :stroke-width="6">
+            <template #default="{ percentage }">
+              <span class="progress-text">加载中...</span>
+              <span class="progress-percentage">{{ percentage }}%</span>
+            </template>
+          </el-progress>
+        </div>
+        <div v-else class="playlist-grid">
           <PlaylistBlock
             v-for="playlist in recommendPlaylists"
             :my-userinfo="myUserinfo"
@@ -93,7 +97,17 @@
             <el-icon class="hot-icon"><Star /></el-icon>
           </el-tooltip>
         </h2>
-        <HotSongList :songs="state.hotSongs" />
+        <div v-if="hotSongsLoading" class="loading-container">
+          <el-progress type="circle" :percentage="hotLoadingProgress" :stroke-width="6">
+            <template #default="{ percentage }">
+              <span class="progress-text">加载中...</span>
+              <span class="progress-percentage">{{ percentage }}%</span>
+            </template>
+          </el-progress>
+        </div>
+        <div v-else>
+          <HotSongList :songs="state.hotSongs" />
+        </div>
       </div>
     </div>
   </div>
@@ -115,13 +129,39 @@ import { Refresh, Star, Trophy, MagicStick, Moon } from '@element-plus/icons-vue
 
 const myUserinfo = ref<User.UserInfo>({...User.UserInfo_InitData});
 
+// 添加加载状态变量
+const adminRecommendLoading = ref(true);
+const autoRecommendLoading = ref(true);
+const hotSongsLoading = ref(true);
+
+// 添加加载进度变量
+const adminLoadingProgress = ref(0);
+const autoLoadingProgress = ref(0);
+const hotLoadingProgress = ref(0);
+
+// 模拟加载进度的函数
+const simulateProgress = (progressRef: any, callback?: Function) => {
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.floor(Math.random() * 10) + 5;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      progressRef.value = progress;
+      if (callback) callback();
+    } else {
+      progressRef.value = progress;
+    }
+  }, 200);
+};
+
 const userId = Number(localStorage.getItem("userid"));
 const recommendedPlaylistInfos = ref<Playlist.PlaylistInfo[]>([]);
 
 const banners = ref([
   require("@/assets/imgs/banner/banner1.png"), // 推荐歌单
-   require("@/assets/imgs/banner/banner2.png"), // 新歌首发
-   require("@/assets/imgs/banner/banner3.png"), // 热门歌曲
+  require("@/assets/imgs/banner/banner2.png"), // 新歌首发
+  require("@/assets/imgs/banner/banner3.png"), // 热门歌曲
 ]);
 
 const token = localStorage.getItem("token");
@@ -133,6 +173,11 @@ const state = reactive({
 const recommendPlaylists = ref<Playlist.PlaylistInfo[]>([])
 
 onMounted(async () => {
+  // 开始模拟加载进度
+  simulateProgress(adminLoadingProgress);
+  simulateProgress(autoLoadingProgress);
+  simulateProgress(hotLoadingProgress);
+
   userInfo(userId).then(
     (res)=>{   
       switch (res.code) {
@@ -149,35 +194,14 @@ onMounted(async () => {
       switch (res.code) {
         case ResultCode.SUCCESS:          
           recommendedPlaylistInfos.value = res.oData;
+          adminRecommendLoading.value = false;
+          adminLoadingProgress.value = 100;
           break;
         default:
           break;
       }
     });
 
-    try {
-    const [playlistsRes, songsRes] = await Promise.all([
-      getRecommendAutoPlaylists(),
-      getHotSongs()
-    ])
-    
-    if (playlistsRes.code === ResultCode.SUCCESS) {
-      recommendPlaylists.value = playlistsRes.oData || []
-    }
-    
-    if (songsRes.code === ResultCode.SUCCESS) {
-      state.hotSongs = songsRes.oData || []
-    }
-  } catch (error) {
-    console.error('获取推荐数据失败:', error)
-    state.hotSongs = []
-    recommendPlaylists.value = []
-  }
-})
-
-// 刷新推荐
-const lastUpdateTime = ref('刚刚更新')
-const refreshRecommends = async () => {
   try {
     const [playlistsRes, songsRes] = await Promise.all([
       getRecommendAutoPlaylists(),
@@ -186,10 +210,58 @@ const refreshRecommends = async () => {
     
     if (playlistsRes.code === ResultCode.SUCCESS) {
       recommendPlaylists.value = playlistsRes.oData || []
+      autoRecommendLoading.value = false;
+      autoLoadingProgress.value = 100;
     }
     
     if (songsRes.code === ResultCode.SUCCESS) {
       state.hotSongs = songsRes.oData || []
+      hotSongsLoading.value = false;
+      hotLoadingProgress.value = 100;
+    }
+  } catch (error) {
+    console.error('获取推荐数据失败:', error)
+    state.hotSongs = []
+    recommendPlaylists.value = []
+    // 即使出错也要关闭加载状态
+    adminRecommendLoading.value = false;
+    autoRecommendLoading.value = false;
+    hotSongsLoading.value = false;
+    adminLoadingProgress.value = 100;
+    autoLoadingProgress.value = 100;
+    hotLoadingProgress.value = 100;
+  }
+})
+
+// 刷新推荐
+const lastUpdateTime = ref('刚刚更新')
+const refreshRecommends = async () => {
+  // 重新开始加载
+  autoRecommendLoading.value = true;
+  hotSongsLoading.value = true;
+  autoLoadingProgress.value = 0;
+  hotLoadingProgress.value = 0;
+  
+  // 模拟加载进度
+  simulateProgress(autoLoadingProgress);
+  simulateProgress(hotLoadingProgress);
+  
+  try {
+    const [playlistsRes, songsRes] = await Promise.all([
+      getRecommendAutoPlaylists(),
+      getHotSongs()
+    ])
+    
+    if (playlistsRes.code === ResultCode.SUCCESS) {
+      recommendPlaylists.value = playlistsRes.oData || []
+      autoRecommendLoading.value = false;
+      autoLoadingProgress.value = 100;
+    }
+    
+    if (songsRes.code === ResultCode.SUCCESS) {
+      state.hotSongs = songsRes.oData || []
+      hotSongsLoading.value = false;
+      hotLoadingProgress.value = 100;
     }
 
     // 更新刷新时间
@@ -197,6 +269,10 @@ const refreshRecommends = async () => {
     lastUpdateTime.value = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} 更新`
   } catch (error) {
     console.error('刷新推荐数据失败:', error)
+    autoRecommendLoading.value = false;
+    hotSongsLoading.value = false;
+    autoLoadingProgress.value = 100;
+    hotLoadingProgress.value = 100;
   }
 }
 
@@ -461,6 +537,29 @@ h2::after {
   color: var(--el-text-color-secondary);
   margin-left: 10px;
   font-weight: normal;
+}
+
+/* 加载状态的样式 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  width: 100%;
+}
+
+.progress-text {
+  display: block;
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
+  margin-bottom: 5px;
+}
+
+.progress-percentage {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--el-color-primary);
 }
 
 /* 动画效果 */
