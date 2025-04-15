@@ -8,7 +8,7 @@ import { App, reactive } from 'vue';
 import { Song } from '@/interface/song';
 import { getSongBlob } from '@/api/song';
 import { eventBus,MEventTypes } from "@/util/eventBus";
-import { HlsPlugin } from 'xgplayer-hls/es/plugin';
+// import { HlsPlugin } from 'xgplayer-hls/es/plugin';
 import { useVocalRemover } from '@/plugins/vocalRemoverPlugin';
 
 

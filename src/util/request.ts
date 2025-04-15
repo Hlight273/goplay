@@ -6,7 +6,7 @@ import { webRoot } from "./webConst";
  
 const service = axios.create({
     baseURL: webRoot,
-    timeout: 30000,
+    timeout: 60000,
     headers: {
       'Cache-Control': 'max-age=3600'
     }
