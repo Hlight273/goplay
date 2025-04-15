@@ -4,7 +4,7 @@
          :class="{'room-mode': isRoomMode}"
          :title="isRoomMode ? '点击切换到单人模式' : '点击切换到房间模式'">
     <el-icon><HomeFilled /></el-icon>
-    <span class="mode-text">{{ isRoomMode ? '房间模式' : '单人模式' }}</span>
+    <span class="mode-text">{{ isRoomMode ? '房间模式中' : '单人模式中' }}</span>
   </button>
 
   <button class="playlist_btn" v-show="!isRoomMode" @click="togglePlaylist">

@@ -33,12 +33,7 @@
           <div class="recommend-container">
             <h2>站长推荐</h2>
             <div v-if="adminRecommendLoading" class="loading-container">
-              <el-progress type="circle" :percentage="adminLoadingProgress" :stroke-width="6">
-                <template #default="{ percentage }">
-                  <span class="progress-text">加载中...</span>
-                  <span class="progress-percentage">{{ percentage }}%</span>
-                </template>
-              </el-progress>
+              <FancyLoader :percentage="adminLoadingProgress" text="加载推荐中..." />
             </div>
             <div v-else class="recommend-list">
               <div v-for="(playlistInfo, index) in recommendedPlaylistInfos" :key="index" >
@@ -73,12 +68,7 @@
           <span class="update-time">{{ lastUpdateTime }}</span>
         </h2>
         <div v-if="autoRecommendLoading" class="loading-container">
-          <el-progress type="circle" :percentage="autoLoadingProgress" :stroke-width="6">
-            <template #default="{ percentage }">
-              <span class="progress-text">加载中...</span>
-              <span class="progress-percentage">{{ percentage }}%</span>
-            </template>
-          </el-progress>
+          <FancyLoader :percentage="autoLoadingProgress" text="加载个性化推荐中..." />
         </div>
         <div v-else class="playlist-grid">
           <PlaylistBlock
@@ -98,12 +88,7 @@
           </el-tooltip>
         </h2>
         <div v-if="hotSongsLoading" class="loading-container">
-          <el-progress type="circle" :percentage="hotLoadingProgress" :stroke-width="6">
-            <template #default="{ percentage }">
-              <span class="progress-text">加载中...</span>
-              <span class="progress-percentage">{{ percentage }}%</span>
-            </template>
-          </el-progress>
+          <FancyLoader :percentage="hotLoadingProgress" text="加载热门歌曲中..." />
         </div>
         <div v-else>
           <HotSongList :songs="state.hotSongs" />
@@ -119,6 +104,7 @@ import { useRouter } from 'vue-router'
 import PlaylistBlock from '@/components/playlistBlock.vue'
 import HotSongList from '@/components/hotSongList.vue'
 import WelcomeCard from '@/components/welcomeCard.vue'
+import FancyLoader from '@/components/FancyLoader.vue'
 import { getRecommendPlaylists, getHotSongs, getRecommendAutoPlaylists } from '@/api/recommend'
 import { Song } from '@/interface/song'
 import { Playlist } from '@/interface/playlist'
@@ -546,20 +532,6 @@ h2::after {
   align-items: center;
   min-height: 200px;
   width: 100%;
-}
-
-.progress-text {
-  display: block;
-  font-size: 14px;
-  color: var(--el-text-color-secondary);
-  margin-bottom: 5px;
-}
-
-.progress-percentage {
-  display: block;
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--el-color-primary);
 }
 
 /* 动画效果 */
