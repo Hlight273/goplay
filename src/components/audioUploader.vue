@@ -42,11 +42,11 @@ const fileLimit = ref(1);
 const loading = ref(false)
 
 const uploadFile = (options:any)=>{
-    console.log("upload");
+    //console.log("upload");
     loading.value= true;
     let rawFile:File = options.file
     fileList.value = []
-    console.log("上传文件:",rawFile);
+    //console.log("上传文件:",rawFile);
     if(props.isRoomPlaylist){//上传到房间歌单
         uploadAudio4Room(props.userId, props.roomCode, rawFile).then((res)=>{
             emit('upload-success', res.oData);//给父组件上传成功的回调
@@ -80,7 +80,7 @@ const uploadFile = (options:any)=>{
 }
 
 const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {//限制总数
-    console.log("exceed");
+    //console.log("exceed");
     fileList.value = [files[0]]
     // if (fileList.value.length >= Number(fileLimit.value)) {
     //     globalProperties?.$message.warning('最多上传一个文件！')
@@ -89,7 +89,7 @@ const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {//限制�
 
 
 const BeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-    console.log("before",rawFile);
+    //console.log("before",rawFile);
     return new Promise((resolve, reject)=>{
         if (!allowedAudioMimeTypes.includes(rawFile.type)) {
             ElMessage.warning("音频格式支持: "+allowedAudioMimeTypes.join('、')+" ！")

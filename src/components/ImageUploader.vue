@@ -94,7 +94,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 }
 
 const BeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-    console.log("before", rawFile);
+    //console.log("before", rawFile);
     return new Promise((resolve, reject) => {
         if (!allowedImageMimeTypes.includes(rawFile.type)) {
             globalProperties?.$message.warning("图片格式支持: " + allowedImageMimeTypes.join('、') + "！");

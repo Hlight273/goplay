@@ -127,6 +127,18 @@ const ls = localStorage;
 const commonStore = useCommonStore();
 const { myUserinfo } = storeToRefs(commonStore);
 
+// 初始化动态列表
+const { currentTab } = defineProps<{
+    currentTab?: string
+}>()
+const isInitialized = ref(false);
+watch(() => currentTab, async (newTab) => {
+    if (newTab === 'mbti' && !isInitialized.value) {
+        await fetchSimilarUsers()
+        isInitialized.value = true;
+    }
+}, { immediate: true })
+
 const hasResult = ref(false)
 const isTestStarted = ref(false)
 const currentQuestion = ref(0)
@@ -161,6 +173,7 @@ const fetchSimilarUsers = async () => {
     const res = await getRandomSimilarMbtiUsers()
     if (res.code === ResultCode.SUCCESS && res.oData) {
       similarUsers.value = res.oData
+      console.log("%c初始化mbti相似用户成功",'color: blue');
     } else if (res.code === ResultCode.EMPTY) {
       similarUsers.value = []
     }
@@ -305,9 +318,9 @@ function initParticles() {
 }
 
 // 组件挂载时检查用户MBTI状态并获取相似用户
-onMounted(async () => {
-    await fetchSimilarUsers()
-})
+// onMounted(async () => {
+//     await fetchSimilarUsers()
+// })
 
 onUnmounted(() => {
   destroyParticles()

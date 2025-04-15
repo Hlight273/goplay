@@ -71,7 +71,7 @@ export function copyToClipboard(textToCopy:string) {
         if (!result) {
           console.log('复制失败')
         } else {
-          console.log('复制成功')
+          //console.log('复制成功')
         }
       } catch (e) {
         document.body.removeChild(input)

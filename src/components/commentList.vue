@@ -137,7 +137,7 @@
   };
 
 watch(() => props.curSong, (newMessage, oldMessage) => {
-    console.log("新歌来咯");
+    //console.log("新歌来咯");
     selectedComment.value = null;
     fetchComments(1)
 },{ deep: true });//深度监听

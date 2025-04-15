@@ -72,24 +72,24 @@ export abstract class BaseStrategy implements VocalRemovalStrategy {
 
     this.btn.onclick = async () => {
         if (this.isProcessing) {
-            console.log('正在处理中，请等待...');
+            //console.log('正在处理中，请等待...');
             return;
         }
 
-        console.log('开始处理:', this.isRemoved ? '恢复原音' : '去除人声');
-        console.log('当前音频源:', this.mediaElement?.src);
-        console.log('原始音频源:', this.originalSrc);
+        //console.log('开始处理:', this.isRemoved ? '恢复原音' : '去除人声');
+        //console.log('当前音频源:', this.mediaElement?.src);
+        //console.log('原始音频源:', this.originalSrc);
         
         this.isProcessing = true;
         try {
             if (this.isRemoved) {
                 await this.performRestore();
-                console.log('已恢复原音');
-                console.log('恢复后音频源:', this.mediaElement?.src);
+                //console.log('已恢复原音');
+                //console.log('恢复后音频源:', this.mediaElement?.src);
             } else {
                 await this.performRemoval();
-                console.log('已完成人声处理');
-                console.log('处理后音频源:', this.mediaElement?.src);
+                //console.log('已完成人声处理');
+                //console.log('处理后音频源:', this.mediaElement?.src);
             }
             this.isRemoved = !this.isRemoved;
         } catch (err) {
@@ -129,7 +129,7 @@ export class VocalRemoverPlugin {
     constructor(private player: Player) {
         // 只监听 URL 变化事件
         player.on('url_change', () => {
-            console.log('URL变化，准备重新初始化策略');
+            //console.log('URL变化，准备重新初始化策略');
             this.handleUrlChange();
         });
     }
@@ -143,22 +143,22 @@ export class VocalRemoverPlugin {
     }
   
     async applyStrategy(strategy: keyof typeof this.strategyInitializers = 'basic') {
-        console.log('开始应用策略:', strategy);
+        //console.log('开始应用策略:', strategy);
         
         // 清理当前策略
         if (this.currentStrategy) {
-          console.log('清理现有策略');
+          //console.log('清理现有策略');
           this.currentStrategy.cleanup();
         }
         
         try {
           //this.showLoading();
           
-          console.log('初始化新策略');
+          //console.log('初始化新策略');
           const initializer = this.strategyInitializers[strategy];
           this.currentStrategy = await initializer();
           
-          console.log('处理播放器');
+          //console.log('处理播放器');
           await this.currentStrategy.process(this.player);
           console.log('策略应用完成');
         } catch (err) {

@@ -48,7 +48,7 @@
           </div>
         </el-tooltip>
       </template>
-      <MusicMBTI />
+      <MusicMBTI :current-tab="activeTab" />
     </el-tab-pane>
 
     <el-tab-pane name="playlist" v-if="token!=null">
@@ -120,9 +120,9 @@ import AudioPanel from '@/views/audioPanel.vue';
 import UserPage from './userPage.vue';
 import TabAdmin from './tabAdmin.vue'
 const MusicVillage = defineAsyncComponent(() => import('./musicVillage.vue'))
+const MusicMBTI = defineAsyncComponent(() => import('@/components/MusicMBTI.vue'))
 import CharacterModel from '@/components/characterModel.vue'
 import CurrentPlaylist from '@/components/currentPlaylist.vue'
-import MusicMBTI from '@/components/MusicMBTI.vue'
 
 
 import { useCommonStore } from "@/store/commonStore";

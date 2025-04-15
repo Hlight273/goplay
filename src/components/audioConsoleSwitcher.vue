@@ -40,10 +40,10 @@ const togglePlaylist = () => {
 }
 
 const toggleGoplayerMode = ()=>{
-    console.log("isroommode",isRoomMode.value,"roomcode",roomCode.value);
+    //console.log("isroommode",isRoomMode.value,"roomcode",roomCode.value);
     
     if(!roomStore.myUserHasRoom()) {
-        console.log("没有房间");
+        //console.log("没有房间");
         
         GoPlayer.quitRoomMode();
         return;
