@@ -130,17 +130,27 @@
           FastClick.attach(document.body);
         }, false);
       }
-      window.addEventListener('load', function() { // 在Vue应用加载完成后移除加载动画
-        setTimeout(function() {
-          const loading = document.getElementById('app-loading');
-          if (loading) {
-            loading.style.opacity = '0';
-            loading.style.transition = 'opacity 0.3s';
-            setTimeout(function() {
-              loading.style.display = 'none';
-            }, 300);
+      // 监听 Vue 应用挂载完成的标志
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.target.id === 'app' && mutation.target.children.length > 0) {
+            const loading = document.getElementById('app-loading');
+            if (loading) {
+              loading.style.opacity = '0';
+              loading.style.transition = 'opacity 0.3s';
+              setTimeout(function() {
+                loading.style.display = 'none';
+              }, 300);
+            }
+            observer.disconnect(); // 停止观察
           }
-        }, 100);
+        });
+      });
+
+      // 开始观察 #app 元素
+      observer.observe(document.getElementById('app'), {
+        childList: true,
+        subtree: true
       });
     </script>
   </body>
