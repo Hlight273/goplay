@@ -39,3 +39,8 @@ export const getRepliesByComment = (commentId: number, page: number, pageSize: n
 export const addComment = (comment: { songId: number, parentId?: number, contentText: string }) => {
     return http.post<Result<string>>(`/comment`, comment);
 };
+
+export const getSongContent = (songId: number) => {
+    return http.get<Result<Song.SongContent>>(
+        `/song/${songId}/songContent`);
+};

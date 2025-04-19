@@ -63,6 +63,18 @@
       <TabMyPlaylist></TabMyPlaylist>
     </el-tab-pane>
 
+    <el-tab-pane name="share" v-if="token!=null">
+        <template #label>
+          <el-tooltip content="音乐分享" placement="right" :show-after="300">
+            <div class="nav-item">
+              <el-icon><Share /></el-icon>
+              <span class="nav-text">分享</span>
+            </div>
+          </el-tooltip>
+        </template>
+        <MusicShareBox></MusicShareBox>
+      </el-tab-pane>
+
     <el-tab-pane name="admin" v-if="token!=null&&isAdmin(myUserinfo)">
       <template #label>
         <el-tooltip content="管理面板" placement="right" :show-after="300">
@@ -119,6 +131,7 @@ import DissolveTransition from '@/components/dissolveTransition.vue';
 import AudioPanel from '@/views/audioPanel.vue';
 import UserPage from './userPage.vue';
 import TabAdmin from './tabAdmin.vue'
+import MusicShareBox from '@/components/MusicShareBox.vue'
 const MusicVillage = defineAsyncComponent(() => import('./musicVillage.vue'))
 const MusicMBTI = defineAsyncComponent(() => import('@/components/MusicMBTI.vue'))
 import CharacterModel from '@/components/characterModel.vue'

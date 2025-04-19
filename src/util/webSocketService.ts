@@ -17,15 +17,15 @@ export class WebSocketService {
   private needHeart = true;
   private heartbeatInterval: number | null = null;
   
-  constructor(brokerURL: string, userId:number, roomId:number, _needHeart?:boolean) {
+  constructor(brokerURL: string, userId:number, roomId:number, _needHeart?:boolean, _isPM?:boolean) {
     console.log("<<new WsService>>"+brokerURL);
     this.url = brokerURL;
     this.userId = userId;
     this.roomId = roomId;
-    this.client = this.createClient(this.url, this.userId, this.roomId, _needHeart??false)
+    this.client = this.createClient(this.url, this.userId, this.roomId, _needHeart??false, _isPM??false)
   }
 
-  createClient(brokerURL:string, userId:number, roomId:number, _needHeart?:boolean):Client{
+  createClient(brokerURL:string, userId:number, roomId:number, _needHeart?:boolean, _isPM?:boolean):Client{
     this.needHeart = _needHeart || false;
     const socket = new SockJS(brokerURL);
     var cl = new Client({
@@ -44,10 +44,11 @@ export class WebSocketService {
         roomId: roomId.toString(),  // 这里传递房间ID
         //'token':localStorage.getItem("token") || ''
       };
-      cl.disconnectHeaders = {
-        userId:  userId.toString(),
-        roomId: roomId.toString(),
-      }
+    }
+    if(_isPM){
+      cl.connectHeaders = {
+        userId: userId.toString(),
+      };
     }
     return cl;
   }

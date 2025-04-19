@@ -16,7 +16,7 @@ export enum OrderStatus {
 const isLocalTest:boolean = false;
 export const isServerRelease:boolean = process.env.VUE_APP_IS_SERVER_RELEASE === 'true';
 
-const RUrl:string = isServerRelease?"117.72.10.111":"192.168.3.55";
+const RUrl:string = isServerRelease?"117.72.10.111":"192.168.5.2";
 
 const FinalIp = isLocalTest?"localhost":RUrl
 

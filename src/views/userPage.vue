@@ -45,6 +45,13 @@
                 <span>{{ targetUserVipInfo.days || 0 }}</span>
                 <small>会员天数</small>
               </div>
+
+              <!-- 添加分享音乐按钮 -->
+              <div class="action-buttons" v-if="targetUserInfo.id !== myUserinfo.id">
+                <el-button type="primary" size="small" @click="shareDialogVisible = true">
+                  <el-icon><Share /></el-icon> 分享音乐
+                </el-button>
+              </div>
             </div>
           </div>
         </div>
@@ -113,6 +120,7 @@
           </div>
         </div>
       </template>
+
       <!-- 或者贴文列表 -->
       <template v-else>
         <div class="subContent">
@@ -122,6 +130,12 @@
 
     </div>
   </div>
+  <MusicShareDialog 
+    v-model:visible="shareDialogVisible"
+    :receiver-id="targetUserInfo.id"
+    :receiver-name="targetUserInfo.nickname"
+    @share-success="handleShareSuccess"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -137,10 +151,11 @@ import { CircleCloseFilled, Folder, Star, Medal, ChatDotSquare, Headset } from '
 import PlaylistBlock from '@/components/playlistBlock.vue'
 import UserPosts from '@/components/UserPosts.vue'
 import VipTag from '@/components/vipTag.vue';
+import MusicShareDialog from '@/components/MusicShareDialog.vue';
 const currentView = ref('playlists')
 
 const commonStore = useCommonStore();
-const { userPageOn, targetUserInfo, targetUserVipInfo } = storeToRefs(commonStore);
+const { userPageOn, targetUserInfo, targetUserVipInfo, myUserinfo } = storeToRefs(commonStore);
 const targetPlaylistInfos = reactive<Playlist.PlaylistInfo[]>([]);
 const isDarkTheme = ref(false);
 const tagTypes = ['primary', 'success', 'warning', 'danger'];
@@ -178,6 +193,13 @@ watch(
   },
   { immediate: true }
 )
+
+const shareDialogVisible = ref(false);
+
+// 处理分享成功
+const handleShareSuccess = () => {
+  // 可以在这里添加额外的逻辑，如果需要的话
+};
 </script>
 
 <style scoped>
@@ -596,6 +618,25 @@ watch(
   color: #ccc;
   border-bottom: .3vh solid #444 !important;
   background: #2a2a2a;
+}
+
+/* 添加分享按钮样式 */
+.action-buttons {
+  margin-top: 1vh;
+  display: flex;
+  gap: 1vh;
+}
+
+/* 暗色主题适配 */
+.dark-theme .action-buttons .el-button {
+  background-color: #333;
+  border-color: #444;
+  color: #ccc;
+}
+
+.dark-theme .action-buttons .el-button:hover {
+  background-color: #444;
+  border-color: #555;
 }
 
 /* 动画效果 */
