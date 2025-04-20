@@ -96,6 +96,7 @@ onMounted(()=>{
     flex-direction: column;
     align-items: center;
     width: 20vh;
+    border: .1vh solid #d2d2d263;
 }
 
 .cover-container {

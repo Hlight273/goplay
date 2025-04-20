@@ -27,84 +27,75 @@
         <TabRoom></TabRoom>
       </el-tab-pane>
 
-    <el-tab-pane name="community" v-if="token!=null">
-      <template #label>
-        <el-tooltip content="音乐社区" placement="right" :show-after="300">
-          <div class="nav-item">
-            <el-icon><HelpFilled /></el-icon>
-            <span class="nav-text">社区</span>
-          </div>
-        </el-tooltip>
-      </template>
-      <MusicVillage :current-tab="activeTab"></MusicVillage>
-    </el-tab-pane>
-
-    <el-tab-pane name="mbti">
-      <template #label>
-        <el-tooltip content="交友圈" placement="right" :show-after="300">
-          <div class="nav-item">
-            <el-icon><GobletSquareFull /></el-icon>
-            <span class="nav-text">交友</span>
-          </div>
-        </el-tooltip>
-      </template>
-      <MusicMBTI :current-tab="activeTab" />
-    </el-tab-pane>
-
-    <el-tab-pane name="playlist" v-if="token!=null">
-      <template #label>
-        <el-tooltip content="我的歌单" placement="right" :show-after="300">
-          <div class="nav-item">
-            <el-icon><Menu /></el-icon>
-            <span class="nav-text">歌单</span>
-          </div>
-        </el-tooltip>
-      </template>
-      <TabMyPlaylist></TabMyPlaylist>
-    </el-tab-pane>
-
-    <el-tab-pane name="share" v-if="token!=null">
+      <el-tab-pane name="community" v-if="token!=null">
         <template #label>
-          <el-tooltip content="音乐分享" placement="right" :show-after="300">
+          <el-tooltip content="音乐社区" placement="right" :show-after="300">
             <div class="nav-item">
-              <el-icon><Share /></el-icon>
-              <span class="nav-text">分享</span>
+              <el-icon><HelpFilled /></el-icon>
+              <span class="nav-text">社区</span>
             </div>
           </el-tooltip>
         </template>
-        <MusicShareBox></MusicShareBox>
+        <MusicVillage :current-tab="activeTab"></MusicVillage>
       </el-tab-pane>
 
-    <el-tab-pane name="admin" v-if="token!=null&&isAdmin(myUserinfo)">
-      <template #label>
-        <el-tooltip content="管理面板" placement="right" :show-after="300">
-          <div class="nav-item">
-            <el-icon><Histogram /></el-icon>
-            <span class="nav-text">管理</span>
-          </div>
-        </el-tooltip>
-      </template>
-      <TabAdmin></TabAdmin>
-    </el-tab-pane>
+      <el-tab-pane name="mbti">
+        <template #label>
+          <el-tooltip content="交友圈" placement="right" :show-after="300">
+            <div class="nav-item">
+              <el-icon><GobletSquareFull /></el-icon>
+              <span class="nav-text">交友</span>
+            </div>
+          </el-tooltip>
+        </template>
+        <MusicMBTI :current-tab="activeTab" />
+      </el-tab-pane>
 
-    <el-tab-pane name="setting" v-if="token!=null">
-      <template #label>
-        <el-tooltip content="设置" placement="right" :show-after="300">
-          <div class="nav-item">
-            <el-icon><Tools /></el-icon>
-            <span class="nav-text">设置</span>
-          </div>
-        </el-tooltip>
-      </template>
-      <TabSetting></TabSetting>
-    </el-tab-pane>
+      <el-tab-pane name="playlist" v-if="token!=null">
+        <template #label>
+          <el-tooltip content="我的歌单" placement="right" :show-after="300">
+            <div class="nav-item">
+              <el-icon><Menu /></el-icon>
+              <span class="nav-text">歌单</span>
+            </div>
+          </el-tooltip>
+        </template>
+        <TabMyPlaylist></TabMyPlaylist>
+      </el-tab-pane>
 
-  </el-tabs>
-  <AudioConsole></AudioConsole>
-  <AudioPanel></AudioPanel>
-  <UserPage v-if="token!=null"></UserPage>
-  <CurrentPlaylist />
-  <CharacterModel :current-tab="activeTab" v-if="token!=null"/>
+      <el-tab-pane name="admin" v-if="token!=null&&isAdmin(myUserinfo)">
+        <template #label>
+          <el-tooltip content="管理面板" placement="right" :show-after="300">
+            <div class="nav-item">
+              <el-icon><Histogram /></el-icon>
+              <span class="nav-text">管理</span>
+            </div>
+          </el-tooltip>
+        </template>
+        <TabAdmin></TabAdmin>
+      </el-tab-pane>
+
+      <el-tab-pane name="setting" v-if="token!=null">
+        <template #label>
+          <el-tooltip content="设置" placement="right" :show-after="300">
+            <div class="nav-item">
+              <el-icon><Tools /></el-icon>
+              <span class="nav-text">设置</span>
+            </div>
+          </el-tooltip>
+        </template>
+        <TabSetting></TabSetting>
+      </el-tab-pane>
+
+    </el-tabs>
+    <AudioConsole></AudioConsole>
+    <AudioPanel></AudioPanel>
+    <UserPage v-if="token!=null"></UserPage>
+    <CurrentPlaylist />
+
+    <MyStorage />
+
+    <CharacterModel :current-tab="activeTab" v-if="token!=null"/>
     
   </main>
   <DissolveTransition 
@@ -128,10 +119,10 @@ import TabSetting from './tabSetting.vue';
 import Goheader from '@/components/goheader.vue';
 import TabMyPlaylist from './tabMyPlaylist.vue';
 import DissolveTransition from '@/components/dissolveTransition.vue';
+import MyStorage from '@/components/musicShare/MyStorage.vue'
 import AudioPanel from '@/views/audioPanel.vue';
 import UserPage from './userPage.vue';
 import TabAdmin from './tabAdmin.vue'
-import MusicShareBox from '@/components/MusicShareBox.vue'
 const MusicVillage = defineAsyncComponent(() => import('./musicVillage.vue'))
 const MusicMBTI = defineAsyncComponent(() => import('@/components/MusicMBTI.vue'))
 import CharacterModel from '@/components/characterModel.vue'
@@ -142,7 +133,7 @@ import { useCommonStore } from "@/store/commonStore";
 import { storeToRefs } from "pinia";
 
 const commonStore = useCommonStore();
-const { dissolveOn, curPlaylistOn, myUserinfo } = storeToRefs(commonStore);
+const { dissolveOn, myUserinfo} = storeToRefs(commonStore);
 
 const activeTab = ref('recommend');
 

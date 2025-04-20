@@ -411,12 +411,12 @@ onUnmounted(() => {
 }
 
 .start-test {
-  padding: 40px 0;
+  padding-bottom: 40px;
   text-align: center;
 }
 
 .start-image {
-  width: 200px;
+  width: 160px;
   height: 200px;
   object-fit: contain;
   filter: drop-shadow(0 0 20px rgba(255, 0, 128, 0.3));

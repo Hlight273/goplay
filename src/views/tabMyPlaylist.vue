@@ -252,6 +252,9 @@ div[style="position: relative;"]:hover .floating_btn {
     align-items: center;
     justify-content: space-between;
     padding: 0 2vh;
+    border-bottom: .1vh solid #d2d2d263;
+    padding-bottom: 1vh;
+    padding-top: 1vh;
 }
 
 .title-area .title {

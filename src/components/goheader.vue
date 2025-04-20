@@ -51,6 +51,9 @@ header {
   padding-bottom: .8vh;
   border: .1vh solid var(--border-color, #652f2f);
   border-top: none;
+
+  position: relative;
+  z-index: 666;
 }
 
 .header-right {

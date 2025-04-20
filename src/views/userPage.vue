@@ -151,7 +151,7 @@ import { CircleCloseFilled, Folder, Star, Medal, ChatDotSquare, Headset } from '
 import PlaylistBlock from '@/components/playlistBlock.vue'
 import UserPosts from '@/components/UserPosts.vue'
 import VipTag from '@/components/vipTag.vue';
-import MusicShareDialog from '@/components/MusicShareDialog.vue';
+import MusicShareDialog from '@/components/musicShare/MusicShareDialog.vue';
 const currentView = ref('playlists')
 
 const commonStore = useCommonStore();

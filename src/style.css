@@ -16,6 +16,8 @@
     --text-shadow-width: 0.2vh;
     --text-shadow-width-: -0.2vh;
     --el-border-radius-base: 4vh;
+
+    --go-dark-border: #8e8e8e;
 }
 
 
@@ -119,6 +121,16 @@ body {
     box-shadow: 1px -1.9vh 0.1vh 0px rgb(16 15 18 / 57%) inset;
     --el-button-hover-bg-color: #575354;
     --el-button-hover-border-color: #911e2f;
+    --el-button-hover-text-color: #ffffff;
+}
+
+.red_oil_btn{
+    background: #d54646;
+    border-radius: 1.6vh;
+    border: 0.3vh solid #4e192d;
+    box-shadow: 1px -1.9vh 0.1vh 0px rgb(84 19 19 / 61%) inset;
+    --el-button-hover-bg-color: #a13a52;
+    --el-button-hover-border-color: #ff5972;
     --el-button-hover-text-color: #ffffff;
 }
 

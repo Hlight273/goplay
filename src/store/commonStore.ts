@@ -8,6 +8,7 @@ import { reactive, ref, watch } from "vue";
 export const useCommonStore = defineStore("common", () => {
 
     const dissolveOn = ref<boolean>(false);
+
     const userPageOn = ref<boolean>(false);
     const curPlaylistOn = ref<boolean>(false);
     
@@ -97,7 +98,7 @@ export const useCommonStore = defineStore("common", () => {
     }
     
    
-
+    
     return { dissolveOn, userPageOn, curPlaylistOn, 
         targetUserInfo, targetUserVipInfo, openUserPage, closeUserPage, openUserPage_byUserInfo,
         myUserinfo, myVipinfo, updateMyUserInfo, updateMyVipInfo, 
