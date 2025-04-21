@@ -16,7 +16,11 @@ export function getMyShares() {
  * @param store 是否保存
  */
 export function handleShareDecision(shareId: number, store: boolean) {
-  let formData = new FormData();
+  if (typeof shareId !== 'number' || typeof store !== 'boolean') {
+    throw new Error('Invalid parameters');
+  }
+  
+  const formData = new FormData();
   formData.append('shareId', shareId.toString());
   formData.append('store', store.toString());
   return http.post<Result<any>>('/share/handle', formData);

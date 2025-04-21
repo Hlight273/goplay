@@ -3,7 +3,7 @@
     <el-dialog
       v-model="dialogVisible"
       title="分享音乐"
-      width="30%"
+      width="80%"
       :close-on-click-modal="false"
       :show-close="true"
     >
@@ -108,8 +108,8 @@ const shareMusicToUser = async () => {
       ElMessage.error(res.message || '分享失败');
     }
   } catch (error) {
-    console.error('分享音乐失败', error);
-    ElMessage.error('分享音乐失败，请稍后再试');
+    //console.error('分享音乐失败', error);
+    //ElMessage.error('分享音乐失败，请稍后再试');
   } finally {
     sharing.value = false;
   }

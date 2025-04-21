@@ -119,14 +119,20 @@
 
 .share-list {
   flex: 1;
-  overflow-y: auto;
-  padding: 0 15px;
+    overflow-y: auto;
+    padding: 0 15px;
+    display: flex
+;
+    justify-content: center;
+    margin-bottom: 15vh;
 }
 
 .share-items {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+    gap: 8px;
+    width: 80%;
+    max-width: 600px;
 }
 
 .share-item {

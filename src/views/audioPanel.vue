@@ -165,8 +165,8 @@ const updateCurSong = (songContent: Song.SongContent | null)=>{
     }
 
     .tabBox {
-        margin-left: 10px;
-        margin-top: 2vh;
+        /* margin-left: 10px;
+        margin-top: 2vh; */
     }
 
     :deep(.el-tabs__item) {

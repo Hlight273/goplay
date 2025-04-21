@@ -48,8 +48,8 @@
 
               <!-- 添加分享音乐按钮 -->
               <div class="action-buttons" v-if="targetUserInfo.id !== myUserinfo.id">
-                <el-button type="primary" size="small" @click="shareDialogVisible = true">
-                  <el-icon><Share /></el-icon> 分享音乐
+                <el-button class="village_btn" type="primary" size="small" @click="shareDialogVisible = true">
+                  <el-icon><Share /></el-icon> 分享音乐(1点积分)
                 </el-button>
               </div>
             </div>
@@ -622,7 +622,7 @@ const handleShareSuccess = () => {
 
 /* 添加分享按钮样式 */
 .action-buttons {
-  margin-top: 1vh;
+  
   display: flex;
   gap: 1vh;
 }

@@ -48,7 +48,7 @@
       'pull-up': !isOpen && wasOpen 
     }" v-show="isOpen || wasOpen">
       <div class="portal-header">
-        <h2>回忆仓库</h2>
+        <h2>MEMORY - STORAGE</h2>
       </div>
       <div class="tabs-container">
         <div class="tabs-header">
@@ -78,6 +78,7 @@
               class="fullscreen-content" 
               :shares="receivedShares"
               :song-details="songDetails"
+              @handle-share="handleShare"
             />
           </div>
         </div>
@@ -166,6 +167,12 @@ const fetchShares = async () => {
 // 处理分享
 const handleShare = async (share: Share.MusicShareMessage, store: boolean) => {
   try {
+    if (!share || typeof share.shareId === 'undefined') {
+      console.error('无效的分享信息', share);
+      ElMessage.error('处理分享失败：无效的分享信息');
+      return;
+    }
+
     const res = await handleShareDecision(share.shareId, store);
     
     if (res.code === ResultCode.SUCCESS) {
@@ -312,24 +319,39 @@ onUnmounted(() => {
 }
 
 .portal-header {
-    display: flex;
-    justify-content: space-between;
+  display: flex
+;
+    justify-content: center;
     align-items: center;
-    padding: 15px 20px;
-    background: linear-gradient(266deg, #6b2d9d, #d45988);
+    padding: 4px 2px;
+    background: linear-gradient(260deg, #461a26, #14153c);
     border-bottom: 1px solid #ba3939;
     box-shadow: 0px -1vh 0.6vh 0px rgba(24, 9, 20, 0.71) inset;
-    border: .2vh solid #9e637e;
+    border: 0.1vh solid #7c3a58;
+    border-radius: 2vh 2vh 0 0;
+    background-size: 400% 400%;
+  animation: moveGradient 3s ease infinite;
   }
+  @keyframes moveGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
 
 .portal-header h2 {
   margin: 0;
-    color: #ffc3e0;
-    font-size: 2vh;
+    color: #b583ae;
+    font-size: 1.5vh;
     text-shadow: 0 0 5px rgb(209 103 255 / 80%);
     margin-bottom: -.8vh;
     position: relative;
-    top: -0.8vh;
+    top: -0.5vh;
     box-sizing: border-box;
     padding: .2vh 1vh;
 }
@@ -361,6 +383,8 @@ onUnmounted(() => {
   /* border-bottom: 1px solid var(--go-dark-border); */
   background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
   justify-content: center;
+  box-shadow: 0px -1.5vh 0.4vh 0px rgb(24 9 20 / 71%) inset;
+  padding-bottom: .5vh;
 }
 
 .tab-item {
@@ -379,6 +403,13 @@ onUnmounted(() => {
 
 .tab-item.active {
   color: #ff7272;
+    background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
+    justify-content: center;
+    box-shadow: 0px -0.8vh 0.8vh 0px rgb(12 8 11 / 71%) inset;
+    padding: 8px 32px;
+    border-radius: 80px 80px 10px 10px;
+    border: 2px solid #302e30;
+    line-height: 10px;
 }
 
 .tab-indicator {
@@ -387,14 +418,16 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #ff7272;
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-  transform-origin: center;
+  
 }
 
 .tab-item.active .tab-indicator {
   transform: scaleX(1);
+  background-color: #ff7272;
+  transition: transform 0.3s ease;
+    transform-origin: center;
+    border: 1px solid #6b1b3c;
+    border-radius: 0 0 10px 10px;
 }
 
 .tabs-content {
@@ -420,6 +453,7 @@ onUnmounted(() => {
   height: 100%;
   overflow-y: auto;
   padding: 20px;
+  overflow: hidden;
 }
 
 .share-notification {
