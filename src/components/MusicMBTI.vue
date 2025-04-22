@@ -94,13 +94,21 @@
 
       <div class="similar-users-section">
         <h3 class="similar-users-title">与你音乐品味相似的用户</h3>
-        <div v-if="similarUsers.length > 0" class="similar-users-bubbles" id="similar-users-container">
+        <div v-if="similarUsers.length > 0" class="similar-users-grid">
           <div v-for="(user, index) in similarUsers" :key="user.id" 
-               class="user-bubble" 
-               :style="getBubbleStyle(index)"
+               class="user-card" 
+               :style="getUserCardStyle(index)"
                @click="handleViewProfile(user)">
-            <img :src="user.avatarUrl" alt="avatar" class="user-avatar">
-            <span class="user-name">{{ user.nickname }}</span>
+            <div class="user-card-inner">
+              <div class="user-avatar-container">
+                <img :src="user.avatarUrl" alt="avatar" class="user-avatar">
+                <div class="user-avatar-glow"></div>
+              </div>
+              <div class="user-info">
+                <span class="user-name">{{ user.nickname }}</span>
+                <span class="user-mbti">{{ getMbtiType(user.mbtiType) }}</span>
+              </div>
+            </div>
           </div>
         </div>
         <div v-if="similarUsers.length === 0" class="no-similar-users">
@@ -235,18 +243,27 @@ const handleViewProfile = (userinfo: User.UserInfo) => {
   commonStore.openUserPage_byUserInfo(userinfo)
 }
 
-// 获取气泡样式
-const getBubbleStyle = (index: number) => {
-  const colors = ['#ff6b6b', '#48dbfb', '#1dd1a1', '#feca57', '#ff9ff3', '#54a0ff']
-  const size = 70 + Math.random() * 30 // 70px到100px之间的随机大小
-  const delay = Math.random() * 5 // 0到5秒的随机延迟
+// 获取MBTI类型字符串
+const getMbtiType = (mbtiTypeCode: number | undefined | null) => {
+  if (mbtiTypeCode === undefined || mbtiTypeCode === null) return '';
+  return MBTICodec.decode(mbtiTypeCode);
+}
+
+// 获取用户卡片样式
+const getUserCardStyle = (index: number) => {
+  const colors = [
+    'linear-gradient(135deg, #ff6b6b, #ee5253)',
+    'linear-gradient(135deg, #48dbfb, #0abde3)',
+    'linear-gradient(135deg, #1dd1a1, #10ac84)',
+    'linear-gradient(135deg, #feca57, #ff9f43)',
+    'linear-gradient(135deg, #ff9ff3, #f368e0)',
+    'linear-gradient(135deg, #54a0ff, #2e86de)'
+  ];
   
   return {
-    backgroundColor: colors[index % colors.length],
-    width: `${size}px`,
-    height: `${size}px`,
-    animationDelay: `${delay}s`
-  }
+    background: colors[index % colors.length],
+    animationDelay: `${index * 0.2}s`
+  };
 }
 
 // 粒子效果相关
@@ -316,11 +333,6 @@ function initParticles() {
     })
   }
 }
-
-// 组件挂载时检查用户MBTI状态并获取相似用户
-// onMounted(async () => {
-//     await fetchSimilarUsers()
-// })
 
 onUnmounted(() => {
   destroyParticles()
@@ -617,7 +629,7 @@ h4 {
   z-index: 1;
 }
 
-/* 相似用户部分样式 */
+/* 相似用户部分样式 - 全新设计 */
 .similar-users-container {
   display: flex;
   flex-direction: column;
@@ -635,66 +647,125 @@ h4 {
 .similar-users-title {
   font-size: 24px;
   color: #e0e0e0;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   text-align: center;
   background: linear-gradient(45deg, #ff0080, #7928ca);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.similar-users-bubbles {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+/* 网格布局的用户卡片 */
+.similar-users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
-  min-height: 200px;
+  padding: 10px;
 }
 
-.user-bubble {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
+.user-card {
+  height: 100px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  animation: float 3s ease-in-out infinite;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  position: relative;
+  animation: card-float 3s ease-in-out infinite;
 }
 
-.user-bubble:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 25px rgba(255, 0, 128, 0.4);
+.user-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(255, 0, 128, 0.3);
+}
+
+.user-card-inner {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.user-avatar-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .user-avatar {
-  width: 60%;
-  height: 60%;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.user-avatar-glow {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  filter: blur(5px);
+  z-index: -1;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.user-info {
+  margin-left: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .user-name {
-  margin-top: 5px;
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: bold;
   color: white;
-  text-align: center;
-  max-width: 90%;
+  margin-bottom: 5px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-@keyframes float {
+.user-mbti {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+@keyframes card-float {
   0% {
-    transform: translateY(0px);
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(-15px);
+    transform: translateY(-5px);
   }
   100% {
-    transform: translateY(0px);
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
   }
 }
 
@@ -704,5 +775,74 @@ h4 {
   align-items: center;
   height: 200px;
   color: #e0e0e0;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+  .similar-users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  .user-card {
+    height: 90px;
+  }
+  
+  .user-avatar-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .user-name {
+    font-size: 14px;
+  }
+  
+  .user-mbti {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .mbti-container {
+    padding: 20px;
+  }
+  
+  .section-title {
+    font-size: 22px;
+  }
+  
+  .similar-users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 15px;
+  }
+  
+  .user-card {
+    height: 80px;
+  }
+  
+  .user-card-inner {
+    padding: 10px;
+  }
+  
+  .user-avatar-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .user-name {
+    font-size: 12px;
+  }
+  
+  .user-mbti {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+  
+  .type-title {
+    font-size: 36px;
+  }
+  
+  .type-name {
+    font-size: 18px;
+  }
 }
 </style>

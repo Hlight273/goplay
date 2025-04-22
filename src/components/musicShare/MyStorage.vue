@@ -9,39 +9,50 @@
     </div>
 
     <!-- 通知组件 -->
-    <div class="share-notification" v-if="showNotification && latestShare" :class="{ 'show': showNotification }">
-      <div class="notification-content">
+    <transition name="fade">
+      <div class="share-notification" v-if="showNotification && latestShare">
         <div class="notification-header">
-          <el-avatar :src="latestShare.senderAvatar" class="sender-avatar"></el-avatar>
-          <div class="notification-title">
-            <span class="sender-name">{{ latestShare.senderName || '用户' + latestShare.senderId }}</span>
-            <span>向你分享了一首歌</span>
-          </div>
-          <el-button class="close-notification" circle @click="closeNotification">
-            <el-icon><Close /></el-icon>
-          </el-button>
+          <span>新的音乐分享</span>
+          <el-icon class="close-icon" @click.stop="closeNotification"><Close /></el-icon>
         </div>
-        <div class="notification-body">
-          <div class="song-info" v-if="songDetails[latestShare.songId]">
-            <img :src="getSongCover(songDetails[latestShare.songId])" alt="封面" class="song-cover">
-            <div class="song-text">
-              <div class="song-name">{{ songDetails[latestShare.songId].songInfo.songName }}</div>
-              <div class="song-artist">{{ songDetails[latestShare.songId].songInfo.songArtist }}</div>
+
+        <div class="notification-content">
+          <div class="notification-sender">
+            <el-avatar :src="latestShare.senderAvatar" class="sender-avatar"></el-avatar>
+            <div class="sender-info">
+              <span class="sender-name">{{ latestShare.senderName || '用户' + latestShare.senderId }}</span>
+              <span class="share-time">刚刚</span>
             </div>
           </div>
-          <div v-else class="loading-song">
-            <el-skeleton :rows="2" animated />
+          
+          <div class="song-container">
+            <div class="song-info" v-if="songDetails[latestShare.songId]">
+              <img :src="getSongCover(songDetails[latestShare.songId])" alt="封面" class="song-cover">
+              <div class="song-text">
+                <div class="song-name">{{ songDetails[latestShare.songId].songInfo.songName }}</div>
+                <div class="song-artist">{{ songDetails[latestShare.songId].songInfo.songArtist }}</div>
+              </div>
+            </div>
+            <div v-else class="loading-song">
+              <el-skeleton :rows="2" animated />
+            </div>
           </div>
+          
           <div class="share-message" v-if="latestShare.contentText">
             {{ latestShare.contentText }}
           </div>
-        </div>
-        <div class="notification-actions">
-          <el-button type="primary" @click="handleShare(latestShare, true)">保存到我的仓库</el-button>
-          <el-button @click="handleShare(latestShare, false)">丢弃</el-button>
+          
+          <div class="notification-actions">
+            <el-button class="black_oil_btn" @click="handleShare(latestShare, true)">
+              <el-icon><Check /></el-icon> 保存
+            </el-button>
+            <el-button class="black_oil_btn" @click="handleShare(latestShare, false)">
+              <el-icon><Close /></el-icon> 丢弃
+            </el-button>
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
 
     <div class="fullscreen-share-box" :class="{ 
       'drop-in': isOpen, 
@@ -90,7 +101,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
-import { Close } from '@element-plus/icons-vue';
+import { Close, Check } from '@element-plus/icons-vue';
 import PortalButton from './PortalButton.vue';
 import MusicShareBox from './MusicShareBox.vue';
 import MusicStorageBox from './MusicStorageBox.vue';
@@ -319,20 +330,20 @@ onUnmounted(() => {
 }
 
 .portal-header {
-  display: flex
-;
-    justify-content: center;
-    align-items: center;
-    padding: 4px 2px;
-    background: linear-gradient(260deg, #461a26, #14153c);
-    border-bottom: 1px solid #ba3939;
-    box-shadow: 0px -1vh 0.6vh 0px rgba(24, 9, 20, 0.71) inset;
-    border: 0.1vh solid #7c3a58;
-    border-radius: 2vh 2vh 0 0;
-    background-size: 400% 400%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 2px;
+  background: linear-gradient(260deg, #461a26, #14153c);
+  border-bottom: 1px solid #ba3939;
+  box-shadow: 0px -1vh 0.6vh 0px rgba(24, 9, 20, 0.71) inset;
+  border: 0.1vh solid #7c3a58;
+  border-radius: 2vh 2vh 0 0;
+  background-size: 400% 400%;
   animation: moveGradient 3s ease infinite;
-  }
-  @keyframes moveGradient {
+}
+
+@keyframes moveGradient {
   0% {
     background-position: 0% 50%;
   }
@@ -346,14 +357,14 @@ onUnmounted(() => {
 
 .portal-header h2 {
   margin: 0;
-    color: #b583ae;
-    font-size: 1.5vh;
-    text-shadow: 0 0 5px rgb(209 103 255 / 80%);
-    margin-bottom: -.8vh;
-    position: relative;
-    top: -0.5vh;
-    box-sizing: border-box;
-    padding: .2vh 1vh;
+  color: #b583ae;
+  font-size: 1.5vh;
+  text-shadow: 0 0 5px rgb(209 103 255 / 80%);
+  margin-bottom: -.8vh;
+  position: relative;
+  top: -0.5vh;
+  box-sizing: border-box;
+  padding: .2vh 1vh;
 }
 
 .notification-badge {
@@ -403,13 +414,13 @@ onUnmounted(() => {
 
 .tab-item.active {
   color: #ff7272;
-    background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
-    justify-content: center;
-    box-shadow: 0px -0.8vh 0.8vh 0px rgb(12 8 11 / 71%) inset;
-    padding: 8px 32px;
-    border-radius: 80px 80px 10px 10px;
-    border: 2px solid #302e30;
-    line-height: 10px;
+  background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
+  justify-content: center;
+  box-shadow: 0px -0.8vh 0.8vh 0px rgb(12 8 11 / 71%) inset;
+  padding: 8px 32px;
+  border-radius: 80px 80px 10px 10px;
+  border: 2px solid #302e30;
+  line-height: 10px;
 }
 
 .tab-indicator {
@@ -418,16 +429,15 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 2px;
-  
 }
 
 .tab-item.active .tab-indicator {
   transform: scaleX(1);
   background-color: #ff7272;
   transition: transform 0.3s ease;
-    transform-origin: center;
-    border: 1px solid #6b1b3c;
-    border-radius: 0 0 10px 10px;
+  transform-origin: center;
+  border: 1px solid #6b1b3c;
+  border-radius: 0 0 10px 10px;
 }
 
 .tabs-content {
@@ -447,6 +457,10 @@ onUnmounted(() => {
   flex-direction: column;
   overflow: hidden;
   background-color: #1a1a1a;
+  border: 4px solid #313131;
+  box-sizing: border-box;
+  margin-left: -1px;
+  border-radius: 10px;
 }
 
 .fullscreen-content {
@@ -456,68 +470,102 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
+/* 新的通知样式 */
 .share-notification {
   position: fixed;
   top: 20px;
   right: 20px;
   width: 350px;
-  background: #1a1a1a;
+  background-color: rgba(30, 30, 30, 0.85);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(255, 71, 89, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   z-index: 9999;
-  transform: translateY(-150%);
-  transition: transform 0.3s ease-out;
-  border: 1px solid var(--go-dark-border);
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideIn 0.3s ease-out forwards;
 }
 
-.share-notification.show {
-  transform: translateY(0);
-}
-
-.notification-content {
-  padding: 15px;
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .notification-header {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background-color: rgba(50, 50, 50, 0.5);
+  color: white;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.close-icon {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.2s;
+}
+
+.close-icon:hover {
+  color: #fff;
+}
+
+.notification-content {
+  padding: 15px;
+  color: #fff;
+}
+
+.notification-sender {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .sender-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   margin-right: 10px;
-  border: 1px solid var(--go-dark-border);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.notification-title {
-  flex: 1;
+.sender-info {
   display: flex;
   flex-direction: column;
-  color: #fff;
 }
 
 .sender-name {
   font-weight: bold;
   font-size: 14px;
-  color: var(--go-dark-border);
+  color: #a5a5ff;
 }
 
-.notification-body {
-  margin: 15px 0;
+.share-time {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
 }
 
-.notification-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+.song-container {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  margin: 10px 0;
+  border: 0.2vh solid #555760;
 }
 
 .song-info {
-  background-color: #2a2a2a;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
   padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #333;
 }
 
 .song-cover {
@@ -526,42 +574,103 @@ onUnmounted(() => {
   border-radius: 4px;
   margin-right: 10px;
   object-fit: cover;
-  border: 1px solid var(--go-dark-border);
 }
 
 .song-text {
   flex: 1;
-  color: #fff;
 }
 
 .song-name {
   font-weight: bold;
   font-size: 14px;
-  color: #ff7272;
+  color: #fff;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .song-artist {
   font-size: 12px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .share-message {
-  font-size: 14px;
-  color: #ccc;
-  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
   word-break: break-word;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.notification-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.notification-actions .el-button {
+  padding: 6px 15px;
+  display: flex;
+  align-items: center;
+}
+
+.notification-actions .el-icon {
+  margin-right: 5px;
 }
 
 .loading-song {
-  padding: 10px;
+  padding: 15px;
 }
 
-/* 响应式布局 */
-@media (max-width: 768px) {
+/* 动画效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
   .share-notification {
-    width: 90%;
-    left: 5%;
-    right: 5%;
+    width: calc(100% - 40px);
+    right: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .share-notification {
+    width: calc(100% - 20px);
+    right: 10px;
+  }
+  
+  .notification-header {
+    padding: 8px 12px;
+  }
+  
+  .notification-content {
+    padding: 10px;
+  }
+  
+  .song-name {
+    font-size: 13px;
+  }
+  
+  .song-artist {
+    font-size: 11px;
   }
 }
 
