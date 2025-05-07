@@ -217,9 +217,11 @@ const receive_PlayerData_InRoom = (msg:IMessage)=>{
 //其他播放器回调事件统一注册、卸载
 const roomPlayerEventReg = () => {
   //console.log(globalProperties?.$GoPlayer.player);
+
   
   //播放
   globalProperties?.$GoPlayer.player4room?.on(Events.PLAY, () => {
+    globalProperties?.$GoPlayer.setIsInited();
     if(globalProperties?.$GoPlayer.is_b_locked()){
       //console.log("播放被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
@@ -235,10 +237,12 @@ const roomPlayerEventReg = () => {
       isExternal:true,
     };
     //console.log("-<<<(((房间内广播_播放)))>>>---");
+    console.log("发播放",globalProperties?.$GoPlayer.player4room?.currentTime);
     broadcast_playerStatusChangeInRoom(_playerData);
   });
   //暂停
   globalProperties?.$GoPlayer.player4room?.on(Events.PAUSE, () => {
+    globalProperties?.$GoPlayer.setIsInited();
     if(globalProperties?.$GoPlayer.is_b_locked()){
       //console.log("暂停被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
@@ -254,10 +258,12 @@ const roomPlayerEventReg = () => {
       isExternal:true,
     };
     //console.log("-<<<(((房间内广播_暂停)))>>>---");
+    console.log("发暂停",globalProperties?.$GoPlayer.player4room?.currentTime);
     broadcast_playerStatusChangeInRoom(_playerData);
   });
   //时间调整
   globalProperties?.$GoPlayer.player4room?.on(Events.SEEKED, () => {
+    globalProperties?.$GoPlayer.setIsInited();
     if(globalProperties?.$GoPlayer.is_b_locked()){
       //console.log("调时间被拦截，锁已解开");
       globalProperties?.$GoPlayer.b_unlock()
@@ -272,6 +278,7 @@ const roomPlayerEventReg = () => {
       isExternal:true,
     };
     //console.log("-<<<(((房间内广播_调时间)))>>>---");
+    console.log("调时间",globalProperties?.$GoPlayer.player4room?.currentTime);
     broadcast_playerStatusChangeInRoom(_playerData);
   });
 

@@ -31,6 +31,9 @@ export class GoPlayer {
     
     public static broadcast_lock:boolean = false;
     private hasSynced = false;
+    public setIsInited() {
+        this.hasSynced = true; 
+    }
    
     constructor() { 
         GoPlayer.broadcast_lock=false;
@@ -311,10 +314,7 @@ export class GoPlayer {
         if(dataIsSetIndex || !this.hasSynced){
             this.player4room.plugins.music.setIndex(_data.index);
         }
-
-        //仅仅切换暂停播放
-        if (_data.paused === this.player4room.paused) return;
-        
+        this.hasSynced = true;
         if(_data.paused){      
             this.player4room.autoplay = false;
             this.player4room.pause();
@@ -327,7 +327,7 @@ export class GoPlayer {
            });
         }  
 
-        this.hasSynced = true;
+       
     }
     setPlayer4RoomIndex(_index:number):void{
         if (!this.player4room || this.player4room.plugins.music.list==null) 

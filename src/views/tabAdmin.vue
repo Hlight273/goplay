@@ -73,6 +73,17 @@
             </template>
           </el-table-column>
         </el-table>
+        <div class="pagination">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            :total="total"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
 
       <!-- 歌曲搜索结果 -->
@@ -111,9 +122,19 @@
             </template>
           </el-table-column>
         </el-table>
+        <div class="pagination">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            :total="total"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
 
-      <!-- 在歌曲搜索结果后面添加用户搜索结果 -->
       <!-- 用户搜索结果 -->
       <div v-if="searchType === 'user'" class="list-container">
         <el-table :data="userResults">
@@ -150,8 +171,27 @@
             </template>
           </el-table-column>
         </el-table>
+        
+        <div class="pagination">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            :total="total"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
-       <!-- 添加用户权限修改弹窗 -->
+
+      
+
+
+
+      <!-- 添加用户权限修改弹窗 -->
+   
+
   <el-dialog 
     v-model="userLevelDialogVisible" 
     title="修改用户权限" 
@@ -340,7 +380,7 @@ const handleSearch = () => {
     case 'playlist':
       searchAdminPlaylists(params).then((res) => {
         if(res.code === ResultCode.SUCCESS) {
-          console.log("xx",res);
+          //console.log("xx",res);
           
           playlistResults.value = res.data.playlistInfos//过滤掉没有歌曲的歌单
             .filter(playlist => playlist.playlist!=null&&playlist.songContentList.length>0)
@@ -854,6 +894,26 @@ const submitUpdateUserLevel = () => {
   :deep(.el-input__inner) {
     background: rgba(0, 0, 0, 0.3);
     border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .pagination {
+    :deep(.el-pagination) {
+      flex-wrap: wrap;
+      justify-content: center;
+      
+      .el-pagination__sizes {
+        margin-top: 10px;
+      }
+    }
   }
 }
 </style>

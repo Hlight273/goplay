@@ -12,20 +12,6 @@
         <button class="custom-button" @click.stop="flipCard">
           <RefreshRight />
         </button>
-        <button class="custom-button delete-button" @click.stop="showRemoveConfirm = true">
-          <Delete />
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 自定义确认对话框 -->
-  <div class="confirm-dialog" v-if="showRemoveConfirm">
-    <div class="confirm-dialog-content">
-      <p>确定要移除这个分享吗？</p>
-      <div class="confirm-dialog-buttons">
-        <button @click="removeShareItem" class="confirm-btn confirm-yes">确定</button>
-        <button @click="showRemoveConfirm = false" class="confirm-btn confirm-no">取消</button>
       </div>
     </div>
   </div>
@@ -33,11 +19,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { VideoPlay, Plus, RefreshRight, Delete } from '@element-plus/icons-vue';
+import { VideoPlay, Plus, RefreshRight } from '@element-plus/icons-vue';
 import { Share } from '@/interface/share';
 import { Song } from '@/interface/song';
 import { MusicCardRenderer } from '@/plugins/musicCardRenderPlugin';
-
 
 const props = defineProps<{
   share: Share.MusicShareMessage,
@@ -45,7 +30,7 @@ const props = defineProps<{
   active: boolean
 }>();
 
-const emit = defineEmits(['play', 'add-to-playlist', 'handle-share']);
+defineEmits(['play', 'add-to-playlist']);
 
 const cardContainer = ref<HTMLElement | null>(null);
 const cardCanvas = ref<HTMLCanvasElement | null>(null);
@@ -56,12 +41,6 @@ let previousMousePosition = { x: 0, y: 0 };
 let targetRotation = { x: 0, y: 0 };
 let currentRotation = { x: 0, y: 0 };
 let animationFrameId: number;
-const showRemoveConfirm = ref(false);
-
-const removeShareItem = () => {
-  emit('handle-share', props.share, false);
-  showRemoveConfirm.value = false;
-};
 
 // 翻转卡片
 const flipCard = () => {
@@ -320,18 +299,6 @@ watch(() => props.share, async () => {
   if (!renderer) return;
   await renderer.createCard(props.songDetails, props.share);
 }, { deep: true });
-
-// 暴露给父组件的旋转方法
-const spinCard = async () => {
-  if (renderer) {
-    await renderer.spinCard(800); // 800ms 完成旋转
-  }
-};
-
-// 暴露方法给父组件
-defineExpose({
-  spinCard
-});
 </script>
 
 
@@ -416,75 +383,4 @@ defineExpose({
   transform: translateY(1px);
   border: 3px solid #d25454;
   }
-
-.delete-button {
-  color: #8a5959;
-}
-
-.delete-button:hover {
-  border: 3px solid #ff3a3a;
-}
-
-/* 自定义确认对话框样式 */
-.confirm-dialog {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.confirm-dialog-content {
-  background-color: #2a2a2a;
-  border-radius: 8px;
-  padding: 20px;
-  width: 300px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  border: 1px solid #3a3a3a;
-}
-
-.confirm-dialog-content p {
-  margin-bottom: 20px;
-  color: #e0e0e0;
-  text-align: center;
-  font-size: 16px;
-}
-
-.confirm-dialog-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.confirm-btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.confirm-yes {
-  background-color: #d25454;
-  color: white;
-}
-
-.confirm-yes:hover {
-  background-color: #e63e3e;
-}
-
-.confirm-no {
-  background-color: #4d4b51;
-  color: #e0e0e0;
-}
-
-.confirm-no:hover {
-  background-color: #5d5b61;
-}
 </style>

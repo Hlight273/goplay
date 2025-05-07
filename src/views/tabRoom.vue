@@ -280,13 +280,36 @@ const receive_Msg_InRoom = (msg:IMessage)=>{
   let roomMsg = JSON.parse(msg.body) as Room.RoomMsg
   msgList.value?.push(roomMsg)
 }
+const isActivelyLeaving = ref(false);
+
+const exitRoom = ()=>{
+  if(roomCode.value==undefined) return
+  isActivelyLeaving.value = true;
+  roomExit(roomCode.value, userId).then(
+    (res)=>{   
+      switch (res.code) {
+        case ResultCode.SUCCESS:
+          wsService?.disconnect();
+          globalProperties?.$message.success(res.message)
+          setPageState(PageStatus.WAIT_FOR_ROOM)
+          break;
+        default:
+          break;
+      }
+    },(err)=>{
+
+    }).finally(() => {
+      isActivelyLeaving.value = false;
+    });
+}
+
 //订阅 用户列表更新 /topic/房间id/userInfoList
 const receive_UserInfoList_InRoom = (msg:IMessage)=>{
   let _userInfoList = JSON.parse(msg.body) as User.UserInfo[]
 
   const stillInRoom = _userInfoList.some(user => user.id === userId);
   
-  if (!stillInRoom && currentPageState.value === PageStatus.IN_ROOM) {//检查我是否还在该列表
+  if (!stillInRoom && currentPageState.value === PageStatus.IN_ROOM && !isActivelyLeaving.value) {//检查我是否还在该列表
     ElMessage.warning('你已被踢出房间');
     setPageState(PageStatus.WAIT_FOR_ROOM);
     return;
@@ -327,24 +350,6 @@ const joinNewRoom = ()=>{
         case ResultCode.SUCCESS:
           globalProperties?.$message.success(res.message)
           setPageState(PageStatus.IN_ROOM, res.oData)
-          break;
-        default:
-          break;
-      }
-    },(err)=>{
-
-    });
-}
-
-const exitRoom = ()=>{
-  if(roomCode.value==undefined) return
-  roomExit(roomCode.value, userId).then(
-    (res)=>{   
-      switch (res.code) {
-        case ResultCode.SUCCESS:
-          wsService?.disconnect();
-          globalProperties?.$message.success(res.message)
-          setPageState(PageStatus.WAIT_FOR_ROOM)
           break;
         default:
           break;
