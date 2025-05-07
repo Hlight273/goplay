@@ -304,7 +304,7 @@ watch(() => props.share, async () => {
 
 <style scoped>
 .music-card-3d-container {
-  width: 100%;
+  /* width: 100%; */
   display: flex;
   justify-content: center;
   align-items: center;
