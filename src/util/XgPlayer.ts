@@ -257,12 +257,12 @@ export class GoPlayer {
         this.roomPlaylist = [..._list];
         
          // 5. 不自动恢复播放索引，除非已经在播放中
-        if (currentIndex >= 0 && currentIndex < this.player4room.plugins.music.list.length && !this.player4room.paused) {
-            this.player4room.plugins.music.setIndex(currentIndex);
-        } else {
-            // 确保不自动播放
-            this.player4room.pause();
-        }
+        // if (currentIndex >= 0 && currentIndex < this.player4room.plugins.music.list.length && !this.player4room.paused) {
+        //     this.player4room.plugins.music.setIndex(currentIndex);
+        // } else {
+        //     // 确保不自动播放
+        //     this.player4room.pause();
+        // }
     }
     loadPlaylist4local(_list:Array<Song.SongContent>){
         this.player4local?.plugins.music.list.splice(0); //清空
